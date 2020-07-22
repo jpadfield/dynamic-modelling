@@ -1,0 +1,89 @@
+body
+{
+  #background-color: #fcfcfc;
+  height: 100%;
+}
+
+
+.list
+{
+	left:80px;
+}
+
+g a 
+			{color:inherit;}
+
+.nav-button {
+    position: relative;
+    top: 8px;
+    left: 8px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.428571429;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.btn-default {
+    color: #333333;
+    background-color: #ffffff;
+    border-color: #cccccc;
+}
+
+.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+    color: #333333;
+    background-color: #ebebeb;
+    border-color: #adadad;
+}
+
+#page {
+  position:absolute;
+  height:100vh;	
+  width:100%;
+  overflow:hidden;
+}
+
+.moddiv {
+  position:relative;
+  height:calc(100vh - 306px);
+  min-height:200px;
+  width:100%;
+  overflow:scroll;
+  background-color:white;
+  left:0px;
+  top:50px;
+}
+
+.textdiv {
+  position:relative;
+  height:255px;
+  width:100%;
+  background-color: white;
+}
+
+#holder.fullscreen{
+    z-index: 9999; 
+    width: 100%; 
+    height: 100%; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+ }
+
+
