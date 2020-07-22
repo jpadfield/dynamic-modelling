@@ -106,31 +106,31 @@ function triples ()
   {
 ob_start();
 echo <<<END
-ng:0F6J-0001-0000-0000	crm:P2.has type	crm:E21.Person	aPID@@crm
-ng:0F6J-0001-0000-0000	crm:P2.has type	aat:300411314
+ng:0QCD-0001-0000-0000	crm:P2.has type	crm:E21.Person	aPID@@crm
+ng:0QCD-0001-0000-0000	crm:P2.has type	aat:300411314
 aat:300411314	rdfs:label	artist painters@en
-ng:0F6J-0001-0000-0000	crm:P2.has type	aat:300024987
+ng:0QCD-0001-0000-0000	crm:P2.has type	aat:300024987
 aat:300024987	rdfs:label	architechts@en
-ng:0F6J-0001-0000-0000	owl:sameAs	ulan:500023578
+ng:0QCD-0001-0000-0000	owl:sameAs	ulan:500023578
 ulan:500023578	rdfs:label	Raphael@en
-ng:0F6J-0001-0000-0000	owl:sameAs	wd:Q5597
+ng:0QCD-0001-0000-0000	owl:sameAs	wd:Q5597
 wd:Q5597	rdfs:label	Raphael@en
-ng:0F6J-0001-0000-0000	rdfs:seeAlso	https://cima.ng-london.org.uk/documentation
+ng:0QCD-0001-0000-0000	rdfs:seeAlso	https://cima.ng-london.org.uk/documentation
 https://cima.ng-london.org.uk/documentation	rdfs:label	Raphael Research Resource@en
-ng:0F6J-0001-0000-0000	rdfs:comment	Free Text@en
-ng:0F6J-0001-0000-0000	crm:P14.performed	ngo:002-0432-0000	aPID@@ePID
+ng:0QCD-0001-0000-0000	rdfs:comment	Free Text@en
+ng:0QCD-0001-0000-0000	crm:P14.performed	ngo:002-0432-0000	aPID@@ePID
 
 _Blank Node	crm:P2.has type	crm:E41.Appellation
-ng:0F6J-0001-0000-0000	crm:P131.is identified by	_Blank Node
+ng:0QCD-0001-0000-0000	crm:P131.is identified by	_Blank Node
 _Blank Node	rdfs:label	Raphael@en
 
 _Blank Node	crm:P2.has type	crm:E74.Group	aPID@@crm
-ng:0F6J-0001-0000-0000	crm:P15.was influenced by	_Blank Node
+ng:0QCD-0001-0000-0000	crm:P15.was influenced by	_Blank Node
 _Blank Node	owl:sameAs	aat:300107304
 aat:300107304	rdfs:label	Ancient Italian@en
 
 _Blank Node	crm:P2.has type	crm:E67 Birth	event@@crm
-ng:0F6J-0001-0000-0000	crm:P98.was born	_Blank Node
+ng:0QCD-0001-0000-0000	crm:P98.was born	_Blank Node
 
 _Blank Node	crm:P2.has type	crm:E53 Place
 _Blank Node-1	crm:P7.took place at	_Blank Node
@@ -148,7 +148,7 @@ _Blank Node	rdfs:label	1483@en
 _Blank Node	owl:sameAs	wd:Q6637
 
 _Blank Node	crm:P2.has type	crm:E69 Death	event@@crm
-ng:0F6J-0001-0000-0000	crm:P100.died in	_Blank Node
+ng:0QCD-0001-0000-0000	crm:P100.died in	_Blank Node
 
 _Blank Node	crm:P2.has type	crm:E53 Place
 _Blank Node-1	crm:P7.took place at	_Blank Node
@@ -165,7 +165,7 @@ _Blank Node	rdfs:label	1520@en
 _Blank Node	owl:sameAs	wd:Q6284
 
 _Blank Node	crm:P2.has type	crm:E31 Document
-ng:0F6J-0001-0000-0000	crm:P70.is documented in	_Blank Node
+ng:0QCD-0001-0000-0000	crm:P70.is documented in	_Blank Node
 _Blank Node	owl:sameAs	https://cima.ng-london.org.uk/documentation/files/2009/10/01/Raphael%20Catalogue%20Complete.pdf
 _Blank Node	rdfs:seeAlso	https://www.book-info.com/isbn/1-85709-999-0.htm
 _Blank Node	rdfs:label	Raphael: From Urbino to Rome@en
@@ -175,262 +175,6 @@ ob_end_clean(); // Don't send output to client
 
 return ($triples);
   }
-
-  
-function graphA ()
-  {
-ob_start();
-echo <<<END
-graph LR
-
-classDef crm stroke:#333333,fill:#DCDCDC,color:#333333,rx:5px,ry:5px;
-classDef thing stroke:#2C5D98,fill:#D0E5FF,color:#2C5D98,rx:5px,ry:5px;
-classDef event stroke:#6B9624,fill:#D0DDBB,color:#6B9624,rx:5px,ry:5px;
-classDef oPID stroke:#2C5D98,fill:#2C5D98,color:white,rx:5px,ry:5px;
-classDef ePID stroke:#6B9624,fill:#6B9624,color:white,rx:5px,ry:5px;
-classDef aPID stroke:black,fill:#FFFF99,rx:20px,ry:20px;
-classDef type stroke:red,fill:#B51511,color:white,rx:5px,ry:5px;
-classDef name stroke:orange,fill:#FEF3BA,rx:20px,ry20px;
-classDef literal stroke:black,fill:#FFB975,rx:2px,ry:2px,max-width:100px;
-classDef classstyle stroke:black,fill:white;
-classDef url stroke:#2C5D98,fill:white,color:#2C5D98,rx:5px,ry:5px;
-classDef note stroke:#2C5D98,fill:#D8FDFF,color:#2C5D98,rx:5px,ry:5px;
-
-O0("ng:0F6J-0001-0000-0000")
-class O0 aPID;
-click O0 "http://data.ng-london.org.uk/0F6J-0001-0000-0000" "Tooltip"
-
-O1("crm:E21.Person-0")
-class O1 crm;
-O0 -- crm:P2.has type -->O1["crm:E21.Person"]
-
-O2("aat:300411314")
-class O2 type;
-click O2 "http://vocab.getty.edu/aat/300411314" "Tooltip"
-O0 -- crm:P2.has type -->O2["aat:300411314"]
-
-O3("artist painters@en")
-class O3 literal;
-O2 -- rdfs:label -->O3["artist painters@en"]
-
-O4("aat:300024987")
-class O4 type;
-click O4 "http://vocab.getty.edu/aat/300024987" "Tooltip"
-O0 -- crm:P2.has type -->O4["aat:300024987"]
-
-O5("architechts@en")
-class O5 literal;
-O4 -- rdfs:label -->O5["architechts@en"]
-
-O6("ulan:500023578")
-class O6 type;
-click O6 "http://vocab.getty.edu/ulan/500023578" "Tooltip"
-O0 -- owl:sameAs -->O6["ulan:500023578"]
-
-O7("Raphael@en")
-class O7 literal;
-O6 -- rdfs:label -->O7["Raphael@en"]
-
-O8("wd:Q5597")
-class O8 type;
-click O8 "https://www.wikidata.org/wiki/Q5597" "Tooltip"
-O0 -- owl:sameAs -->O8["wd:Q5597"]
-O8 -- rdfs:label -->O7["Raphael@en"]
-
-O9("https://cima.ng-london.org.uk/documentation")
-class O9 url;
-click O9 "https://cima.ng-london.org.uk/documentation" "Tooltip"
-O0 -- rdfs:seeAlso -->O9["https://cima.ng-london.org.uk/documentation"]
-
-O10("Raphael Research Resource@en")
-class O10 literal;
-O9 -- rdfs:label -->O10["Raphael Research Resource@en"]
-
-O11("Free Text@en")
-class O11 literal;
-O0 -- rdfs:comment -->O11["Free Text@en"]
-
-O12("ngo:002-0432-0000")
-class O12 ePID;
-click O12 "http://data.ng-london.org.uk/resource/002-0432-0000" "Tooltip"
-O0 -- crm:P14.performed -->O12["ngo:002-0432-0000"]
-
-O13("_Blank Node-N17")
-class O13 oPID;
-
-O14("crm:E41.Appellation-1")
-class O14 crm;
-O13 -- crm:P2.has type -->O14["crm:E41.Appellation"]
-O0 -- crm:P131.is identified by -->O13["_Blank Node-N17"]
-O13 -- rdfs:label -->O7["Raphael@en"]
-
-O15("_Blank Node-N18")
-class O15 oPID;
-
-O16("crm:E74.Group-2")
-class O16 crm;
-O15 -- crm:P2.has type -->O16["crm:E74.Group"]
-O0 -- crm:P15.was influenced by -->O15["_Blank Node-N18"]
-
-O17("aat:300107304")
-class O17 type;
-click O17 "http://vocab.getty.edu/aat/300107304" "Tooltip"
-O15 -- owl:sameAs -->O17["aat:300107304"]
-
-O18("Ancient Italian@en")
-class O18 literal;
-O17 -- rdfs:label -->O18["Ancient Italian@en"]
-
-O19("_Blank Node-N19")
-class O19 oPID;
-
-O20("crm:E67 Birth-3")
-class O20 crm;
-O19 -- crm:P2.has type -->O20["crm:E67 Birth"]
-O0 -- crm:P98.was born -->O19["_Blank Node-N19"]
-
-O21("_Blank Node-N20")
-class O21 oPID;
-
-O22("crm:E53 Place-4")
-class O22 crm;
-O21 -- crm:P2.has type -->O22["crm:E53 Place"]
-O19 -- crm:P7.took place at -->O21["_Blank Node-N20"]
-
-O23("tgn:7003994")
-class O23 type;
-click O23 "http://vocab.getty.edu/tgn/7003994" "Tooltip"
-O21 -- owl:sameAs -->O23["tgn:7003994"]
-
-O24("wd:Q2759")
-class O24 type;
-click O24 "https://www.wikidata.org/wiki/Q2759" "Tooltip"
-O21 -- owl:sameAs -->O24["wd:Q2759"]
-
-O25("Urbino (inhabited place)@en")
-class O25 literal;
-O23 -- rdfs:label -->O25["Urbino (inhabited place)@en"]
-
-O26("_Blank Node-N21")
-class O26 oPID;
-
-O27("crm:E52.Time-span-5")
-class O27 crm;
-O26 -- crm:P2.has type -->O27["crm:E52.Time-span"]
-
-O28("aat:300379244")
-class O28 type;
-click O28 "http://vocab.getty.edu/aat/300379244" "Tooltip"
-O26 -- crm:P2.has type -->O28["aat:300379244"]
-
-O29("years@en")
-class O29 literal;
-O28 -- rdfs:label -->O29["years@en"]
-O19 -- crm:P4.has timespan -->O26["_Blank Node-N21"]
-
-O30("1483-01-01 #xsd:dateTime")
-class O30 literal;
-O26 -- crm:P82a.begin of the begin -->O30["1483-01-01 #xsd:dateTime"]
-
-O31("1483-12-31 #xsd:dateTime")
-class O31 literal;
-O26 -- crm:P82a.end of the end -->O31["1483-12-31 #xsd:dateTime"]
-
-O32("1483@en")
-class O32 literal;
-O26 -- rdfs:label -->O32["1483@en"]
-
-O33("wd:Q6637")
-class O33 type;
-click O33 "https://www.wikidata.org/wiki/Q6637" "Tooltip"
-O26 -- owl:sameAs -->O33["wd:Q6637"]
-
-O34("_Blank Node-N22")
-class O34 oPID;
-
-O35("crm:E69 Death-6")
-class O35 crm;
-O34 -- crm:P2.has type -->O35["crm:E69 Death"]
-O0 -- crm:P100.died in -->O34["_Blank Node-N22"]
-
-O36("_Blank Node-N23")
-class O36 oPID;
-
-O37("crm:E53 Place-7")
-class O37 crm;
-O36 -- crm:P2.has type -->O37["crm:E53 Place"]
-O34 -- crm:P7.took place at -->O36["_Blank Node-N23"]
-
-O38("tgn:7000874")
-class O38 type;
-click O38 "http://vocab.getty.edu/tgn/7000874" "Tooltip"
-O36 -- owl:sameAs -->O38["tgn:7000874"]
-
-O39("wd:Q220")
-class O39 type;
-click O39 "https://www.wikidata.org/wiki/Q220" "Tooltip"
-O36 -- owl:sameAs -->O39["wd:Q220"]
-
-O40("Rome (inhabited place)@en")
-class O40 literal;
-O38 -- rdfs:label -->O40["Rome (inhabited place)@en"]
-
-O41("_Blank Node-N24")
-class O41 oPID;
-
-O42("crm:E52.Time-span-8")
-class O42 crm;
-O41 -- crm:P2.has type -->O42["crm:E52.Time-span"]
-O41 -- crm:P2.has type -->O28["aat:300379244"]
-O34 -- crm:P4.has timespan -->O41["_Blank Node-N24"]
-
-O43("1520-01-01 #xsd:dateTime")
-class O43 literal;
-O41 -- crm:P82a.begin of the begin -->O43["1520-01-01 #xsd:dateTime"]
-
-O44("1520-12-31 #xsd:dateTime")
-class O44 literal;
-O41 -- crm:P82a.end of the end -->O44["1520-12-31 #xsd:dateTime"]
-
-O45("1520@en")
-class O45 literal;
-O41 -- rdfs:label -->O45["1520@en"]
-
-O46("wd:Q6284")
-class O46 type;
-click O46 "https://www.wikidata.org/wiki/Q6284" "Tooltip"
-O41 -- owl:sameAs -->O46["wd:Q6284"]
-
-O47("_Blank Node-N25")
-class O47 oPID;
-
-O48("crm:E31 Document-9")
-class O48 crm;
-O47 -- crm:P2.has type -->O48["crm:E31 Document"]
-O0 -- crm:P70.is documented in -->O47["_Blank Node-N25"]
-
-O49("https://cima.ng-london.org.uk/documentation/files/2009/10/01/Raphael%20Catalogue%20Complete.pdf")
-class O49 url;
-click O49 "https://cima.ng-london.org.uk/documentation/files/2009/10/01/Raphael%20Catalogue%20Complete.pdf" "Tooltip"
-O47 -- owl:sameAs -->O49["https://cima.ng-london.org.uk/documentation/files/2009/10/01<br/>/Raphael%20Catalogue%20Complete.pdf"]
-
-O50("https://www.book-info.com/isbn/1-85709-999-0.htm")
-class O50 url;
-click O50 "https://www.book-info.com/isbn/1-85709-999-0.htm" "Tooltip"
-O47 -- rdfs:seeAlso -->O50["https://www.book-info.com/isbn/1-85709-999-0.htm"]
-
-O51("Raphael: From Urbino to Rome@en")
-class O51 literal;
-O47 -- rdfs:label -->O51["Raphael: From Urbino to Rome@en"]
-;
-
-END;
-$code = ob_get_contents();
-ob_end_clean(); // Don't send output to client
-
-return ($code);
-  }
-
 
 function getRaw($data)
   {	
