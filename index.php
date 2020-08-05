@@ -1,6 +1,7 @@
 <?php
 
 $orientation = "LR";
+$live_edit_link = "./";
 
 if ($_POST)//isset($_POST["triplesTxt"]))
   {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
@@ -20,7 +21,9 @@ exit;
 ////////////////////////////////////////////////////////////////////////
 
 function buildPage ($triplesTxt, $mermaid)
-  {  
+  {
+  global  $live_edit_link;
+  
   ob_start();
   echo <<<END
 
@@ -43,6 +46,7 @@ function buildPage ($triplesTxt, $mermaid)
     <form id="triplesFrom" action="./" method="post">
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
+      <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>
       <textarea class="form-control rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
     </form>
   </div>
@@ -69,7 +73,6 @@ $(document).ready(function(){
     $("#clear").click(function(){
         $("#triplesTxt").text("")
     });
-
 });
 
 $(function () {
@@ -246,7 +249,7 @@ function getRaw($data)
 	else
 	  {$bnd = false;}
 
-	if (in_array ($trip[1], array("crm:P2.has type", "has type", "type", "rdf:type")))
+	if (in_array ($trip[1], array("crm:P2.has_type", "crm:P2.has type", "has type", "type", "rdf:type")))
 	  {$pt = true;}
 	else
 	  {$pt = false;}
@@ -292,7 +295,7 @@ function getRaw($data)
 
 function Mermaid_formatData ($selected)
   {
-  global $orientation;
+  global $orientation, $live_edit_link;
   
   ob_start();
   echo <<<END
@@ -317,7 +320,8 @@ END;
   ob_end_clean(); // Don't send output to client	
 
   $defs = "";
-  $defs .= "<div class=\"mermaid\">".$defTop;
+  //$defs .= "<div class=\"mermaid\">".$defTop;
+  $defs .= $defTop;
 
   $things = array();
   $no = 0;
@@ -377,7 +381,23 @@ END;
       "[\"".$use."\"]\n";		
     }
 
-  $defs .= ";</div>";
+  $defs .= ";";
+  
+  $code = array(
+    "code" => $defs,
+    "mermaid" => array(
+      "theme" => "default",
+      "flowchart" => array( 
+	  "curve" => "basis")
+      ));
+  $json = json_encode($code);
+  $code = base64_encode($json);
+  $live_edit_link = 'https://mermaid-js.github.io/mermaid-live-editor/#/edit/'.$code;
+  /*
+  echo "<a href='https://mermaid-js.github.io/mermaid-live-editor/#/edit/$code'>LINK</a>";//<br/><br/>$decode";
+  echo "<a href='https://mermaid-js.github.io/mermaid-live-editor/#/view/$code'>PNG</a>";
+  exit;*/
+  $defs = "<div class=\"mermaid\">".$defs."</div>";
 	
   return ($defs);
   }	
@@ -471,6 +491,7 @@ function checkTriples ($data)
 function laj2trips ($arr, $pSub=false, $pPred=false)
   {
   $out = "";
+  //prg(0, $arr);
   
   if (isset($arr["id"]))
     {$sub = $arr["id"];
@@ -496,6 +517,9 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
       $out .= "$sub\t$k\t$v\n";
       }
     }
+
+  //prg(0, $out);
+  //echo "#################################<br/>";
 
   return($out);
   }
