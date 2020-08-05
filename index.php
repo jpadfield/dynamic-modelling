@@ -1,16 +1,28 @@
 <?php
 
+$orientation = "LR";
+
 if ($_POST)//isset($_POST["triplesTxt"]))
-  {$triplesTxt = $_POST["triplesTxt"];}
+  {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
 else
   {$triplesTxt = triples ();}
+
+$config = getRemoteJsonDetails ("config.json", false, true);
   
 $triples = explode("\n", $triplesTxt);
 $raw = getRaw($triples);
 $mermaid = Mermaid_formatData ($raw["test"]);
 
-ob_start();
-echo <<<END
+$html = buildPage ($triplesTxt, $mermaid);
+echo $html;
+exit;
+
+////////////////////////////////////////////////////////////////////////
+
+function buildPage ($triplesTxt, $mermaid)
+  {  
+  ob_start();
+  echo <<<END
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -30,13 +42,14 @@ echo <<<END
   <div id="editor" class="textdiv">
     <form id="triplesFrom" action="./" method="post">
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
-      <textarea class="form-control rounded-0 detectTab" name="triplesTxt" rows="10">$triplesTxt</textarea>
+      <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
+      <textarea class="form-control rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
     </form>
   </div>
       
 <div id="holder" class="moddiv">
   <div id="split-container">
-      <button class="btn btn-default nav-button" id="fs" onclick="togglefullscreen('fs', 'holder')">Full screen</button>
+      <button class="btn btn-default nav-button" id="fs" style="padding: 5px; margin-right: 16px; float:right;" onclick="togglefullscreen('fs', 'holder')"><img src="graphics/view-fullscreen.png" width="20" /></button>
     <div id="graph-container" style="color:white;">
       <div id="graph">$mermaid</div>
     </div>
@@ -51,6 +64,13 @@ echo <<<END
   <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/mermaid@8.5.2/dist/mermaid.min.js"></script>
   <script>
+
+$(document).ready(function(){
+    $("#clear").click(function(){
+        $("#triplesTxt").text("")
+    });
+
+});
 
 $(function () {
 
@@ -80,15 +100,17 @@ mermaid.initialize({startOnLoad:true, flowchart: {
   }});
 
 function togglefullscreen (b, divID)
-  {  
-  if ($('#'+b).html() == "Full screen") {
-    $('#'+b).html("Restore screen");
-    }
+  {
+  var src = $('#'+b).children('img')[0].src;
+  var filename = src.substring(src.lastIndexOf('/')+1);
+
+  if (filename == "view-fullscreen.png") {
+    $('#'+b).html("<img src=\"graphics/view-restore.png\" width=\"20\" />"); }
   else {
-    $('#'+b).html("Full screen");
-    }
+    $('#'+b).html("<img src=\"graphics/view-fullscreen.png\" width=\"20\" />");  }
       
   $('#'+divID).toggleClass('fullscreen');
+  $(':focus').blur();
   }
   
 
@@ -100,7 +122,8 @@ END;
 $html = ob_get_contents();
 ob_end_clean(); // Don't send output to client
 
-echo $html;
+return($html);
+}
 
 function triples ()
   {
@@ -177,7 +200,9 @@ return ($triples);
   }
 
 function getRaw($data)
-  {	
+  {
+  global $orientation;
+
   $output = array();
 	
   $no = 0;
@@ -188,8 +213,6 @@ function getRaw($data)
   $bba = array();
   $bbano = 1;
  
-  //foreach ($data as $tag => $arr) 
-    //{
     $tag = "test";
     $output[$tag]["model"] = $tag;
     $output[$tag]["comment"] = ucfirst ($tag)." Model";
@@ -211,32 +234,46 @@ function getRaw($data)
 	
       if(preg_match("/^[\/][\/][ ]Model[:][\s]*([a-zA-Z0-9 ]+)[\s]*[\/][\/](.+)$/", $line, $m))
 	{$output[$tag]["comment"] = $m[2];}
-		
+
+      if(preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m))
+	{$orientation = $m[1];}
+
+      // Ignore comments and empty lines
       if (isset($trip[2]))
 	{
-	// Ignore comments and empty lines
+	if (in_array($trip[0], array("_Blank Node", "_BN", "_bn")))
+	  {$bnd = true;}
+	else
+	  {$bnd = false;}
 
-	//All Blank Nodes need to be numbered to be unique
-	if ($trip[0] == "_Blank Node" and $trip[1] == "crm:P2.has type" and !$bnew)
-	  {$bn++;
-	   $bnew=true;}
-		
+	if (in_array ($trip[1], array("crm:P2.has type", "has type", "type", "rdf:type")))
+	  {$pt = true;}
+	else
+	  {$pt = false;}
+
 	// Ensure subsequent Blank Nodes are seen as new. 
-	if ($trip[1] == "crm:P2.has type" AND $trip[0] != "_Blank Node")
-	  {$bnew=false;}
-								
-	if ($trip[0] == "_Blank Node")
-	  {$trip[0] = "_Blank Node-N".$bn;}
-	else if (preg_match("/^_Blank Node[-]([0-9]+)$/", $trip[0], $m))
-	  {$trip[0] = "_Blank Node-N".($bn-$m[1]);}
+	if ( $bnd and  $pt and !$bnew) {
+	    $bn++;
+	    $bnew=true;}
+	// Flag as not a new blank node after listing other predicates or typing something else 
+	else if ((!$bnd and $pt) or !$pt) {
+	    $bnew=false;}
+
+	// Number each blank node to make it unique							
+	if ($bnd)
+	  {$trip[0] = $trip[0]."-N".$bn;}
+	// Catching reference to a previous blank node
+	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[0], $m))
+	  {$trip[0] = "$m[1]-N".($bn-$m[2]);}
 				
-	// Current process is assuming that the subject and the object can not both be Blank Nodes
-	if ($trip[2] == "_Blank Node")
-	  {$trip[2] = "_Blank Node-N".$bn;
+	// Current process is assuming that the subject and the object can not both be a new Blank Nodes
+	if (in_array($trip[2], array("_Blank Node", "_BN", "_bn")))
+	  {$trip[2] = $trip[2]."-N".$bn;
 	   $bnew=false;}
-	else if (preg_match("/^_Blank Node[-]([0-9]+)$/", $trip[2], $m))
-	  {$trip[2] = "_Blank Node-N".($bn-$m[1]);}
-										
+	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[2], $m))
+	  {$trip[2] = $m[1]."-N".($bn-$m[2]);}
+
+	// Number the predicates so they are all unique									
 	$trip[1] = $trip[1]."-N".$tn;
 			
 	$output[$tag]["triples"][] = $trip;
@@ -248,7 +285,6 @@ function getRaw($data)
       if ($trip[0] == "// Stop") // For debugging
 	{break;}
       }
-    //}	
 
   return ($output);
   }
@@ -256,10 +292,12 @@ function getRaw($data)
 
 function Mermaid_formatData ($selected)
   {
+  global $orientation;
+  
   ob_start();
   echo <<<END
 
-graph LR
+graph $orientation
 
 classDef crm stroke:#333333,fill:#DCDCDC,color:#333333,rx:5px,ry:5px;
 classDef thing stroke:#2C5D98,fill:#D0E5FF,color:#2C5D98,rx:5px,ry:5px;
@@ -389,4 +427,98 @@ function Mermaid_defThing ($var, $no, $fc=false)
 	return ($str);
 	}
 
+function prg($exit=false, $alt=false, $noecho=false)
+	{
+	if ($alt === false) {$out = $GLOBALS;}
+	else {$out = $alt;}
+	
+	ob_start();
+	echo "<pre class=\"wrap\">";
+	if (is_object($out))
+		{var_dump($out);}
+	else
+		{print_r ($out);}
+	echo "</pre>";
+	$out = ob_get_contents();
+  ob_end_clean(); // Don't send output to client
+  
+	if (!$noecho) {echo $out;}
+		
+	if ($exit) {exit;}
+	else {return ($out);}
+	}
+
+function checkTriples ($data)
+  {  
+  $json = json_decode($data, true);
+
+  if($json)
+    {
+    if (isset($json["@context"]))
+      {$triplesTxt = "This Model\thas context\t".$json["@context"]."\n";
+       unset($json["@context"]);}
+    else
+      {$triplesTxt = false;}
+    
+    $triplesTxt .= laj2trips ($json);
+    }
+  else
+    {$triplesTxt = $data;}
+    
+  return ($triplesTxt);
+  }
+
+function laj2trips ($arr, $pSub=false, $pPred=false)
+  {
+  $out = "";
+  
+  if (isset($arr["id"]))
+    {$sub = $arr["id"];
+     unset($arr["id"]);}
+  else
+    {$sub = "_BN";}
+  
+  if ($pSub and $pPred)
+    {
+    $pSub = parseEntities($pSub);
+    $sub = parseEntities($sub);
+    $out .= "$pSub\t$pPred\t$sub\n";}
+    
+  foreach ($arr as $k => $v)
+    {
+    if (is_array($v))
+      {foreach ($v as $n => $a)
+	{$out .= laj2trips($a, $sub, $k);}}
+    else
+      {
+      $v = parseEntities($v);
+      $sub = parseEntities($sub);
+      $out .= "$sub\t$k\t$v\n";
+      }
+    }
+
+  return($out);
+  }
+
+
+function parseEntities($name)
+  {
+  if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/]([0-9]+)$/", $name, $m))
+    {$out = "aat:$m[1]";}
+  else if (preg_match("/^http[s]*[:][\/]+linked[.]art[\/]example[\/]([a-z]+[\/][0-9]+)$/", $name, $m))
+    {$out = "lae:$m[1]";}
+  else
+    {$out = $name;}
+
+  return($out);
+  }
+
+function getRemoteJsonDetails ($uri, $format=false, $decode=false)
+	{if ($format) {$uri = $uri.".".$format;}
+	 $fc = file_get_contents($uri);
+	 if ($decode)
+		{$output = json_decode($fc, true);}
+	 else
+		{$output = $fc;}
+	 return ($output);}  
 ?>

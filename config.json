@@ -1,0 +1,97 @@
+{
+  "format": {
+    "default": {
+      "stroke": "black", "fill": "white", "color": "black",
+      "rx": "5px", "ry": "5px"},
+    "crm": {
+      "stroke": "#333333", "fill": "#DCDCDC", "color": "#333333"},
+    "thing": {
+      "stroke": "#2C5D98", "fill": "#D0E5FF", "color": "#2C5D98"},
+    "event": {
+      "stroke": "#6B9624", "fill": "#D0DDBB", "color": "#6B9624"},      
+    "oPID": {
+      "stroke": "#2C5D98", "fill": "#2C5D98", "color": "white"},
+    "ePID": {
+      "stroke": "#6B9624", "fill": "#6B9624", "color": "white"},
+    "aPID": {
+      "stroke": "black", "fill": "#FFFF99",
+      "rx": "20px", "ry": "20px"},
+    "type": {
+      "stroke": "red", "fill": "#B51511", "color": "white"},
+    "name": {
+      "stroke": "orange", "fill": "#FEF3BA",
+      "rx": "20px", "ry": "20px"},
+    "literal": {
+      "stroke": "black", "fill": "#FFB975",
+      "rx": "2px", "ry": "2px", "max-width": "100px"},
+    "url": {
+      "stroke": "#2C5D98", "color": "#2C5D98"},
+    "note": {
+      "stroke": "#2C5D98", "fill": "#D8FDFF", "color": "#2C5D98"}
+  },
+  "prefix" : {
+    "ngo": {
+      "match": {
+	"short": "ngo[:]([0-9A-Z]{3}[-].+)",
+	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]resource[\/]([0-9A-Z]{3}[-].+)"},
+      "format": "oPID",
+      "url": "https://data.ng-london.org.uk/resource/"
+      }, 
+    "ng": {
+      "match": {
+	"short": "ng[:]([0-9A-Z]{4}[-].+)",
+	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z]{4}[-].+)"},
+      "format": "oPID",
+      "url": "https://data.ng-london.org.uk/"
+      }, 
+    "aat": {
+      "match": {
+	"short": "aat[:](.+)",
+	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/](.+)"},
+      "format": "type",
+      "url": "http://vocab.getty.edu/aat/"
+      },   
+    "ulan": {
+      "match": {
+	"short": "ulan[:](.+)",
+	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]ulan[\/](.+)"},
+      "format": "type",
+      "url": "http://vocab.getty.edu/ulan/"
+      },   
+    "tgn": {
+      "match": {
+	"short": "tgn[:](.+)",
+	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]tgn[\/](.+)"},
+      "format": "type",
+      "url": "http://vocab.getty.edu/tgn/"
+      },    
+    "wd": {
+      "match": {
+	"short": "wd[:](.+)",
+	"long": "http[s]*[:][\/]+www[.]wikidata[.]org[\/]wiki[\/](.+)"},
+      "format": "type",
+      "url": "https://www.wikidata.org/wiki/"
+      },
+    "note": {
+      "match": {
+	"short": "[\"].+[\"]"},
+      "format": "note"
+      },
+    "crm": {
+      "match": {
+	"short": "crm[:](E.+)"},
+      "format": "crm"
+      },
+    "ngi": {
+      "match": {
+	"short": "ngi[:](.+)"},
+      "format": "oPID"
+      },
+    "bn": {
+      "match": {
+	"short": "_bn[\\s-]*(.*)",
+	"long": "_Blank Node[\\s-]*(.*)"},
+      "format": "thing"
+      }      
+    }  
+}
