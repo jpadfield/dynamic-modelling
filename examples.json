@@ -1,0 +1,17 @@
+{
+  "artist": {
+    "title": "Artist CIDOC CRM",
+    "format": "triples",
+    "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/artist/artist-triples.csv"
+  },
+  "object": {
+    "title": "Object CIDOC CRM",
+    "format": "triples",
+    "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/object/object-triples.csv"
+  },
+  "imaging": {
+    "title": "Simple Image Examination CIDOC CRM",
+    "format": "triples",
+    "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/imageexam/imageexam-triples.csv"
+  }
+}

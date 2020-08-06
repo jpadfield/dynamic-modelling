@@ -2,14 +2,25 @@
 
 $orientation = "LR";
 $live_edit_link = "./";
-
-if ($_POST)//isset($_POST["triplesTxt"]))
-  {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
-else
-  {$triplesTxt = triples ();}
-
 $config = getRemoteJsonDetails ("config.json", false, true);
-  
+$examples = getRemoteJsonDetails ("examples.json", false, true);
+
+if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
+  {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
+else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
+  {$ex = $examples[$_GET["example"]];
+   $triplesTxt = file_get_contents($ex["uri"]);}
+else if (isset($_GET["data"]))
+  {$triplesTxt = gzuncompress(base64_decode($_GET["data"])); }
+else if (isset($examples["artist"]))
+  {$ex = $examples["artist"];
+   $triplesTxt = file_get_contents($ex["uri"]);}
+else
+  {$triplesTxt = "";}
+
+$data = urlencode(base64_encode(gzcompress($triplesTxt)));
+$bookmark = './?data='.$data;
+
 $triples = explode("\n", $triplesTxt);
 $raw = getRaw($triples);
 $mermaid = Mermaid_formatData ($raw["test"]);
@@ -20,9 +31,35 @@ exit;
 
 ////////////////////////////////////////////////////////////////////////
 
+function buildExamplesDD ()
+  {
+  global $examples;
+
+  ob_start();
+  echo <<<END
+  <div class="dropdown show" style="display: inline-block;margin-left: 8px;">
+  <a class="btn btn-default dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Examples
+  </a>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+END;
+  $html = ob_get_contents();
+  ob_end_clean(); // Don't send output to client
+
+  foreach ($examples as $k => $a)
+    {$html .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";}
+
+  $html .= "</div></div>";
+
+  return ($html);
+  }
+
+  
 function buildPage ($triplesTxt, $mermaid)
   {
-  global  $live_edit_link;
+  global  $live_edit_link, $bookmark;
+
+  $exms = buildExamplesDD ();
   
   ob_start();
   echo <<<END
@@ -46,7 +83,9 @@ function buildPage ($triplesTxt, $mermaid)
     <form id="triplesFrom" action="./" method="post">
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
-      <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>
+      $exms
+      <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>      
+      <a title="Bookmark of last updated graph" href="$bookmark" target="_blank" class="btn btn-default nav-button" style="margin-right: 8px; float:right; margin-bottom: 16px;" id="getIm" type="button">Bookmark</a>
       <textarea class="form-control rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
     </form>
   </div>
@@ -75,80 +114,6 @@ ob_end_clean(); // Don't send output to client
 
 return($html);
 }
-
-function triples ()
-  {
-ob_start();
-echo <<<END
-ng:0QCD-0001-0000-0000	crm:P2.has type	crm:E21.Person	aPID@@crm
-ng:0QCD-0001-0000-0000	crm:P2.has type	aat:300411314
-aat:300411314	rdfs:label	artist painters@en
-ng:0QCD-0001-0000-0000	crm:P2.has type	aat:300024987
-aat:300024987	rdfs:label	architechts@en
-ng:0QCD-0001-0000-0000	owl:sameAs	ulan:500023578
-ulan:500023578	rdfs:label	Raphael@en
-ng:0QCD-0001-0000-0000	owl:sameAs	wd:Q5597
-wd:Q5597	rdfs:label	Raphael@en
-ng:0QCD-0001-0000-0000	rdfs:seeAlso	https://cima.ng-london.org.uk/documentation
-https://cima.ng-london.org.uk/documentation	rdfs:label	Raphael Research Resource@en
-ng:0QCD-0001-0000-0000	rdfs:comment	Free Text@en
-ng:0QCD-0001-0000-0000	crm:P14.performed	ngo:002-0432-0000	aPID@@ePID
-
-_Blank Node	crm:P2.has type	crm:E41.Appellation
-ng:0QCD-0001-0000-0000	crm:P131.is identified by	_Blank Node
-_Blank Node	rdfs:label	Raphael@en
-
-_Blank Node	crm:P2.has type	crm:E74.Group	aPID@@crm
-ng:0QCD-0001-0000-0000	crm:P15.was influenced by	_Blank Node
-_Blank Node	owl:sameAs	aat:300107304
-aat:300107304	rdfs:label	Ancient Italian@en
-
-_Blank Node	crm:P2.has type	crm:E67 Birth	event@@crm
-ng:0QCD-0001-0000-0000	crm:P98.was born	_Blank Node
-
-_Blank Node	crm:P2.has type	crm:E53 Place
-_Blank Node-1	crm:P7.took place at	_Blank Node
-_Blank Node	owl:sameAs	tgn:7003994
-_Blank Node	owl:sameAs	wd:Q2759
-tgn:7003994	rdfs:label	Urbino (inhabited place)@en
-
-_Blank Node	crm:P2.has type	crm:E52.Time-span
-_Blank Node	crm:P2.has type	aat:300379244
-aat:300379244	rdfs:label	years@en
-_Blank Node-2	crm:P4.has timespan	_Blank Node
-_Blank Node	crm:P82a.begin of the begin	1483-01-01 #xsd:dateTime
-_Blank Node	crm:P82a.end of the end	1483-12-31 #xsd:dateTime
-_Blank Node	rdfs:label	1483@en
-_Blank Node	owl:sameAs	wd:Q6637
-
-_Blank Node	crm:P2.has type	crm:E69 Death	event@@crm
-ng:0QCD-0001-0000-0000	crm:P100.died in	_Blank Node
-
-_Blank Node	crm:P2.has type	crm:E53 Place
-_Blank Node-1	crm:P7.took place at	_Blank Node
-_Blank Node	owl:sameAs	tgn:7000874
-_Blank Node	owl:sameAs	wd:Q220
-tgn:7000874	rdfs:label	Rome (inhabited place)@en
-
-_Blank Node	crm:P2.has type	crm:E52.Time-span
-_Blank Node	crm:P2.has type	aat:300379244
-_Blank Node-2	crm:P4.has timespan	_Blank Node
-_Blank Node	crm:P82a.begin of the begin	1520-01-01 #xsd:dateTime
-_Blank Node	crm:P82a.end of the end	1520-12-31 #xsd:dateTime
-_Blank Node	rdfs:label	1520@en
-_Blank Node	owl:sameAs	wd:Q6284
-
-_Blank Node	crm:P2.has type	crm:E31 Document
-ng:0QCD-0001-0000-0000	crm:P70.is documented in	_Blank Node
-_Blank Node	owl:sameAs	https://cima.ng-london.org.uk/documentation/files/2009/10/01/Raphael%20Catalogue%20Complete.pdf
-_Blank Node	rdfs:seeAlso	https://www.book-info.com/isbn/1-85709-999-0.htm
-_Blank Node	rdfs:label	Raphael: From Urbino to Rome@en
-END;
-$triples = ob_get_contents();
-ob_end_clean(); // Don't send output to client
-
-return ($triples);
-  }
 
 function getRaw($data)
   {
@@ -185,11 +150,13 @@ function getRaw($data)
 	
       if(preg_match("/^[\/][\/][ ]Model[:][\s]*([a-zA-Z0-9 ]+)[\s]*[\/][\/](.+)$/", $line, $m))
 	{$output[$tag]["comment"] = $m[2];}
-
-      if(preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m))
+      else if(preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m))
 	{$orientation = $m[1];}
+      // ignore lines that are commented out
+      else if(preg_match("/^[\/#][\/#].*$/", $line, $m)) 
+	{$trip = array($line);}
 
-      // Ignore comments and empty lines
+      // Ignore notes, empty lines or commented lines
       if (isset($trip[2]))
 	{
 	if (in_array($trip[0], array("_Blank Node", "_BN", "_bn")))
@@ -240,29 +207,36 @@ function getRaw($data)
   return ($output);
   }
 
+function formatClassDef ($formats)
+  {
+  $classDef = false;
 
+  if (isset($formats["default"]))
+    {$default = $formats["default"];
+     unset($formats["default"]);}
+  else
+    {$defailts = array();}
+    
+  foreach ($formats as $nm => $styles)
+    {$cda = array();
+     $styles = array_merge($default, $styles);
+     foreach ($styles as $field => $value)
+      {$cda[] = $field.":".$value;}
+     $classDef .= "classDef ".trim($nm)." ".implode(",", $cda).";\n";}
+     
+  return ($classDef);
+  }
+  
 function Mermaid_formatData ($selected)
   {
-  global $orientation, $live_edit_link;
+  global $orientation, $live_edit_link, $config;
+
+  $classDef = formatClassDef ($config["format"]);
   
   ob_start();
   echo <<<END
-
 graph $orientation
-
-classDef crm stroke:#333333,fill:#DCDCDC,color:#333333,rx:5px,ry:5px;
-classDef thing stroke:#2C5D98,fill:#D0E5FF,color:#2C5D98,rx:5px,ry:5px;
-classDef event stroke:#6B9624,fill:#D0DDBB,color:#6B9624,rx:5px,ry:5px;
-classDef oPID stroke:#2C5D98,fill:#2C5D98,color:white,rx:5px,ry:5px;
-classDef ePID stroke:#6B9624,fill:#6B9624,color:white,rx:5px,ry:5px;
-classDef aPID stroke:black,fill:#FFFF99,rx:20px,ry:20px;
-classDef type stroke:red,fill:#B51511,color:white,rx:5px,ry:5px;
-classDef name stroke:orange,fill:#FEF3BA,rx:20px,ry20px;
-classDef literal stroke:black,fill:#FFB975,rx:2px,ry:2px,max-width:100px;
-classDef classstyle stroke:black,fill:white;
-classDef url stroke:#2C5D98,fill:white,color:#2C5D98,rx:5px,ry:5px;
-classDef note stroke:#2C5D98,fill:#D8FDFF,color:#2C5D98,rx:5px,ry:5px;
-
+$classDef
 END;
   $defTop = ob_get_contents();
   ob_end_clean(); // Don't send output to client	
@@ -341,56 +315,35 @@ END;
   $json = json_encode($code);
   $code = base64_encode($json);
   $live_edit_link = 'https://mermaid-js.github.io/mermaid-live-editor/#/edit/'.$code;
-  /*
-  echo "<a href='https://mermaid-js.github.io/mermaid-live-editor/#/edit/$code'>LINK</a>";//<br/><br/>$decode";
-  echo "<a href='https://mermaid-js.github.io/mermaid-live-editor/#/view/$code'>PNG</a>";
-  exit;*/
   $defs = "<div class=\"mermaid\">".$defs."</div>";
 	
   return ($defs);
   }	
 
 function Mermaid_defThing ($var, $no, $fc=false)
-	{	
-	$diagCmatches = array(
-		"aat[:].+" => "type",
-		"wd[:].+" => "type",
-		"ulan[:].+" => "type",
-		"tgn[:].+" => "type",
-		"ng[:].+" => "oPID",
-		"ngo[:].+" => "oPID",
-		"ngi[:].+" => "oPID",
-		"_Blank.+" => "thing",
-		"http.+" => "url",
-		"crm[:]E.+" => "crm",
-		"[\"].+[\"]" => "note"
-		);
-		 
-	if ($fc) {$cls = $fc;}
-	else {
-		$cls = "literal";
-		foreach ($diagCmatches as $k => $cur)
-			{
-			if(preg_match("/^".$k."$/", $var, $m))
-				{$cls = $cur;
-				 break;}}}	 
+	{
+	global $config;
+
+	$prefix = $config["prefix"];
+	$click = false;
 	$code  = "O".$no;
-	$str = "\n$code(\"$var\")\nclass $code $cls;\n";
-		 
-	if(preg_match("/^http.+$/", $var, $m))
-		{$str .= "click ".$code." \"$var\" \"Tooltip\"\n";}		
-	else if(preg_match("/^ngo[:]([0-9A-Z]{3}[-].+)$/", $var, $m))
-		{$str .= "click ".$code." \"http://data.ng-london.org.uk/resource/$m[1]\" \"Tooltip\"\n";}
-	else if(preg_match("/^ng[:]([0-9A-Z]{4}[-].+)$/", $var, $m))
-		{$str .= "click ".$code." \"http://data.ng-london.org.uk/$m[1]\" \"Tooltip\"\n";}
-	else if(preg_match("/^aat[:](.+)$/", $var, $m))
-		{$str .= "click ".$code." \"http://vocab.getty.edu/aat/$m[1]\" \"Tooltip\"\n";}
-	else if(preg_match("/^tgn[:](.+)$/", $var, $m))
-		{$str .= "click ".$code." \"http://vocab.getty.edu/tgn/$m[1]\" \"Tooltip\"\n";}
-	else if(preg_match("/^ulan[:](.+)$/", $var, $m))
-		{$str .= "click ".$code." \"http://vocab.getty.edu/ulan/$m[1]\" \"Tooltip\"\n";}
-	else if(preg_match("/^wd[:](.+)$/", $var, $m))
-		{$str .= "click ".$code." \"https://www.wikidata.org/wiki/$m[1]\" \"Tooltip\"\n";}
+	$cls = "literal";
+
+	foreach($prefix as $nm => $a)
+	  {
+	  if(preg_match("/^".$a["match"]["short"]."$/", $var, $m))
+	    {
+	    $cls = $a["format"] ;
+	    if (isset($a["url"]))
+	      {$click = "click ".$code." \"".$a["url"]."$m[1]\"\n";}
+	    else if(preg_match("/^http.+$/", $var, $m))
+	      {$click = "click ".$code." \"".$var."\"\n";}
+	    break;
+	    }	  
+	  }
+	if ($fc) {$cls = $fc;}
+				 
+	$str = "\n$code(\"$var\")\nclass $code $cls;\n".$click;	    
 	
 	return ($str);
 	}
@@ -468,7 +421,6 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
   return($out);
   }
 
-
 function parseEntities($name)
   {
   if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/]([0-9]+)$/", $name, $m))
@@ -488,5 +440,6 @@ function getRemoteJsonDetails ($uri, $format=false, $decode=false)
 		{$output = json_decode($fc, true);}
 	 else
 		{$output = $fc;}
-	 return ($output);}  
+	 return ($output);}
+
 ?>

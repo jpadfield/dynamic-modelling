@@ -89,9 +89,19 @@
       },
     "bn": {
       "match": {
-	"short": "_bn[\\s-]*(.*)",
+	"short": "_[bB][nN][\\s-]*(.*)",
 	"long": "_Blank Node[\\s-]*(.*)"},
       "format": "thing"
+      }  ,
+    "bn2": {
+      "match": {
+	"short": "_Blank Node[\\s-]*(.*)"},
+      "format": "thing"
+      }  ,
+    "url": {
+      "match": {
+	"short": "http.+"},
+      "format": "url"
       }      
     }  
 }
