@@ -58,67 +58,15 @@ function buildPage ($triplesTxt, $mermaid)
       <div id="graph">$mermaid</div>
     </div>
   </div> <!-- CLOSE split-container -->
-</div> <!-- CLOSE holder -->
- 
-      
+</div> <!-- CLOSE holder -->      
 
-</div>
-        
+</div>        
   <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
   <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/mermaid@8.5.2/dist/mermaid.min.js"></script>
-  <script>
-
-$(document).ready(function(){
-    $("#clear").click(function(){
-        $("#triplesTxt").text("")
-    });
-});
-
-$(function () {
-
-  $(document).on('keydown', 'textarea.detectTab', function(e) { 
-    var keyCode = e.keyCode || e.which; 
-
-    if (keyCode == 9) { 
-      e.preventDefault(); 
-    // call custom function here
-    var start = this.selectionStart;
-    var end = this.selectionEnd;
-
-    // set textarea value to: text before caret + tab + text after caret
-    $(this).val($(this).val().substring(0, start)
-                + "\t"
-                + $(this).val().substring(end));
-
-    // put caret at right position again
-    this.selectionStart =
-    this.selectionEnd = start + 1;    
-    } 
-  });
-});
-
-mermaid.initialize({startOnLoad:true, flowchart: { 
-    curve: 'basis'
-  }});
-
-function togglefullscreen (b, divID)
-  {
-  var src = $('#'+b).children('img')[0].src;
-  var filename = src.substring(src.lastIndexOf('/')+1);
-
-  if (filename == "view-fullscreen.png") {
-    $('#'+b).html("<img src=\"graphics/view-restore.png\" width=\"20\" />"); }
-  else {
-    $('#'+b).html("<img src=\"graphics/view-fullscreen.png\" width=\"20\" />");  }
-      
-  $('#'+divID).toggleClass('fullscreen');
-  $(':focus').blur();
-  }
-  
-
-  </script>  
-    </body>
+   <script src="local.js"></script>
+  <script></script>  
+  </body>
 </html>
 
 END;
@@ -491,7 +439,6 @@ function checkTriples ($data)
 function laj2trips ($arr, $pSub=false, $pPred=false)
   {
   $out = "";
-  //prg(0, $arr);
   
   if (isset($arr["id"]))
     {$sub = $arr["id"];
@@ -517,9 +464,6 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
       $out .= "$sub\t$k\t$v\n";
       }
     }
-
-  //prg(0, $out);
-  //echo "#################################<br/>";
 
   return($out);
   }
