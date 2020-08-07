@@ -11,6 +11,8 @@ if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
 else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
   {$ex = $examples[$_GET["example"]];
    $triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
+else if (isset($_GET["url"]))
+  {$triplesTxt = checkTriples (file_get_contents($_GET["url"]));}
 else if (isset($_GET["data"]))
   {$triplesTxt = gzuncompress(base64_decode($_GET["data"])); }
 else
@@ -332,6 +334,10 @@ END;
   
   foreach ($selected["triples"] as $k => $t) 
     {
+    foreach ($t as $tk => $tv)
+      {if (preg_match("/^[\@](.+$)/", $tv, $m))
+	{$t[$tk] = $m[1];} }
+    
     // Ensure that all refs to crm classes are unique so the diagram
     // does not Overlap too much
     if(preg_match("/^(crm:E.+)$/", $t[2], $m))
@@ -343,9 +349,14 @@ END;
 
     $objs[$t[0]] = 1;
     }
-		
+	
   foreach ($selected["triples"] as $k => $t) 
-    {
+    {    
+    // @ at the start of terms breaks the mermaid builder
+    foreach ($t as $tk => $tv)
+      {if (preg_match("/^[\@](.+$)/", $tv, $m))
+	{$t[$tk] = $m[1];} }
+	
     // Format the displayed text, either wrapping or removing numbers
     // used to indicate separate instances of the same text/name
     if (count_chars($t[2]) > 60)
@@ -378,7 +389,7 @@ END;
 	{$fcs[1] = "oPID";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
        $no++;}		
-					 					
+      
     $defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
       "[\"".$use."\"]\n";		
     }
@@ -484,6 +495,7 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
     {
     $pSub = parseEntities($pSub);
     $sub = parseEntities($sub);
+    $pPred = parseEntities($pPred);
     $out .= "$pSub\t$pPred\t$sub\n";}
     
   foreach ($arr as $k => $v)
@@ -500,6 +512,7 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
       {
       $v = parseEntities($v);
       $sub = parseEntities($sub);
+      $k = parseEntities($k);
       $out .= "$sub\t$k\t$v\n";
       }
     }
