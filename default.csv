@@ -1,0 +1,18 @@
+//Graph TB - this is an optional special comment that requests a Top Bottom flow diagram, the default is Left Right
+Dynamic Modeller	was created by	Joseph Padfield	oPID@@aPID
+Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
+Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
+Dynamic Modeller	works with	Triples
+// Comments can be added simply by starting a line with // or ##
+Triples	are	Tab separated
+Triples	have some	"Basic automatic formatting, but it is possible to force some further options using an additional instructions after the third value in a given triple."
+Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
+// Blank node can be added as shown
+Dynamic Modeller	carries out	_BN	oPID@@ePID
+_BN has type	Production
+_BN	produces	Flow-diagrams
+Flow-diagrams	can be saved by	"Copying the triples and saving them as a text file."
+Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark button, after an update."
+Flow-diagrams	can be saved by	Saving an image	@@ePID
+Saving an image	has comment	"Following the link under the Get Image button an using the options provided."
+Saving an image	is achieved using the	https://mermaid-js.github.io/mermaid-live-editor

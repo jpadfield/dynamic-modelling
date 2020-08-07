@@ -2,6 +2,7 @@
 
 $orientation = "LR";
 $live_edit_link = "./";
+$default = file_get_contents("default.csv");
 $config = getRemoteJsonDetails ("config.json", false, true);
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 
@@ -9,14 +10,11 @@ if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
   {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
 else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
   {$ex = $examples[$_GET["example"]];
-   $triplesTxt = file_get_contents($ex["uri"]);}
+   $triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
 else if (isset($_GET["data"]))
   {$triplesTxt = gzuncompress(base64_decode($_GET["data"])); }
-else if (isset($examples["artist"]))
-  {$ex = $examples["artist"];
-   $triplesTxt = file_get_contents($ex["uri"]);}
 else
-  {$triplesTxt = "";}
+  {$triplesTxt = checkTriples ($default);}
 
 $data = urlencode(base64_encode(gzcompress($triplesTxt)));
 $bookmark = './?data='.$data;
@@ -54,6 +52,55 @@ END;
   return ($html);
   }
 
+
+function debugJsonConversaion ($json, $php, $triples)
+  {
+  global $examples;
+  $php = print_r($php, true);
+  
+  ob_start();
+  echo <<<END
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container-fluid" style="padding:0px;">
+  
+  <div class="container-fluid" style="padding:0px;">
+ 
+    <div class="row" style="padding:0px;margin:0px;">
+      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
+	<pre style="height:100%;overflow:scroll;">$json</pre></div>
+      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:#efefef;">
+	<pre style="height:100%;overflow:scroll;">$php</pre></div>
+      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
+	<pre style="height:100%;overflow:scroll;">$triples</pre></div>
+    </div>
+    <br>
+    
+  </div>
+</div>
+
+</body>
+</html>
+
+END;
+  $html = ob_get_contents();
+  ob_end_clean(); // Don't send output to client
+
+  echo $html;
+  exit;
+  }
+
   
 function buildPage ($triplesTxt, $mermaid)
   {
@@ -86,7 +133,10 @@ function buildPage ($triplesTxt, $mermaid)
       $exms
       <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>      
       <a title="Bookmark of last updated graph" href="$bookmark" target="_blank" class="btn btn-default nav-button" style="margin-right: 8px; float:right; margin-bottom: 16px;" id="getIm" type="button">Bookmark</a>
-      <textarea class="form-control rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
+      <div id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
+      <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
+      <button class="btn btn-default textbtn" id="tfs" type="button"  onclick="togglefullscreen('tfs', 'textholder')"><img src="graphics/view-fullscreen.png" width="20" /></button>
+      </div>
     </form>
   </div>
       
@@ -374,7 +424,7 @@ function checkTriples ($data)
   $json = json_decode($data, true);
 
   if($json)
-    {
+    {    
     if (isset($json["@context"]))
       {$triplesTxt = "This Model\thas context\t".$json["@context"]."\n";
        unset($json["@context"]);}
@@ -382,6 +432,7 @@ function checkTriples ($data)
       {$triplesTxt = false;}
     
     $triplesTxt .= laj2trips ($json);
+    //debugJsonConversaion ($data, $json, $triplesTxt);
     }
   else
     {$triplesTxt = $data;}
@@ -408,8 +459,13 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
   foreach ($arr as $k => $v)
     {
     if (is_array($v))
-      {foreach ($v as $n => $a)
-	{$out .= laj2trips($a, $sub, $k);}}
+      {
+      if(isset($v["id"]))
+	{$out .= laj2trips($v, $sub, $k);}
+      else
+	{foreach ($v as $n => $a)
+	  {$out .= laj2trips($a, $sub, $k);}}
+      }
     else
       {
       $v = parseEntities($v);

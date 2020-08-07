@@ -13,5 +13,10 @@
     "title": "Simple Image Examination CIDOC CRM",
     "format": "triples",
     "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/imageexam/imageexam-triples.csv"
+  },
+  "object2":{
+    "title": "Object Linked Art Showcase 1 Getty example",
+    "format": "json",
+    "uri": "https://raw.githubusercontent.com/linked-art/showcase1/master/data/getty/Object/02bac13e-7e54-45ab-ba3a-426b7e48a0d1.json"
   }
 }
