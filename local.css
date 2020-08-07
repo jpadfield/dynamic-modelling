@@ -40,6 +40,14 @@ g a
     user-select: none;
 }
 
+.imbutton {
+  opacity:0.75;
+}
+
+.imbutton:hover {
+  opacity:1;
+}
+
 .btn-default {
     color: #333333;
     background-color: #ffffff;

@@ -128,11 +128,20 @@ function buildPage ($triplesTxt, $mermaid)
 <div id="page">
   <div id="editor" class="textdiv">
     <form id="triplesFrom" action="./" method="post">
+      <a title="The National Gallery" href="https://www.nationalgallery.org.uk/" target="_blank"  class="imbutton" style="margin-left: 8px; margin-top: 8px;" >
+	<img src="graphics/ng-logo-black-100x40.png" width="32" /></a>
+
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
       $exms
+
+      <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling" target="_blank"  class="imbutton" style="margin-right: 8px; float:right; margin-top: 8px;" >
+	<img src="graphics/GitHub-Mark-64px.png" width="32" /></a>
+	
       <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>      
       <a title="Bookmark of last updated graph" href="$bookmark" target="_blank" class="btn btn-default nav-button" style="margin-right: 8px; float:right; margin-bottom: 16px;" id="getIm" type="button">Bookmark</a>
+      <button type="button" class="btn btn-default" style="margin-top: 8px; float:right; " data-toggle="modal" data-target="#helpModalCenter">Help</button>
+      
       <div id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
       <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
       <button class="btn btn-default textbtn" id="tfs" type="button"  onclick="togglefullscreen('tfs', 'textholder')"><img src="graphics/view-fullscreen.png" width="20" /></button>
@@ -149,7 +158,28 @@ function buildPage ($triplesTxt, $mermaid)
   </div> <!-- CLOSE split-container -->
 </div> <!-- CLOSE holder -->      
 
-</div>        
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLongTitle">Instructions</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+      
   <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
   <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/mermaid@8.5.2/dist/mermaid.min.js"></script>
