@@ -129,7 +129,7 @@ function buildPage ($triplesTxt, $mermaid)
   <div id="editor" class="textdiv">
     <form id="triplesFrom" action="./" method="post">
       <a title="The National Gallery" href="https://www.nationalgallery.org.uk/" target="_blank"  class="imbutton" style="margin-left: 8px; margin-top: 8px;" >
-	<img src="graphics/ng-logo-black-100x40.png" width="32" /></a>
+	<img src="graphics/ng-logo-black-100x40.png" height="32" /></a>
 
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
       <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
