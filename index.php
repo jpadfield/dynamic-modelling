@@ -4,6 +4,11 @@ $orientation = "LR";
 $live_edit_link = "./";
 $default = file_get_contents("default.csv");
 $config = getRemoteJsonDetails ("config.json", false, true);
+
+// Example of formats: http://localhost/mod2/?data=eJxdUDtuBDEIrW3Jd8gZfAKKNOn2CqyHSZz4M7LZSHv7gGeioDSI9xE8SKO6ktsXbS%2FcHX%2Fk9u7SqACrDZ6%2BqbFx9Nvbq1skgPbiuOXNGHAZpADg0vl5kNEbVnLKAWgbfMlMA4uxPIYipk1oAEHBt852yOTHvjslAYK%2F47TiglpU6%2FdPSvYATNyHO2mJqOjMGP%2BFjJoynilj8Fuu0zhy27sMcUoDXEgG5UrzwGacR8EkF18CwMLXY%2B3O6w%2Fx%2FK4s%2FiWCTwXnnPws9kxD%2FrUAPy3jnwE%3D
+
+//http://localhost/mod2/?data=eJyNkTFyxCAMRWuY4Q45g0%2FwizTp9gosxgkJBo9hM9nbRxK2YVLFhefr64Ek5PZVxZC%2B%2FPxSs6ofIb0rt6%2BASKOb0wn%2F7VNtHCCB0c3rTL69vTYQYG00MbcwD4gVhH6AFUKMoZHn5gWiRkhSH2z0fLKrFwhgyRViqH63cYAee1Q%2F%2FAEkjeZ4uCJXzwjdQMpoiXu61MeyCAQY3aKevdviGwKw5gby%2FdO78R2sq3lXzaY5OaJBxfw7KZv%2FH3UOaxmIkJZMVRTbwBEZfdpDrbD6stl0nqCKh0NVz1zHt2idvw4BEssyebfTQB5vP7WtT8BpXGsZaRdtKaU%2Bo78OAt38BZuA4HA%3D
+
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 
 if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
@@ -184,8 +189,11 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Summary" => ' 
-                                <h6 class="px-3">Most Used Apps</h6>
+    "Summary" => ' ',
+    "Blank Nodes" => ' ',
+    "Formatting" => ' ',
+    "Aliases" => '',
+    "Dump" => ' <h6 class="px-3">Most Used Apps</h6>
                                 <ol class="pb-4">
                                     <li>Watsapp</li>
                                     <li>Instagram</li>
@@ -197,8 +205,8 @@ function buildModal ()
                                 <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-android"></span> Suggested Apps</h6>
                                 <h6 class="text-primary pb-2"><a href="#">Opera Browser</a> <span class="text-secondary">- One of the best browsers</span></h6>
                                 <h6 class="text-primary pb-2"><a href="#">Camscanner</a> <span class="text-secondary">- Easily scan your documents</span></h6>
-                                <h6 class="text-primary pb-4"><a href="#">Coursera</a> <span class="text-secondary">- Learn online, lecturers from top universities</span></h6>',
-    "Blank Nodes" => '
+                                <h6 class="text-primary pb-4"><a href="#">Coursera</a> <span class="text-secondary">- Learn online, lecturers from top universities</span></h6>
+		<div class="line"></div>		 
                                 <form>
                                     <div class="form-group pb-5 px-3"> <select name="account" class="form-control">
                                             <option selected disabled>Select Product</option>
@@ -213,8 +221,8 @@ function buildModal ()
                                 <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-star"></span> Popular Topics</h6>
                                 <h6 class="text-primary pb-2"><a href="#">Getting started with Blazemeter</a></h6>
                                 <h6 class="text-primary pb-2"><a href="#">Creating tests</a></h6>
-                                <h6 class="text-primary pb-4"><a href="#">Running tests</a></h6>',
-    "Formatting" => ' 
+                                <h6 class="text-primary pb-4"><a href="#">Running tests</a></h6>
+		<div class="line"></div>		
                                 <form>
                                     <div class="form-group pb-5 px-3 row justify-content-center"> <button type="button" class="btn btn-primary">New Community +</button> </div>
                                 </form>
@@ -227,8 +235,9 @@ function buildModal ()
                                 <div class="border border-1 box">
                                     <h5>Community 2</h5>
                                     <p class="text-muted mb-1">Members : <strong>16</strong></p>
-                                </div>',
-    "Aliases" => '                                 <form>
+                                </div>
+				<div class="line"></div>
+				                               <form>
                                     <div class="form-group pb-2 px-3"> <input type="text" placeholder="Enter College Name" class="form-control"> </div>
                                     <div class="form-group row pb-2 px-3">
                                         <div class="col-6"> <input type="text" placeholder="Percentage" class="form-control"> </div>
@@ -298,7 +307,7 @@ function buildModal ()
         </div>
         <div class="line"></div>
         <div class="modal-footer d-flex flex-column justify-content-center border-0">
-	  <p class="text-muted">Can't find what you're looking for?</p> <button type="button" class="btn btn-primary">Contact Support Team</button>
+	  <p class="text-muted">More questions or issues? - <a href="https://github.com/jpadfield/dynamic-modelling/issues">Try Github</a>.</p>
 	</div>
       </div>
     </div>
@@ -539,11 +548,12 @@ function formatClassDef ($formats)
   {
   $classDef = false;
 
-  if (isset($formats["default"]))
-    {$default = $formats["default"];
-     unset($formats["default"]);}
+  if (isset($formats["base"]))
+    {$default = $formats["base"];
+     //unset($formats["base"]);
+     }
   else
-    {$defailts = array();}
+    {$default = array();}
     
   foreach ($formats as $nm => $styles)
     {$cda = array();

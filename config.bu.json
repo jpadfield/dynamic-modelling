@@ -17,8 +17,7 @@
       "stroke": "black", "fill": "#FFFF99",
       "rx": "20px", "ry": "20px"},
     "type": {
-      "stroke": "red", "fill": "#FAB565",
-      "rx":"20px","ry":"20px;"},
+      "stroke": "red", "fill": "#FAB565"},
     "name": {
       "stroke": "orange", "fill": "#FEF3BA",
       "rx": "20px", "ry": "20px"},
@@ -34,8 +33,10 @@
       "stroke": "black","fill":"#E1BA9C","rx":"20px","ry":"20px;"},
     "actor": {
       "stroke": "black","fill":"#FFBDCA","rx":"20px","ry":"20px;"},
-
-    
+    "type2": {
+      "stroke": "red","fill":"#FAB565","rx":"20px","ry":"20px;"},
+    "name2": {
+      "stroke": "orange","fill":"#FEF3BA","rx":"20px","ry":"20px;"},
     "dims": {
       "stroke": "black","fill":"#c6c6c6","rx":"20px","ry":"20px;"},
     "infoobj": {
