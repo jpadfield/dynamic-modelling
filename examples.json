@@ -18,5 +18,10 @@
     "title": "Object Linked Art Showcase 1 Getty example",
     "format": "json",
     "uri": "https://raw.githubusercontent.com/linked-art/showcase1/master/data/getty/Object/02bac13e-7e54-45ab-ba3a-426b7e48a0d1.json"
+  },
+  "example_formats":{
+    "title": "Examples of all of the predefined config formats",
+    "format": "data",
+    "data": "eJx9UstuxCAMPIPEP%2Bw38AeVditVqvbWc0UIaWnzErCVVuLja2zYpCTpxR7jYZzg0W5gvR2%2FTXsKEwufdvxg2g0RkeB0sBDMjxkDi5gEp6rqvjdjJgDaKkzNl9EgQVnwXNcEVHnArYzSYXIsYhKcqqqLEgUJvjMq3GfDYoo7zdYOnsUUBUf8t4XqGeyKz73SoI5JcKqqLmoUlETq%2FxjVABIpbh97Ns5OLdzHDBOorgk0o8A0pH7Km%2BtZhCB4QqvhU0jDIdad3gbjFNzKQHDkLgQfbl2HAvHter48v1wvZ8HpdGE1ysOAFNNnvdL5k9s4SqIjCR7w6PVlscwRDd9XZlcckdJSJe1WPpYiK9tI8g0QMJ2qpUnamiTrrC%2FbsZvgI1nMQPByshpgB%2BNnBYsrCMaUs8pDMjtIZofIf%2Fe0oeheee%2FDvYdNLPgXTBBn2A%3D%3D"
   }
 }

@@ -4,22 +4,22 @@ $orientation = "LR";
 $live_edit_link = "./";
 $default = file_get_contents("default.csv");
 $config = getRemoteJsonDetails ("config.json", false, true);
-
-// Example of formats: http://localhost/mod2/?data=eJxdUDtuBDEIrW3Jd8gZfAKKNOn2CqyHSZz4M7LZSHv7gGeioDSI9xE8SKO6ktsXbS%2FcHX%2Fk9u7SqACrDZ6%2BqbFx9Nvbq1skgPbiuOXNGHAZpADg0vl5kNEbVnLKAWgbfMlMA4uxPIYipk1oAEHBt852yOTHvjslAYK%2F47TiglpU6%2FdPSvYATNyHO2mJqOjMGP%2BFjJoynilj8Fuu0zhy27sMcUoDXEgG5UrzwGacR8EkF18CwMLXY%2B3O6w%2Fx%2FK4s%2FiWCTwXnnPws9kxD%2FrUAPy3jnwE%3D
-
-//http://localhost/mod2/?data=eJyNkTFyxCAMRWuY4Q45g0%2FwizTp9gosxgkJBo9hM9nbRxK2YVLFhefr64Ek5PZVxZC%2B%2FPxSs6ofIb0rt6%2BASKOb0wn%2F7VNtHCCB0c3rTL69vTYQYG00MbcwD4gVhH6AFUKMoZHn5gWiRkhSH2z0fLKrFwhgyRViqH63cYAee1Q%2F%2FAEkjeZ4uCJXzwjdQMpoiXu61MeyCAQY3aKevdviGwKw5gby%2FdO78R2sq3lXzaY5OaJBxfw7KZv%2FH3UOaxmIkJZMVRTbwBEZfdpDrbD6stl0nqCKh0NVz1zHt2idvw4BEssyebfTQB5vP7WtT8BpXGsZaRdtKaU%2Bo78OAt38BZuA4HA%3D
-
 $examples = getRemoteJsonDetails ("examples.json", false, true);
+$usedClasses = array();
+$allClasses = formatClassDef ($config["format"]);
 
 if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
   {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
 else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
   {$ex = $examples[$_GET["example"]];
-   $triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
+  if (isset($ex["data"]))
+    {$triplesTxt = gzuncompress(base64_decode(urldecode($ex["data"])));}
+  else
+    {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}}
 else if (isset($_GET["url"]))
   {$triplesTxt = checkTriples (file_get_contents($_GET["url"]));}
 else if (isset($_GET["data"]))
-  {$triplesTxt = gzuncompress(base64_decode($_GET["data"])); }
+  {$triplesTxt = gzuncompress(base64_decode($_GET["data"]));}
 else
   {$triplesTxt = checkTriples ($default);}
 
@@ -546,59 +546,58 @@ function getRaw($data)
 
 function formatClassDef ($formats)
   {
+  $allClasses = array();
   $classDef = false;
 
   if (isset($formats["base"]))
-    {$default = $formats["base"];
-     //unset($formats["base"]);
-     }
+    {$default = $formats["base"];}
   else
     {$default = array();}
+
+  // additional historic classes
+  $formats["oPID"] = $formats["object"];
+  $formats["ePID"] = $formats["event"];
+  $formats["aPID"] = $formats["actor"];
     
   foreach ($formats as $nm => $styles)
     {$cda = array();
      $styles = array_merge($default, $styles);
      foreach ($styles as $field => $value)
       {$cda[] = $field.":".$value;}
-     $classDef .= "classDef ".trim($nm)." ".implode(",", $cda).";\n";}
+     $classDef .= "classDef ".trim($nm)." ".implode(",", $cda).";\n";
+     $allClasses[trim($nm)] = "classDef ".trim($nm)." ".implode(",", $cda).";\n";}
      
-  return ($classDef);
+  return ($allClasses);//$classDef);
   }
   
 function Mermaid_formatData ($selected)
   {
-  global $orientation, $live_edit_link, $config;
-
-  $classDef = formatClassDef ($config["format"]);
-  
-  ob_start();
-  echo <<<END
-graph $orientation
-$classDef
-END;
-  $defTop = ob_get_contents();
-  ob_end_clean(); // Don't send output to client	
-
+  global $orientation, $live_edit_link, $config, $usedClasses;
+	
   $defs = "";
-  //$defs .= "<div class=\"mermaid\">".$defTop;
-  $defs .= $defTop;
-
   $things = array();
   $no = 0;
-  $crm = 0;
+  $unique = 0;
   $objs = array();
   
   foreach ($selected["triples"] as $k => $t) 
     {
+    // Starting things with @ can upset mermaid
     foreach ($t as $tk => $tv)
       {if (preg_match("/^[\@](.+$)/", $tv, $m))
 	{$t[$tk] = $m[1];} }
     
-    // Ensure that all refs to crm classes are unique so the diagram
+    // Ensure that all refs to listed prefix classes are unique so the diagram
     // does not Overlap too much
-    if(preg_match("/^(crm:E.+)$/", $t[2], $m))
-      {$selected["triples"][$k][2] = $t[2]."-".$crm;
-       $crm++;}
+    
+    $au = $config["unique"]["prefix"];
+
+    foreach ($au  as $pk => $pr)
+      {if(preg_match("/^($pr:.+)$/", $t[2], $m))
+	{$selected["triples"][$k][2] = $t[2]."-".$unique;
+	 $unique++;
+	 break 1;}}
+       
     // Remove excess white spaces from numbered properties
     if(preg_match("/^(.+)-N[0-9]+$/", $t[1], $m))
       {$selected["triples"][$k][1] = trim($m[1]);}
@@ -607,7 +606,7 @@ END;
     }
 	
   foreach ($selected["triples"] as $k => $t) 
-    {    
+    {
     // @ at the start of terms breaks the mermaid builder
     foreach ($t as $tk => $tv)
       {if (preg_match("/^[\@](.+$)/", $tv, $m))
@@ -620,37 +619,47 @@ END;
     else
       {$use = $t[2];}
 			
-    if(preg_match("/^(crm[:].+)[-][0-9]+$/", $use, $m))
-      {$use = $m[1];}
+    foreach ($au  as $pk => $pr)
+      {if(preg_match("/^(${pr}[:].+)[-][0-9]+$/", $use, $m))
+	{$use = $m[1];
+	 break 1;}}
 
     // Allow the user to force the formatting classes used for the
     // object and subject
     if(isset($t[3]))
-      {$fcs = explode ("@@", $t[3]);}
+      {$fcs = explode ("|", $t[3]);
+	if(!isset($fcs[1]))
+	  {$fcs = explode ("@@", $t[3]);}
+	if(!isset($fcs[1]))
+	  {$fcs[1] = false;}}
     else
       {$fcs = array(false, false);}
 								
     if (!isset($things[$t[0]]))
       {$things[$t[0]] = "O".$no;
-       // Default objects to oPID class
+       // Default objects to object class
        if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
-	{$fcs[0] = "oPID";}
+	{$fcs[0] = "object";}
        $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
        $no++;}
-			 
+
+    //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
+    // NEED NEW RULES
     if (!isset($things[$t[2]]))
       {$things[$t[2]] = "O".$no;
-       // Default objects to oPID class
-       if (!$fcs[1] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[1], $m) and isset($objs[$t[2]]))
-	{$fcs[1] = "oPID";}
+       // Default objects to object class
+       if (!$fcs[1] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[2], $m) and isset($objs[$t[2]]))
+	{$fcs[1] = "object";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
        $no++;}		
-      
+
     $defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
       "[\"".$use."\"]\n";		
     }
 
-  $defs .= ";";
+  $defs = "graph $orientation\n".
+    implode("", $usedClasses).
+    "\n$defs;";
   
   $code = array(
     "code" => $defs,
@@ -669,7 +678,7 @@ END;
 
 function Mermaid_defThing ($var, $no, $fc=false)
 	{
-	global $config;
+	global $config, $usedClasses, $allClasses;		
 
 	$prefix = $config["prefix"];
 	$click = false;
@@ -689,6 +698,9 @@ function Mermaid_defThing ($var, $no, $fc=false)
 	    }	  
 	  }
 	if ($fc) {$cls = $fc;}
+
+	if(isset($allClasses[$cls]))
+	  {$usedClasses[$cls] = $allClasses[$cls];}
 				 
 	$str = "\n$code(\"$var\")\nclass $code $cls;\n".$click;	    
 	
