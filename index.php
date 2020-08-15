@@ -184,7 +184,7 @@ function buildPage ($triplesTxt, $mermaid)
       
     </nav> <!-- CLOSE LEVEL 1 -->
     <!-- LEVEL 2 -->
-    <div class="" style="" >
+    <div class="" style=""  role="region" >
       <form id="triplesFrom" action="./" method="post">
 	<div  aria-label="Holder for the triples text" title1" id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
 	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
@@ -201,7 +201,7 @@ function buildPage ($triplesTxt, $mermaid)
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
 	<div class="tbtns" style="">
 	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button></div>
-	<div style="overflow: scroll; height: 100%;">
+	<div style="overflow: scroll; height: 100%;" tabindex=0>
 	$mermaid
 	</div>
     </div><!-- CLOSE LEVEL 3 -->
