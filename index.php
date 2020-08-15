@@ -42,11 +42,11 @@ function buildExamplesDD ()
 
   ob_start();
   echo <<<END
-  <div class="dropdown show" style="display: inline-block;margin-left: 8px;">
-  <a class="btn btn-default dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Examples
-  </a>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuExamples" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Examples
+    </a>
+  <div class="dropdown-menu  dropdown-menu-right" aria-labelledby="dropdownMenuExamples">
 END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
@@ -54,7 +54,32 @@ END;
   foreach ($examples as $k => $a)
     {$html .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";}
 
-  $html .= "</div></div>";
+  $html .= "</div></li>";
+
+  return ($html);
+  }
+  
+function buildLinksDD ()
+  {
+  global $live_edit_link, $bookmark;
+
+  ob_start(); //style="margin-right: 8px; float:right; margin-bottom: 16px;" 
+  echo <<<END
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLinks" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Links
+    </a>
+  <div class="dropdown-menu  dropdown-menu-right" aria-labelledby="dropdownMenuLinks">
+    <a class="dropdown-item" title="Mermaid Live Editor" href=" $live_edit_link" target="_blank">Get Image</a>
+    <a class="dropdown-item" title="Bookmark Link" href=" $bookmark" target="_blank">Bookmark Link</a>
+END;
+  $html = ob_get_contents();
+  ob_end_clean(); // Don't send output to client
+
+  foreach ($examples as $k => $a)
+    {$html .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";}
+
+  $html .= "</div></li>";
 
   return ($html);
   }
@@ -114,11 +139,13 @@ function buildPage ($triplesTxt, $mermaid)
   global  $live_edit_link, $bookmark;
 
   $exms = buildExamplesDD ();
+  $links = buildLinksDD ();
   $modal = buildModal ();
   ob_start();
   echo <<<END
 
 <!DOCTYPE html>
+<html lang="en">
 <!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
@@ -126,48 +153,61 @@ function buildPage ($triplesTxt, $mermaid)
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta charset="utf-8">
-  <title></title>
+  <title>Dynamic Simple Modelling</title>
   <link href="https://unpkg.com/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="local.css" rel="stylesheet" type="text/css">
   <style></style>
 </head>
 <body>
-<div id="page">
-  <div id="editor" class="textdiv">
-    <form id="triplesFrom" action="./" method="post">
-      <a title="The National Gallery" href="https://www.nationalgallery.org.uk/" target="_blank"  class="imbutton" style="margin-left: 8px; margin-top: 8px;" >
-	<img src="graphics/ng-logo-black-100x40.png" height="32" /></a>
+<div id="page" class="container-fluid">
 
-      <button class="btn btn-default nav-button" style="margin-bottom: 16px;" type="submit">Update</button>
-      <button class="btn btn-default nav-button" style="margin-bottom: 16px;" id="clear" type="button">Clear</button>
-      $exms
+  <div class="d-flex flex-column mb-3 vh-100">
+    <!-- LEVEL 1 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
-      <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling" target="_blank"  class="imbutton" style="margin-right: 8px; float:right; margin-top: 8px;" >
-	<img src="graphics/GitHub-Mark-64px.png" width="32" /></a>
+      <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling"  target="_blank"  class="imbutton" style="float:right;" >
+	<img aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" width="32" /></a>
 	
-      <a title="Mermaid Live Editor" href=" $live_edit_link" target="_blank" class="btn btn-default nav-button" style="margin-right: 16px; float:right; margin-bottom: 16px;" id="getIm" type="button">Get Image</a>      
-      <a title="Bookmark of last updated graph" href="$bookmark" target="_blank" class="btn btn-default nav-button" style="margin-right: 8px; float:right; margin-bottom: 16px;" id="getIm" type="button">Bookmark</a>
-      <button type="button" class="btn btn-default" style="margin-top: 8px; float:right; " data-toggle="modal" data-target="#helpModalCenter">Help</button>
+      <h1 class="navbar-brand" style="font-size:1.5rem;margin:0px 16px 0px 16px;">Simple Dynamic Modelling</h1>
       
-      <div id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
-      <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt" rows="10">$triplesTxt</textarea>
-      <button class="btn btn-default textbtn" id="tfs" type="button"  onclick="togglefullscreen('tfs', 'textholder')"><img src="graphics/view-fullscreen.png" width="20" /></button>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span></button>
+      
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+	<ul class="navbar-nav ml-auto">
+	  $exms
+	  $links
+	  <li class="nav-item">
+	    <a href="#myModal" data-toggle="modal" data-target="#helpModalCenter" class="nav-link">Help</a></li>
+	</ul>
       </div>
-    </form>
-  </div>
       
-<div id="holder" class="moddiv">
-  <div id="split-container">
-      <button class="btn btn-default nav-button" id="fs" style="padding: 5px; margin-right: 16px; float:right;" onclick="togglefullscreen('fs', 'holder')"><img src="graphics/view-fullscreen.png" width="20" /></button>
-    <div id="graph-container" style="color:white;">
-      <div id="graph">$mermaid</div>
-    </div>
-  </div> <!-- CLOSE split-container -->
-</div> <!-- CLOSE holder -->      
-
-</div>
-
+    </nav> <!-- CLOSE LEVEL 1 -->
+    <!-- LEVEL 2 -->
+    <div class="" style="" >
+      <form id="triplesFrom" action="./" method="post">
+	<div  aria-label="Holder for the triples text" title1" id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
+	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
+	  <div class="tbtns" style="">
+	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model" src="graphics/view-refresh.png" width="20" /></button>
+	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" src="graphics/clear-text.png" width="20" /></button>
+	      <button title="Help" class="btn btn-default textbtn" id="help" type="button"   data-toggle="modal" data-target="#helpModalCenter" aria-label="Open Help Modal"><img aria-label="Help" src="graphics/help.png" width="20" /></button>
+	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button>
+	  </div>
+	</div>
+      </form>
+    </div><!-- CLOSE LEVEL 2 -->
+    <!-- LEVEL 3 -->
+    <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
+	<div class="tbtns" style="">
+	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button></div>
+	<div style="overflow: scroll; height: 100%;">
+	$mermaid
+	</div>
+    </div><!-- CLOSE LEVEL 3 -->
+  </div><!-- CLOSE FLEX DIV -->
 $modal
+</div><!-- CLOSE PAGE -->
       
   <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
   <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -293,7 +333,7 @@ function buildModal ()
   ob_start();
   echo <<<END
   <!-- Modal-->
-  <div id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
+  <div role="region" id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
 	<!-- Tab headers, numbered from tab01 -> tab0n, etc -->

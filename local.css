@@ -65,25 +65,28 @@ g a
   height:100vh;	
   width:100%;
   overflow:hidden;
+  padding:0px;
 }
 
-.textbtn {
+.tbtns {
   position: absolute;
+  right: 21px;
+  top: 6px;
+  height:33px;
+  }
+  
+.textbtn {
+  position: relative;
   padding: 5px;
-  top: 8px;
-  width: 32px !important;
-  left: calc(100vw - 54px);
+  width: 32px !important;  
   }
   
 .moddiv {
   position:relative;
-  height:calc(100vh - 306px);
   min-height:200px;
   width:100%;
-  overflow:scroll;
   background-color:white;
   left:0px;
-  top:50px;
 }
 
 .textareadiv {
@@ -94,6 +97,7 @@ g a
   background-color: white;
   left: 0px;
   top: 0px;
+  margin: 0px;
 }
 
 .textdiv {
