@@ -60,6 +60,14 @@ g a
     border-color: #adadad;
 }
 
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(0,0,0,.7);
+}
+
+.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+    background-color: #e4e4e4;
+}
+
 #page {
   position:absolute;
   height:100vh;	

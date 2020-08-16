@@ -146,10 +146,6 @@ function buildPage ($triplesTxt, $mermaid)
 
 <!DOCTYPE html>
 <html lang="en">
-<!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta charset="utf-8">
@@ -166,7 +162,7 @@ function buildPage ($triplesTxt, $mermaid)
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
       <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling"  target="_blank"  class="imbutton" style="float:right;" >
-	<img aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" width="32" /></a>
+	<img alt="GitHub Logo" aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" width="32" /></a>
 	
       <h1 class="navbar-brand" style="font-size:1.5rem;margin:0px 16px 0px 16px;">Simple Dynamic Modelling</h1>
       
@@ -186,13 +182,13 @@ function buildPage ($triplesTxt, $mermaid)
     <!-- LEVEL 2 -->
     <div class="" style=""  role="region" >
       <form id="triplesFrom" action="./" method="post">
-	<div  aria-label="Holder for the triples text" title1" id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
+	<div  id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
 	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
 	  <div class="tbtns" style="">
-	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model" src="graphics/view-refresh.png" width="20" /></button>
-	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" src="graphics/clear-text.png" width="20" /></button>
-	      <button title="Help" class="btn btn-default textbtn" id="help" type="button"   data-toggle="modal" data-target="#helpModalCenter" aria-label="Open Help Modal"><img aria-label="Help" src="graphics/help.png" width="20" /></button>
-	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button>
+	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="20" /></button>
+	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="20" /></button>
+	      <button title="Help" class="btn btn-default textbtn" id="help" type="button"   data-toggle="modal" data-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="20" /></button>
+	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button>
 	  </div>
 	</div>
       </form>
@@ -200,7 +196,7 @@ function buildPage ($triplesTxt, $mermaid)
     <!-- LEVEL 3 -->
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
 	<div class="tbtns" style="">
-	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button></div>
+	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button></div>
 	<div style="overflow: scroll; height: 100%;" tabindex=0>
 	$mermaid
 	</div>
@@ -265,7 +261,7 @@ function buildModal ()
   ob_start();
   echo <<<END
   <!-- Modal-->
-  <div role="region" id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
+  <div id="helpModalCenter" tabindex="-1" role="dialog" aria-label="Help Modal" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
 	<!-- Tab headers, numbered from tab01 -> tab0n, etc -->
