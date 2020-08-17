@@ -69,14 +69,14 @@
       "match": {
 	"short": "ngo[:]([0-9A-Z]{3}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]resource[\/]([0-9A-Z]{3}[-].+)"},
-      "format": "oPID",
+      "format": "object",
       "url": "https://data.ng-london.org.uk/resource/"
       }, 
     "ng": {
       "match": {
 	"short": "ng[:]([0-9A-Z]{4}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z]{4}[-].+)"},
-      "format": "oPID",
+      "format": "object",
       "url": "https://data.ng-london.org.uk/"
       }, 
     "aat": {
@@ -114,7 +114,7 @@
       },
     "crm": {
       "match": {
-	"short": "crm[:](E.+)"},
+	"short": "crm[:](.+)"},
       "format": "crm"
       },
     "ngi": {

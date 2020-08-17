@@ -76,9 +76,6 @@ END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
 
-  foreach ($examples as $k => $a)
-    {$html .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";}
-
   $html .= "</div></li>";
 
   return ($html);
@@ -449,7 +446,9 @@ function getRaw($data)
 	{$trip = array($line);}
       
       $trip = array_map('trim', $trip);
-
+      $trip["bn"] = false; //used to flag new blank nodes and possibly other formatting controls
+      $trip["type"] = false; //used to flag new blank nodes and possibly other formatting controls
+      
       // Increment triple number
       $tn++;
 	
@@ -464,13 +463,18 @@ function getRaw($data)
       // Ignore notes, empty lines or commented lines
       if (isset($trip[2]))
 	{
-	if (in_array($trip[0], array("_Blank Node", "_BN", "_bn")))
-	  {$bnd = true;}
+	if (in_array(strtolower($trip[0]), array("_blank node", "_bn")))
+	  {$bnd = true;
+	   $trip["bn"] = true;}
 	else
 	  {$bnd = false;}
 
-	if (in_array ($trip[1], array("crm:P2.has_type", "crm:P2.has type", "has type", "type", "rdf:type")))
-	  {$pt = true;}
+	$typeCheck = preg_replace('/[. ]/', "_", strtolower($trip[1]));
+	
+	if (in_array ($typeCheck, array(
+	  "crm:p2_has_type", "has_type", "type", "rdf:type")))
+	  {$pt = true;
+	   $trip["type"] = true;}
 	else
 	  {$pt = false;}
 
@@ -490,7 +494,7 @@ function getRaw($data)
 	  {$trip[0] = "$m[1]-N".($bn-$m[2]);}
 				
 	// Current process is assuming that the subject and the object can not both be a new Blank Nodes
-	if (in_array($trip[2], array("_Blank Node", "_BN", "_bn")))
+	if (in_array(strtolower($trip[2]), array("_blank node", "_bn")))
 	  {$trip[2] = $trip[2]."-N".$bn;
 	   $bnew=false;}
 	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[2], $m))
@@ -607,17 +611,27 @@ function Mermaid_formatData ($selected)
       {$things[$t[0]] = "O".$no;
        // Default objects to object class
        if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
-	{$fcs[0] = "object";}
+	{if ($t["bn"] ) {$fcs[0] = "object_bn";}
+	 else {$fcs[0] = "object";}}
        $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
        $no++;}
 
     //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
     // NEED NEW RULES
     if (!isset($things[$t[2]]))
-      {$things[$t[2]] = "O".$no;
+      {
+      if (preg_match ("/^([a-zA-Z]+)[:].+$/", $t[2], $m))
+	{$prf = $m[1];}
+      else
+	{$prf = false;}
+	
+      $things[$t[2]] = "O".$no;
+
        // Default objects to object class
-       if (!$fcs[1] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[2], $m) and isset($objs[$t[2]]))
+       if (!$fcs[1] and !$prf and isset($objs[$t[2]]))
 	{$fcs[1] = "object";}
+       else if (!$fcs[1] and  $t["type"] and !in_array($prf, array_keys($config["prefix"])))
+	{$fcs[1] = "type";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
        $no++;}		
 
