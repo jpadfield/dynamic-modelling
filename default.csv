@@ -6,14 +6,15 @@ Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from
 Dynamic Modeller	works with	Triples
 // Comments can be added simply by starting a line with // or ##
 Triples	are	Tab separated
-Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple."
+Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple
+Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats"
 Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
 // Blank node can be added as shown
 Dynamic Modeller	carries out	_BN	object|event_bn
 _BN has type	Production
 _BN	produces	Flow-diagrams
 Flow-diagrams	can be saved by	"Copying the triples and saving them as a text file."
-Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark button, after an update."
+Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark Link options, under the Links menu, after an update."
 Flow-diagrams	can be saved by	Saving an image	|event
-Saving an image	has comment	"Following the link under the Get Image button an using the options provided."
+Saving an image	has comment	"Following the link under the Get Image link, under the Links menu, and using the options provided."
 Saving an image	is achieved using the	https://mermaid-js.github.io/mermaid-live-editor
