@@ -6,8 +6,8 @@ Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from
 Dynamic Modeller	works with	Triples
 // Comments can be added simply by starting a line with // or ##
 Triples	are	Tab separated
-Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple
-Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats"
+Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
+Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats
 Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
 // Blank node can be added as shown
 Dynamic Modeller	carries out	_BN	object|event_bn
