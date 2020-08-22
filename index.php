@@ -419,8 +419,9 @@ END;
 
 function getRaw($data)
   {
-  global $orientation;
+  global $orientation, $config;
 
+  $au = $config["unique"]["regex"];
   $output = array();
 	
   $no = 0;
@@ -431,10 +432,11 @@ function getRaw($data)
   $bba = array();
   $bbano = 1;
  
-    $tag = "test";
-    $output[$tag]["model"] = $tag;
-    $output[$tag]["comment"] = ucfirst ($tag)." Model";
-    $output[$tag]["count"] = 0;
+  $tag = "test";
+  $output[$tag]["model"] = $tag;
+  $output[$tag]["comment"] = ucfirst ($tag)." Model";
+  $output[$tag]["count"] = 0;
+  $output[$tag]["objects"] = array();
 
     foreach ($data as $k => $line) 
       {
@@ -446,6 +448,12 @@ function getRaw($data)
 	{$trip = array($line);}
       
       $trip = array_map('trim', $trip);
+
+      // Starting things with @ can upset mermaid
+      foreach ($trip as $tk => $tv)
+	{if (preg_match("/^[\@](.+$)/", $tv, $m))
+	  {$trip[$tk] = $m[1];}}
+	
       $trip["bn"] = false; //used to flag new blank nodes and possibly other formatting controls
       $trip["type"] = false; //used to flag new blank nodes and possibly other formatting controls
       
@@ -470,9 +478,10 @@ function getRaw($data)
 	  {$bnd = false;}
 
 	$typeCheck = preg_replace('/[. ]/', "_", strtolower($trip[1]));
-	
+	echo "<!-- $typeCheck -->\n";
+	// Defining a thing as have type "Type" is a special case so the "Type" is left as a literal by default
 	if (in_array ($typeCheck, array(
-	  "crm:p2_has_type", "has_type", "type", "rdf:type")))
+	  "crm:p2_has_type", "has_type", "type", "rdf:type")) and strtolower($trip[2]) != "type")
 	  {$pt = true;
 	   $trip["type"] = true;}
 	else
@@ -500,9 +509,21 @@ function getRaw($data)
 	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[2], $m))
 	  {$trip[2] = $m[1]."-N".($bn-$m[2]);}
 
-	// Number the predicates so they are all unique									
-	$trip[1] = $trip[1]."-N".$tn;
-			
+	// Number the predicates so they are all unique
+	// NOT REQUIRED 									
+	//$trip[1] = $trip[1]."-N".$tn;
+
+	// Ensure that all refs to listed unique classes are unique so the diagram
+	// does not Overlap too much - only parsing "subjects"
+	foreach ($au  as $rxk => $rxv)
+	  { if(preg_match("/^$rxv$/", $trip[2], $m))
+	    {$trip[2] = $trip[2]."-". $tn;
+	      break 1;}}
+
+	// list unique "objects"
+	if (!in_array($trip[0], $output[$tag]["objects"]))
+	  {$output[$tag]["objects"][] = $trip[0];}
+	  
 	$output[$tag]["triples"][] = $trip;
 	$output[$tag]["count"]++;
 	}
@@ -549,50 +570,23 @@ function Mermaid_formatData ($selected)
   $defs = "";
   $things = array();
   $no = 0;
-  $unique = 0;
   $objs = array();
-  
-  foreach ($selected["triples"] as $k => $t) 
-    {
-    // Starting things with @ can upset mermaid
-    foreach ($t as $tk => $tv)
-      {if (preg_match("/^[\@](.+$)/", $tv, $m))
-	{$t[$tk] = $m[1];} }
-    
-    // Ensure that all refs to listed prefix classes are unique so the diagram
-    // does not Overlap too much
-    
-    $au = $config["unique"]["prefix"];
+  $au = $config["unique"]["regex"];
 
-    foreach ($au  as $pk => $pr)
-      {if(preg_match("/^($pr:.+)$/", $t[2], $m))
-	{$selected["triples"][$k][2] = $t[2]."-".$unique;
-	 $unique++;
-	 break 1;}}
-       
-    // Remove excess white spaces from numbered properties
-    if(preg_match("/^(.+)-N[0-9]+$/", $t[1], $m))
-      {$selected["triples"][$k][1] = trim($m[1]);}
-
-    $objs[$t[0]] = 1;
-    }
-	
+  // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
-    {
-    // @ at the start of terms breaks the mermaid builder
-    foreach ($t as $tk => $tv)
-      {if (preg_match("/^[\@](.+$)/", $tv, $m))
-	{$t[$tk] = $m[1];} }
-	
+    {	
     // Format the displayed text, either wrapping or removing numbers
     // used to indicate separate instances of the same text/name
     if (count_chars($t[2]) > 60)
       {$use = wordwrap($t[2], 60, "<br/>", true);}
     else
       {$use = $t[2];}
-			
+
+    // If entities have been numbered to force them to be unique
+    // hide the number from being displayed
     foreach ($au  as $pk => $pr)
-      {if(preg_match("/^(${pr}[:].+)[-][0-9]+$/", $use, $m))
+      {if(preg_match("/^(${pr})[-][0-9]+$/", $use, $m))
 	{$use = $m[1];
 	 break 1;}}
 
@@ -715,7 +709,7 @@ function checkTriples ($data)
   $json = json_decode($data, true);
 
   if($json)
-    {    
+    {
     if (isset($json["@context"]))
       {$triplesTxt = "This Model\thas context\t".$json["@context"]."\n";
        unset($json["@context"]);}
@@ -731,8 +725,13 @@ function checkTriples ($data)
   return ($triplesTxt);
   }
 
+
+// NEED TO CATCH IF $arr is not an array !!!!
 function laj2trips ($arr, $pSub=false, $pPred=false)
   {
+  //if (!is_array($arr))
+  //  {prg(1, $arr);}
+    
   $out = "";
   
   if (isset($arr["id"]))

@@ -141,8 +141,9 @@
     },
     "unique": {
       "comment": "Force any items with these prefixes to be a unique item in the model",
-      "prefix": [
-	"crm"
+      "regex": [
+	"crm[:].+",
+	"Type"
 	]
       }
 }
