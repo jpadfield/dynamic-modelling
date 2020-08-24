@@ -204,7 +204,7 @@ $modal
       
   <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
   <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/mermaid@8.5.2/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/mermaid@8.7.0/dist/mermaid.min.js"></script>
    <script src="local.js"></script>
   <script></script>  
   </body>
@@ -478,7 +478,7 @@ function getRaw($data)
 	  {$bnd = false;}
 
 	$typeCheck = preg_replace('/[. ]/', "_", strtolower($trip[1]));
-	echo "<!-- $typeCheck -->\n";
+	//echo "<!-- $typeCheck -->\n";
 	// Defining a thing as have type "Type" is a special case so the "Type" is left as a literal by default
 	if (in_array ($typeCheck, array(
 	  "crm:p2_has_type", "has_type", "type", "rdf:type")) and strtolower($trip[2]) != "type")
