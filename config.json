@@ -67,42 +67,42 @@
   "prefix" : {
     "ngo": {
       "match": {
-	"short": "ngo[:]([0-9A-Z]{3}[-].+)",
+	"short": "[Nn][Gg][Oo][:]([0-9A-Z]{3}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]resource[\/]([0-9A-Z]{3}[-].+)"},
       "format": "object",
       "url": "https://data.ng-london.org.uk/resource/"
       }, 
     "ng": {
       "match": {
-	"short": "ng[:]([0-9A-Z]{4}[-].+)",
+	"short": "[Nn][Gg][:]([0-9A-Z]{4}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z]{4}[-].+)"},
       "format": "object",
       "url": "https://data.ng-london.org.uk/"
       }, 
     "aat": {
       "match": {
-	"short": "aat[:](.+)",
+	"short": "[Aa][Aa][Tt][:](.+)",
 	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/](.+)"},
       "format": "type",
       "url": "http://vocab.getty.edu/aat/"
       },   
     "ulan": {
       "match": {
-	"short": "ulan[:](.+)",
+	"short": "[Uu][Ll][Aa][nN][:](.+)",
 	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]ulan[\/](.+)"},
       "format": "type",
       "url": "http://vocab.getty.edu/ulan/"
       },   
     "tgn": {
       "match": {
-	"short": "tgn[:](.+)",
+	"short": "[Tt][Gg][Nn][:](.+)",
 	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]tgn[\/](.+)"},
       "format": "type",
       "url": "http://vocab.getty.edu/tgn/"
       },    
     "wd": {
       "match": {
-	"short": "wd[:](.+)",
+	"short": "[Ww][Dd][:](.+)",
 	"long": "http[s]*[:][\/]+www[.]wikidata[.]org[\/]wiki[\/](.+)"},
       "format": "type",
       "url": "https://www.wikidata.org/wiki/"
@@ -114,12 +114,22 @@
       },
     "crm": {
       "match": {
-	"short": "crm[:](.+)"},
+	"short": "[Cc][Rr][Mm][:](.+)"},
+      "format": "crm"
+      },
+    "sci": {
+      "match": {
+	"short": "[sS][cC][iI][:](.+)"},
+      "format": "crm"
+      },
+    "dig": {
+      "match": {
+	"short": "[Dd][Ii][Gg][:](.+)"},
       "format": "crm"
       },
     "ngi": {
       "match": {
-	"short": "ngi[:](.+)"},
+	"short": "[nN[[gG][iI][:](.+)"},
       "format": "oPID"
       },
     "bn": {
@@ -142,7 +152,9 @@
     "unique": {
       "comment": "Force any items with these prefixes to be a unique item in the model",
       "regex": [
-	"crm[:].+",
+	"[Cc][Rr][Mm][:].+",
+	"[sS][cC][Ii][:].+",
+	"[dD][iI][gG][:].+",
 	"Type"
 	]
       }

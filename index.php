@@ -28,8 +28,9 @@ $bookmark = './?data='.$data;
 
 $triples = explode("\n", $triplesTxt);
 $raw = getRaw($triples);
-$mermaid = Mermaid_formatData ($raw["test"]);
 
+$mermaid = Mermaid_formatData ($raw["test"]);
+	
 $html = buildPage ($triplesTxt, $mermaid);
 echo $html;
 exit;
@@ -150,6 +151,15 @@ function buildPage ($triplesTxt, $mermaid)
   <link href="https://unpkg.com/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="local.css" rel="stylesheet" type="text/css">
   <style></style>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P2QQWTBKX7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-P2QQWTBKX7');
+</script>
 </head>
 <body>
 <div id="page" class="container-fluid">
@@ -437,6 +447,9 @@ function getRaw($data)
   $output[$tag]["comment"] = ucfirst ($tag)." Model";
   $output[$tag]["count"] = 0;
   $output[$tag]["objects"] = array();
+  
+  //pair rdf:type and crm:p2_has_type "objects"
+  $typeObjects = array();
 
     foreach ($data as $k => $line) 
       {
@@ -516,9 +529,18 @@ function getRaw($data)
 	// Ensure that all refs to listed unique classes are unique so the diagram
 	// does not Overlap too much - only parsing "subjects"
 	foreach ($au  as $rxk => $rxv)
-	  { if(preg_match("/^$rxv$/", $trip[2], $m))
-	    {$trip[2] = $trip[2]."-". $tn;
-	      break 1;}}
+		{
+		if(preg_match("/^$rxv$/", $trip[2], $m))
+			{
+			$check = strtolower($trip[0]."-".$trip[2]);
+			if (isset($typeObjects[$check]))
+				{$trip[2] = $typeObjects[$check];}//$trip[2]."-". $tn;}
+			else
+				{$typeObjects[$check] = $trip[2]."-". $tn;
+				 $trip[2] = $trip[2]."-". $tn;}
+			break 1;
+			}
+		}
 
 	// list unique "objects"
 	if (!in_array($trip[0], $output[$tag]["objects"]))
@@ -559,7 +581,7 @@ function formatClassDef ($formats)
       {$cda[] = $field.":".$value;}
      $classDef .= "classDef ".trim($nm)." ".implode(",", $cda).";\n";
      $allClasses[trim($nm)] = "classDef ".trim($nm)." ".implode(",", $cda).";\n";}
-     
+ 
   return ($allClasses);//$classDef);
   }
   
@@ -576,6 +598,7 @@ function Mermaid_formatData ($selected)
   // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
     {	
+		
     // Format the displayed text, either wrapping or removing numbers
     // used to indicate separate instances of the same text/name
     if (count_chars($t[2]) > 60)
@@ -593,29 +616,39 @@ function Mermaid_formatData ($selected)
     // Allow the user to force the formatting classes used for the
     // object and subject
     if(isset($t[3]))
-      {$fcs = explode ("|", $t[3]);
-	if(!isset($fcs[1]))
-	  {$fcs = explode ("@@", $t[3]);}
-	if(!isset($fcs[1]))
-	  {$fcs[1] = false;}}
-    else
-      {$fcs = array(false, false);}
+      {
+			$fcs = explode ("|", $t[3]);
+			if(!isset($fcs[1]))
+				{$fcs = explode ("@@", $t[3]);}
+			
+			if(!isset($fcs[1]))
+				{$fcs[1] = false;}}
+			else
+				{$fcs = array(false, false);}
 								
     if (!isset($things[$t[0]]))
-      {$things[$t[0]] = "O".$no;
-       // Default objects to object class
-       if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
-	{if ($t["bn"] ) {$fcs[0] = "object_bn";}
-	 else {$fcs[0] = "object";}}
-       $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
-       $no++;}
+      {
+			$things[$t[0]] = "O".$no;
+      
+      // Default objects to object class
+      if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
+				{
+				if ($t["bn"] ) {$fcs[0] = "object_bn";}
+				else {$fcs[0] = "object";}
+				}
+				
+			$defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
+			$no++;
+			}
 
     //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
     // NEED NEW RULES
     if (!isset($things[$t[2]]))
       {
-      if (preg_match ("/^([a-zA-Z]+)[:].+$/", $t[2], $m))
-	{$prf = $m[1];}
+      if (preg_match ("/^([a-zA-Z]+)([:].+)$/", $t[2], $m))
+	{$prf = strtolower($m[1]);
+	 //$t[2] = $prf.$m[2];
+	 }
       else
 	{$prf = false;}
 	
@@ -624,7 +657,7 @@ function Mermaid_formatData ($selected)
        // Default objects to object class
        if (!$fcs[1] and !$prf and isset($objs[$t[2]]))
 	{$fcs[1] = "object";}
-       else if (!$fcs[1] and  $t["type"] and !in_array($prf, array_keys($config["prefix"])))
+       else if (!$fcs[1] and  $t["type"] and !in_array(strtolower($prf), array_keys($config["prefix"])))
 	{$fcs[1] = "type";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
        $no++;}		
@@ -660,7 +693,7 @@ function Mermaid_defThing ($var, $no, $fc=false)
 	$click = false;
 	$code  = "O".$no;
 	$cls = "literal";
-
+	
 	foreach($prefix as $nm => $a)
 	  {
 	  if(preg_match("/^".$a["match"]["short"]."$/", $var, $m))
