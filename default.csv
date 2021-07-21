@@ -4,17 +4,31 @@ Dynamic Modeller	was created by	Joseph Padfield	object|actor
 Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
 Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
 Dynamic Modeller	works with	Triples
+Dynamic Modeller	can use	Subgraphs
 // Comments can be added simply by starting a line with // or ##
+//subgraph Example Subgraph Title
+Subgraphs	are	Grouped sections of a graph
+Subgraphs	has comment	"Subgraph are started by adding a special comment  before the relevant triples - //Subgraph GROUP TITLE "
+Subgraphs	has comment	"Subgraph are ended by adding a special comment  after the relevant triples - //end"
+Subgraphs	can be nested as	Sub-Subgraphs
+//subgraph Example Sub-Subgraph Title
+Sub-Subgraphs	has comment	"Care needs to be taken to make sure which Subgraph nodes appear in, but it is possible to created nested sub-subgraphs simply by starting a new subgraph inside another one."
+//end
+//end
 Triples	are	Tab separated
 Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
 Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats
 Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
 // Blank node can be added as shown
-Dynamic Modeller	carries out	_BN	object|event_bn
-_BN has type	Production
-_BN	produces	Flow-diagrams
+_BN	has type	Production	event_bn|
+_BN	are allocated	"An automatic number each time the 'has type' property is used, so multiple _BN can be added to the list of triples and they will processed. All other properties will be allocated to the current _BN until a new 'has type' property is called."
+Dynamic Modeller	carries out	_BN
+_BN	produces	Flow-diagrams	|thing
 Flow-diagrams	can be saved by	"Copying the triples and saving them as a text file."
 Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark Link options, under the Links menu, after an update."
 Flow-diagrams	can be saved by	Saving an image	|event
 Saving an image	has comment	"Following the link under the Get Image link, under the Links menu, and using the options provided."
 Saving an image	is achieved using the	https://mermaid-js.github.io/mermaid-live-editor
+_BN	has type	Author	actor_bn|
+_BN	has comment	"New Blank Nodes, or any other entities can refer back to a previous Blank Node by adding a suffix to indicate how many Blank Nodes back one wants to refer to, i.e. the previous blank node would be referenced as '_BN-1' and the one before that would be '_BN-2' and so on."
+_BN	assigned	_BN-1

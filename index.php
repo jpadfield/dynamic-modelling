@@ -475,8 +475,14 @@ function getRaw($data)
 	
       if(preg_match("/^[\/][\/][ ]Model[:][\s]*([a-zA-Z0-9 ]+)[\s]*[\/][\/](.+)$/", $line, $m))
 	{$output[$tag]["comment"] = $m[2];}
-      else if(preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m))
-	{$orientation = $m[1];}
+      else if((preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m)) or
+        (preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
+	{$orientation = $m[1];
+        $trip = array($line);}
+      else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
+	{$trip = array("subgraph", $m[1], "");}
+      else if(preg_match("/^[\/][\/][ ]*[eE][nN][dD][ ]*(.*)$/", $line, $m))
+	{$trip = array("end", "", "");}
       // ignore lines that are commented out
       else if(preg_match("/^[\/#][\/#].*$/", $line, $m)) 
 	{$trip = array($line);}
@@ -599,6 +605,10 @@ function Mermaid_formatData ($selected)
   foreach ($selected["triples"] as $k => $t) 
     {	
 		
+    if (in_array($t[0], array("subgraph", "end")))
+			{$defs .= "\n$t[0] $t[1]\n";}
+		else
+			{
     // Format the displayed text, either wrapping or removing numbers
     // used to indicate separate instances of the same text/name
     if (count_chars($t[2]) > 60)
@@ -609,7 +619,10 @@ function Mermaid_formatData ($selected)
     // If entities have been numbered to force them to be unique
     // hide the number from being displayed
     foreach ($au  as $pk => $pr)
-      {if(preg_match("/^(${pr})[-][0-9]+$/", $use, $m))
+      {if(preg_match("/^(.+)[#][-][0-9]+$/", $use, $m))
+        {$use = $m[1];
+	  break 1;}
+       else if(preg_match("/^(${pr})[-][0-9]+$/", $use, $m))
 	{$use = $m[1];
 	 break 1;}}
 
@@ -664,6 +677,7 @@ function Mermaid_formatData ($selected)
 
     $defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
       "[\"".$use."\"]\n";		
+	}
     }
 
   $defs = "graph $orientation\n".
