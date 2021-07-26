@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/281618147.svg)](https://zenodo.org/badge/latestdoi/281618147)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5137618.svg)](https://doi.org/10.5281/zenodo.5137618)
 # dynamic-modelling
 This is an interactive live modelling system which can automatically convert simple tab separated triples into graphical models using the [mermaid library](https://mermaid-js.github.io/mermaid).  
 
