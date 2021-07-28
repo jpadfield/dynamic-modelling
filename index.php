@@ -1,5 +1,10 @@
 <?php
 
+if (isset($_SERVER["SCRIPT_URL"]))
+	{$thisPage = $_SERVER["SCRIPT_URL"];}
+else
+	{$thisPage = "./";}
+	
 $orientation = "LR";
 $live_edit_link = "./";
 $default = file_get_contents("default.csv");
@@ -24,14 +29,15 @@ else
   {$triplesTxt = checkTriples ($default);}
 
 $data = urlencode(base64_encode(gzcompress($triplesTxt)));
-$bookmark = './?data='.$data;
+$bookmark = $thisPage.'?data='.$data;
 
-$triples = explode("\n", $triplesTxt);
+$triples = getCleanTriples($triplesTxt);
+$cleanTriplesTxt = implode("\n", $triples);
 $raw = getRaw($triples);
 
 $mermaid = Mermaid_formatData ($raw["test"]);
 	
-$html = buildPage ($triplesTxt, $mermaid);
+$html = buildPage ($cleanTriplesTxt, $mermaid);
 echo $html;
 exit;
 
@@ -134,11 +140,12 @@ END;
   
 function buildPage ($triplesTxt, $mermaid)
   {
-  global  $live_edit_link, $bookmark;
+  global  $live_edit_link, $bookmark, $thisPage;
 
   $exms = buildExamplesDD ();
   $links = buildLinksDD ();
   $modal = buildModal ();
+
   ob_start();
   echo <<<END
 
@@ -188,7 +195,7 @@ function buildPage ($triplesTxt, $mermaid)
     </nav> <!-- CLOSE LEVEL 1 -->
     <!-- LEVEL 2 -->
     <div class="" style=""  role="region" >
-      <form id="triplesFrom" action="./" method="post">
+      <form id="triplesFrom" action="$thisPage" method="post">
 	<div  id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
 	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
 	  <div class="tbtns" style="">
@@ -426,6 +433,45 @@ END;
   return ($html);
   }
 
+
+function getCleanTriples($triplesTxt)
+  {
+
+  $lastLine = 0;
+	$cleanData = array();
+	
+	$data = explode("\n", $triplesTxt);
+	
+	foreach ($data as $k => $line) 
+		{
+		if (preg_match("/^.+\t.+\t.+$/", $line, $m))
+			{$trip = explode ("\t", $line);}
+		else if (preg_match("/^.+[,].+[,].+$/", $line, $m))
+			{$trip = explode (",", $line);}
+		else
+			{$trip = array($line);}
+      
+		$trip = array_map('trim', $trip);
+
+    // Starting things with @ can upset mermaid
+		foreach ($trip as $tk => $tv)
+			{if (preg_match("/^[\@](.+$)/", $tv, $m))
+				{$trip[$tk] = $m[1];}}
+		
+		//only consider the first 4 values - removes spaces coming from spreadsheets
+		$trip = array_slice($trip, 0, 4);
+		
+		// Considered as a data line
+		if ($trip[0])
+			{$lastLine = $k;}
+				
+		// Allow gaps of up to two lines between blocks of triples and remove others.
+		if ($k <= $lastLine + 2)
+			{$cleanData[] = implode("\t", $trip);}
+		}
+		
+	return ($cleanData);
+	}
 
 function getRaw($data)
   {
