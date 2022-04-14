@@ -27,8 +27,15 @@ $(function () {
   });
 });
 
-mermaid.initialize({startOnLoad:true, flowchart: { 
-    curve: 'basis'
+    
+mermaid.initialize({
+    startOnLoad:true, 
+    securityLevel: "loose",
+    logLevel: 0,
+    flowchart: { 
+    curve: 'basis',
+    useMaxWidth: false,
+    htmlLabels: true
   }});
 
 function togglefullscreen (b, divID)
@@ -37,9 +44,9 @@ function togglefullscreen (b, divID)
   var filename = src.substring(src.lastIndexOf('/')+1);
 
   if (filename == "view-fullscreen.png") {
-    $('#'+b).html("<img src=\"graphics/view-restore.png\" width=\"20\" />"); }
+    $('#'+b).html("<img src=\"graphics/view-restore.png\" width=\"26\" />"); }
   else {
-    $('#'+b).html("<img src=\"graphics/view-fullscreen.png\" width=\"20\" />");  }
+    $('#'+b).html("<img src=\"graphics/view-fullscreen.png\" width=\"26\" />");  }
       
   $('#'+divID).toggleClass('fullscreen');
   $(':focus').blur();

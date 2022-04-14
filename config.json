@@ -11,7 +11,11 @@
     "object": {
       "stroke": "#2C5D98", "fill": "#2C5D98", "color": "white"},           
     "object_bn": {
-      "stroke": "#1E3F67", "fill": "#94abc5", "color": "#1E3F67", "rx": "20px", "ry": "20px"},
+      "stroke": "#1E3F67", "fill": "#94abc5", "color": "#1E3F67", "rx": "20px", "ry": "20px"},      
+    "document": {
+      "stroke": "#2C5D98", "fill": "#33B0FF", "color": "2C5D98"},           
+    "document_bn": {
+      "stroke": "#1E3F67", "fill": "#B8E3FE", "color": "#1E3F67", "rx": "20px", "ry": "20px"},
     "actor": {
       "stroke": "#4e4403", "fill": "#fdde29", "color": "#4e4403"},
     "actor_bn": {
@@ -110,6 +114,11 @@
     "note": {
       "match": {
 	"short": "[\"].+[\"]"},
+      "format": "note"
+      },
+    "note": {
+      "match": {
+	"short": "[#34;].+[#34;]"},
       "format": "note"
       },
     "crm": {

@@ -1,9 +1,20 @@
 <?php
 
+$versions = array(
+	"jquery" => "3.6.0",
+	"bootstrap" => "5.1.3",
+	"mermaid" => "8.14.0"
+	);
+  
+if (isset($_GET["debug"])) {}
+	
 if (isset($_SERVER["SCRIPT_URL"]))
 	{$thisPage = $_SERVER["SCRIPT_URL"];}
 else
 	{$thisPage = "./";}
+
+if (isset($_SERVER["HTTP_X_FORWARDED_HOST"]) and  $_SERVER["HTTP_X_FORWARDED_HOST"] == "round4.ng-london.org.uk")
+	{$thisPage = "/ex".$thisPage;}
 	
 $orientation = "LR";
 $live_edit_link = "./";
@@ -28,14 +39,25 @@ else if (isset($_GET["data"]))
 else
   {$triplesTxt = checkTriples ($default);}
 
+// Thumbnail display might be possible with
+//    
+// O4 -- "crm:P48_has_preferred_identifier" -->O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]
+
+// The text "&nbsp"s are required to get the box to be bigger - it results in a slide like display.
+    
+
 $data = urlencode(base64_encode(gzcompress($triplesTxt)));
 $bookmark = $thisPage.'?data='.$data;
 
+//prg(0, $triplesTxt);
 $triples = getCleanTriples($triplesTxt);
+//prg(1, $triples);
 $cleanTriplesTxt = implode("\n", $triples);
+//prg(0, $cleanTriplesTxt);
 $raw = getRaw($triples);
-
+//prg(0, $raw);
 $mermaid = Mermaid_formatData ($raw["test"]);
+//prg(0, $mermaid);
 	
 $html = buildPage ($cleanTriplesTxt, $mermaid);
 echo $html;
@@ -50,10 +72,10 @@ function buildExamplesDD ()
   ob_start();
   echo <<<END
   <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuExamples" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuExamples" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Examples
     </a>
-  <div class="dropdown-menu  dropdown-menu-right" aria-labelledby="dropdownMenuExamples">
+  <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuExamples">
 END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
@@ -73,10 +95,10 @@ function buildLinksDD ()
   ob_start(); //style="margin-right: 8px; float:right; margin-bottom: 16px;" 
   echo <<<END
   <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLinks" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLinks" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Links
     </a>
-  <div class="dropdown-menu  dropdown-menu-right" aria-labelledby="dropdownMenuLinks">
+  <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuLinks">
     <a class="dropdown-item" title="Mermaid Live Editor" href=" $live_edit_link" target="_blank">Get Image</a>
     <a class="dropdown-item" title="Bookmark Link" href=" $bookmark" target="_blank">Bookmark Link</a>
 END;
@@ -140,12 +162,14 @@ END;
   
 function buildPage ($triplesTxt, $mermaid)
   {
-  global  $live_edit_link, $bookmark, $thisPage;
+  global  $live_edit_link, $bookmark, $thisPage, $versions;
 
   $exms = buildExamplesDD ();
   $links = buildLinksDD ();
   $modal = buildModal ();
 
+	$bw = "26px";
+	
   ob_start();
   echo <<<END
 
@@ -155,8 +179,8 @@ function buildPage ($triplesTxt, $mermaid)
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta charset="utf-8">
   <title>Dynamic Simple Modelling</title>
-  <link href="https://unpkg.com/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="local.css" rel="stylesheet" type="text/css">
+  <link href="https://unpkg.com/bootstrap@${versions[bootstrap]}/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="local-dev.css" rel="stylesheet" type="text/css">
   <style></style>
   <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2QQWTBKX7"></script>
@@ -176,20 +200,24 @@ function buildPage ($triplesTxt, $mermaid)
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
       <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling"  target="_blank"  class="imbutton" style="float:right;" >
-	<img alt="GitHub Logo" aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" width="32" /></a>
+	<img alt="GitHub Logo" aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" style="margin-left:10px;" width="32" /></a>
 	
       <h1 class="navbar-brand" style="font-size:1.5rem;margin:0px 16px 0px 16px;">Simple Dynamic Modelling</h1>
       
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span></button>
       
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	<ul class="navbar-nav ml-auto">
+      <div class="collapse navbar-collapse float-end" id="navbarSupportedContent">
+      
+      <span class="navbar-text w-100">
+		  
+	<ul class="navbar-nav ml-auto float-end">
 	  $exms
 	  $links
 	  <li class="nav-item">
-	    <a href="#myModal" data-toggle="modal" data-target="#helpModalCenter" class="nav-link">Help</a></li>
+	    <a href="#myModal" data-bs-toggle="modal" data-bs-target="#helpModalCenter" class="nav-link me-4">Help</a></li>
 	</ul>
+	</span>
       </div>
       
     </nav> <!-- CLOSE LEVEL 1 -->
@@ -199,10 +227,10 @@ function buildPage ($triplesTxt, $mermaid)
 	<div  id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
 	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
 	  <div class="tbtns" style="">
-	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="20" /></button>
-	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="20" /></button>
-	      <button title="Help" class="btn btn-default textbtn" id="help" type="button"   data-toggle="modal" data-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="20" /></button>
-	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button>
+	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="$bw" /></button>
+	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="$bw" /></button>
+	      <button title="Help" class="btn btn-default textbtn" id="help" type="button" data-bs-toggle="modal" data-bs-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="$bw" /></button>
+	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
 	  </div>
 	</div>
       </form>
@@ -210,7 +238,7 @@ function buildPage ($triplesTxt, $mermaid)
     <!-- LEVEL 3 -->
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
 	<div class="tbtns" style="">
-	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="20" /></button></div>
+	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button></div>
 	<div style="overflow: scroll; height: 100%;" tabindex=0>
 	$mermaid
 	</div>
@@ -219,9 +247,9 @@ function buildPage ($triplesTxt, $mermaid)
 $modal
 </div><!-- CLOSE PAGE -->
       
-  <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
-  <script src="https://unpkg.com/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/mermaid@8.7.0/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/jquery@${versions[jquery]}/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
+  <script src="https://unpkg.com/bootstrap@${versions[bootstrap]}/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mermaid@${versions[mermaid]}/dist/mermaid.min.js"></script>
    <script src="local.js"></script>
   <script></script>  
   </body>
@@ -239,36 +267,33 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Summary" => ' ',
-    "Blank Nodes" => ' ',
-    "Formatting" => ' ',
-    "Aliases" => ''
+    "Summary" => 'Details to be added',
+    "Blank Nodes" => 'Details to be added',
+    "Formatting" => 'Details to be added',
+    "Aliases" => 'Details to be added'
     );
-
-  $tHeaders = false;
-  $tFields = false;
-
-  $at = " active";
-  $sh = "show";
-  $tc = "font-weight-bold";
+  
+  $tabHeaders = false;
+  $tabContents = false;
 
   $no = 1;
+  $active = "active";
   foreach ($tabs as $k => $ht)
     {
     $dno = sprintf('%02d', $no);
-    $tHeaders .= "
-<div class=\"tabs$at\" id=\"tab$dno\">".
-      "<h6 class=\"$tc\">$k</h6></div>";
 
-    $tFields .= "
-<fieldset id=\"tab${dno}1\"  class=\"$sh\"><div class=\"bg-light\">
-  <h5 class=\"text-center mb-4 mt-0 pt-4\">$k</h5>
-  $ht
-</div></fieldset>";
-
-    $at = "";
-    $sh = "";
-    $tc = "text-muted";
+    $tabHeaders .= "  
+			<li class=\"nav-item\">
+				<a href=\"#tab$dno\" class=\"nav-link $active\" data-bs-toggle=\"tab\">$k</a>
+			</li>";
+		
+    $tabContents .= "  
+			<div class=\"tab-pane fade show $active\" id=\"tab$dno\">
+				<h5 class=\"text-center mb-4 mt-0 pt-4\">$k</h5>
+				<div class=\"m-4\">$ht</div>
+			</div>";
+		
+		$active = "";	
     $no++;
     }
   
@@ -278,21 +303,21 @@ function buildModal ()
   <div id="helpModalCenter" tabindex="-1" role="dialog" aria-label="Help Modal" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-	<!-- Tab headers, numbered from tab01 -> tab0n, etc -->
-	<div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
-	      $tHeaders
-	</div>
-	<div class="line"></div>
-	<!-- Tab Contents, numbered from tab011 -> tab0n1, etc -->
-	<div class="modal-body p-0">
-	  $tFields
-        </div>
-        <div class="line"></div>
-        <div class="modal-footer d-flex flex-column justify-content-center border-0">
-	  <p class="text-muted">More questions or issues? - <a href="https://github.com/jpadfield/dynamic-modelling/issues">Try Github</a>.</p>
-	</div>
-      </div>
+				
+				<ul class="nav nav-tabs" id="myTab">
+					$tabHeaders
+				</ul>
+				<div class="tab-content">
+					$tabContents
+				</div>
+			<div class="line"></div>
+			<div class="modal-footer d-flex flex-column justify-content-center border-0">
+				<p class="text-muted">More questions or issues? - <a href="https://github.com/jpadfield/dynamic-modelling/issues">Try Github</a>.</p>
+			</div>
+				
+			</div>
     </div>
+    
   </div>
 END;
   $html = ob_get_contents();
@@ -455,8 +480,12 @@ function getCleanTriples($triplesTxt)
 
     // Starting things with @ can upset mermaid
 		foreach ($trip as $tk => $tv)
-			{if (preg_match("/^[\@](.+$)/", $tv, $m))
-				{$trip[$tk] = $m[1];}}
+			{
+      if (preg_match("/^[\@](.+$)/", $tv, $m))
+				{$tv = $m[1];}
+        
+      $trip[$tk] = parseEntities($tv);
+      }
 		
 		//only consider the first 4 values - removes spaces coming from spreadsheets
 		$trip = array_slice($trip, 0, 4);
@@ -640,17 +669,22 @@ function formatClassDef ($formats)
 function Mermaid_formatData ($selected)
   {
   global $orientation, $live_edit_link, $config, $usedClasses;
-	
+
   $defs = "";
   $things = array();
   $no = 0;
   $objs = array();
   $au = $config["unique"]["regex"];
 
+//prg(0, $selected);
   // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
-    {	
-		
+    {
+    //prg(0, $t);
+		$t[1] = check_string($t[1]);
+    $t[2] = str_replace('"', "#34;", $t[2]);
+    //$t[2] = check_string($t[2]);
+    
     if (in_array($t[0], array("subgraph", "end")))
 			{$defs .= "\n$t[0] $t[1]\n";}
 		else
@@ -674,16 +708,20 @@ function Mermaid_formatData ($selected)
 
     // Allow the user to force the formatting classes used for the
     // object and subject
+    $fcs = array(false, false);
+   
     if(isset($t[3]))
       {
 			$fcs = explode ("|", $t[3]);
 			if(!isset($fcs[1]))
 				{$fcs = explode ("@@", $t[3]);}
-			
+						
 			if(!isset($fcs[1]))
-				{$fcs[1] = false;}}
-			else
-				{$fcs = array(false, false);}
+				{$fcs[1] = false;}
+			}
+			
+		if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
+				{$fcs = array(false, "note");}
 								
     if (!isset($things[$t[0]]))
       {
@@ -720,22 +758,34 @@ function Mermaid_formatData ($selected)
 	{$fcs[1] = "type";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
        $no++;}		
-
+ 
+ // need to check for an image and if so update $use
+ // O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]  
+    if (preg_match ("/^IGNOREJUSTNOWASITDOESNOTSEEMTOWORKhttp.+[jpegpn]+$/", $t[2], $m))
+      {$tmp = check_string("<img src='$t[2]'/>");
+       $use = "[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp$tmp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]";}
+    else
+      {$use = "[\"".$use."\"]";}
+      
     $defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
-      "[\"".$use."\"]\n";		
+      $use."\n";		
 	}
-    }
+    }//exit;
 
   $defs = "graph $orientation\n".
     implode("", $usedClasses).
     "\n$defs;";
   
+  //prg(1, $defs);
   $code = array(
     "code" => $defs,
     "mermaid" => array(
       "theme" => "default",
+      "securityLevel" => "loose",
+      "logLevel" => "warn",
       "flowchart" => array( 
-	  "curve" => "basis")
+	  "curve" => "basis",
+    "htmlLabels" => true)
       ));
   $json = json_encode($code);
   $code = base64_encode($json);
@@ -803,18 +853,19 @@ function checkTriples ($data)
 
   if($json)
     {
+    
     if (isset($json["@context"]))
       {$triplesTxt = "This Model\thas context\t".$json["@context"]."\n";
        unset($json["@context"]);}
     else
       {$triplesTxt = false;}
     
-    $triplesTxt .= laj2trips ($json);
+    $triplesTxt .= laj2trips ($json);    
     //debugJsonConversaion ($data, $json, $triplesTxt);
     }
   else
-    {$triplesTxt = $data;}
-    
+    {$triplesTxt = $data;}    
+  
   return ($triplesTxt);
   }
 
@@ -864,8 +915,11 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
 
 function parseEntities($name)
   {
+
   if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/]([0-9]+)$/", $name, $m))
     {$out = "aat:$m[1]";}
+  else if (preg_match("/^http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
+    {$out = "ng:$m[1]";}
   else if (preg_match("/^http[s]*[:][\/]+linked[.]art[\/]example[\/]([a-z]+[\/][0-9]+)$/", $name, $m))
     {$out = "lae:$m[1]";}
   else
@@ -882,5 +936,23 @@ function getRemoteJsonDetails ($uri, $format=false, $decode=false)
 	 else
 		{$output = $fc;}
 	 return ($output);}
+	 
+function check_string($my_string)
+	{
+	// Excluded: ";", '#59;' - "#", '#35;' - "@", '#64;' - ":", '#58;' - "/", '#47;'
+	$chars = array('!', '*', '"', "'", "(", ")", "&", "=", "+", 
+		"$", ",", "?", "%", "[", "]", "\\");
+  $codes = array('#33;', '#42;', '#34;', '#39;', '#40;', '#41;', '#38;', '#61;',
+		'#43;', '#36;', '#44;', '#63;', '#37;', '#91;', '#93;', 
+		'#92;');
+  
+  $my_string = trim ($my_string);
+  
+	if (preg_match('/^.*[^a-zA-Z0-9 |_#-].*$/', $my_string))
+		{$my_string = trim ($my_string, '"');
+		 $my_string = '"'.str_replace($chars, $codes, $my_string).'"';}
+		
+	return ($my_string);
+	}
 
 ?>
