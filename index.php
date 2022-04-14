@@ -3,7 +3,8 @@
 $versions = array(
 	"jquery" => "3.6.0",
 	"bootstrap" => "5.1.3",
-	"mermaid" => "8.14.0"
+	//"mermaid" => "8.14.0"
+	"mermaid" => "9.0.0"
 	);
   
 if (isset($_GET["debug"])) {}
@@ -215,7 +216,7 @@ function buildPage ($triplesTxt, $mermaid)
 	  $exms
 	  $links
 	  <li class="nav-item">
-	    <a href="#myModal" data-bs-toggle="modal" data-bs-target="#helpModalCenter" class="nav-link me-4">Help</a></li>
+	    <a href="#myModal" data-bs-toggle="modal" data-bs-target="#helpModalCenter" class="nav-link me-4">Info</a></li>
 	</ul>
 	</span>
       </div>
@@ -267,10 +268,23 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Summary" => 'Details to be added',
-    "Blank Nodes" => 'Details to be added',
-    "Formatting" => 'Details to be added',
-    "Aliases" => 'Details to be added'
+    "Summary" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tools makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents and example set or data, and the generated model, this example demonstrate the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. It is also possible to generate a static image version of any given model by following the <b>Get Image</b> option and using the tools provide by the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>.
+    <br/><br/>
+    <h5>This specific project was supported by:</h5>
+<br/>
+		<h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
+<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
+<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
+<br/>
+<h6></a>The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project</h6>
+<p dir="auto"><a href="https://www.iperionhs.eu/" rel="nofollow"><img height="42px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%;"></a>&nbsp;&nbsp;
+<a href="https://www.iperionhs.eu/" rel="nofollow"><img height="32px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/iperionhs-eu-tag2.png" alt="IPERION-HS" style="max-width: 100%;"></a></p>
+<br/>
+<h6>The AHRC Funded <a href="https://linked.art/" rel="nofollow">Linked.Art</a> project</h6>
+<p><a href="https://ahrc.ukri.org/" rel="nofollow"><img height="48px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art" style="max-width: 100%;"></a></p>',
+    //"Blank Nodes" => 'Details to be added',
+    //"Formatting" => 'Details to be added',
+    //"Aliases" => 'Details to be added'
     );
   
   $tabHeaders = false;
@@ -683,6 +697,7 @@ function Mermaid_formatData ($selected)
     //prg(0, $t);
 		$t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
+    $t[2] = str_replace('?', "#63;", $t[2]);
     //$t[2] = check_string($t[2]);
     
     if (in_array($t[0], array("subgraph", "end")))
