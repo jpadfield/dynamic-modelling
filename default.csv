@@ -5,6 +5,8 @@ Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
 Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
 Dynamic Modeller	works with	Triples
 Dynamic Modeller	can use	Subgraphs
+Dynamic Modeller	uses	https://github.com/ariutta/svg-pan-zoom
+https://github.com/ariutta/svg-pan-zoom	has comment	"svg-pan-zoom is used to allow users to use their mouse to navigate around and zoom in and out of larger models"
 // Comments can be added simply by starting a line with // or ##
 //subgraph Example Subgraph Title
 Subgraphs	are	Grouped sections of a graph
@@ -15,6 +17,10 @@ Subgraphs	can be nested as	Sub-Subgraphs
 Sub-Subgraphs	has comment	"Care needs to be taken to make sure which Subgraph nodes appear in, but it is possible to created nested sub-subgraphs simply by starting a new subgraph inside another one."
 //end
 //end
+//subgraph Formatted Subgraph
+Subgraphs	can be styled	Styled Subgraphs
+Styled Subgraphs	has comment	"Any of the existing standard formats can automatically be applied to a subgraph by simply adding the name of the format after the //end line. For example this subgraph has been styled with the line //end base"
+//end base
 Triples	are	Tab separated
 Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
 Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats

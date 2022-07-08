@@ -4,7 +4,7 @@ $versions = array(
 	"jquery" => "3.6.0",
 	"bootstrap" => "5.1.3",
 	//"mermaid" => "8.14.0"
-	"mermaid" => "9.0.0"
+	"mermaid" => "9.1.3"
 	);
   
 if (isset($_GET["debug"])) {}
@@ -240,9 +240,9 @@ function buildPage ($triplesTxt, $mermaid)
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
 	<div class="tbtns" style="">
 	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button></div>
-	<div style="overflow: scroll; height: 100%;" tabindex=0>
+	<!-- <div style="overflow: hidden; height: 100%;" tabindex=0> -->
 	$mermaid
-	</div>
+	<!-- </div> -->
     </div><!-- CLOSE LEVEL 3 -->
   </div><!-- CLOSE FLEX DIV -->
 $modal
@@ -251,6 +251,7 @@ $modal
   <script src="https://unpkg.com/jquery@${versions[jquery]}/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
   <script src="https://unpkg.com/bootstrap@${versions[bootstrap]}/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/mermaid@${versions[mermaid]}/dist/mermaid.min.js"></script>
+  <script src="./svg-pan-zoom.js" crossorigin="anonymous"></script> 
    <script src="local.js"></script>
   <script></script>  
   </body>
@@ -571,7 +572,7 @@ function getRaw($data)
       else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
 	{$trip = array("subgraph", $m[1], "");}
       else if(preg_match("/^[\/][\/][ ]*[eE][nN][dD][ ]*(.*)$/", $line, $m))
-	{$trip = array("end", "", "");}
+	{$trip = array("end", $m[1], "");}
       // ignore lines that are commented out
       else if(preg_match("/^[\/#][\/#].*$/", $line, $m)) 
 	{$trip = array($line);}
@@ -682,28 +683,42 @@ function formatClassDef ($formats)
   
 function Mermaid_formatData ($selected)
   {
-  global $orientation, $live_edit_link, $config, $usedClasses;
+  global $orientation, $live_edit_link, $config, $allClasses, $usedClasses;
 
   $defs = "";
   $things = array();
   $no = 0;
   $objs = array();
   $au = $config["unique"]["regex"];
+  $sgIDs = array();
 
-//prg(0, $selected);
   // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
     {
-    //prg(0, $t);
 		$t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
     $t[2] = str_replace('?', "#63;", $t[2]);
     //$t[2] = check_string($t[2]);
     
-    if (in_array($t[0], array("subgraph", "end")))
-			{$defs .= "\n$t[0] $t[1]\n";}
-		else
-			{
+    // Updated to allow formats classes to be added to subgraphs - 05/07/22 JPadfield
+    if (in_array($t[0], array("subgraph")))
+	{$tid = str_replace(' ', "", $t[1]);
+	 $sgIDs[] = $tid;
+	 $defs .= "\n$t[0] $tid [\"$t[1]\"]\n";
+	 }
+    else if (in_array($t[0], array("end")))
+	{
+	$defs .= "\n$t[0] $t[1]\n";
+	$sgID = array_pop($sgIDs);
+	if ($t[1]) 
+	  {	  
+	  if(isset($allClasses[$t[1]]))
+	    {$usedClasses[$t[1]] = $allClasses[$t[1]];}
+	  $defs .= "class $sgID $t[1]\n";
+	  }
+	}
+    else
+	{
     // Format the displayed text, either wrapping or removing numbers
     // used to indicate separate instances of the same text/name
     if (count_chars($t[2]) > 60)
@@ -805,7 +820,7 @@ function Mermaid_formatData ($selected)
   $json = json_encode($code);
   $code = base64_encode($json);
   $live_edit_link = 'https://mermaid-js.github.io/mermaid-live-editor/#/edit/'.$code;
-  $defs = "<div class=\"mermaid\">".$defs."</div>";
+  $defs = "<div id=\"modelDiv\" style=\"height:100%\" class=\"mermaid\">".$defs."</div>";
 	
   return ($defs);
   }	
