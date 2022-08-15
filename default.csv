@@ -1,10 +1,18 @@
-//Graph LR - this is an optional special comment that requests TB (Top Bottom) or a LR (Left Right) flow diagram, the default is LR
+//The first line is an optional special comment that requests TB (Top Bottom) or a LR (Left Right) flow diagram, the default is LR - the style of the nodes linking the displayed concepts can also be adjusted with the addition or omission of the extra term "fix"
 // Extra formats can be selected using a | separated pair of terms - the format only needs to be defined the first time an entities is referenced
-Dynamic Modeller	was created by	Joseph Padfield	object|actor
+Dynamic Modeller	was created by	Joseph Padfield|https://orcid.org/0000-0002-2572-6428	object|actor
 Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
 Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
 Dynamic Modeller	works with	Triples
 Dynamic Modeller	can use	Subgraphs
+Dynamic Modeller	allows the use of	Tooltips	|document
+Tooltips	tooltip	Also known as hover text or labels
+Tooltips	for example	Example Concept with a Tooltip	|thing
+Example Concept with a Tooltip	tooltip	This approach can be used to hide comments on larger flow diagrams to simplify their appearance but without loosing the extra descriptions and information.
+Tooltips	has comment	"Tooltips are added to link based nodes, with alternative texts, automatically, but they can also be added manually through an additional triple using the 'tooltip' property to link the item to the required text:<br/>Label  tooltip Required hover text "
+Dynamic Modeller	can format	Links with alternative labels
+Links with alternative labels	for example	Example Formats	|url
+Links with alternative labels	has comment	"This can be achieved by adding the alternative label as a <b>'|'</b> separated suffix, such as:<br/>'ALT TEXT|https://full.url/or/link' "
 Dynamic Modeller	uses	https://github.com/ariutta/svg-pan-zoom
 https://github.com/ariutta/svg-pan-zoom	has comment	"svg-pan-zoom is used to allow users to use their mouse to navigate around and zoom in and out of larger models"
 // Comments can be added simply by starting a line with // or ##
@@ -23,7 +31,7 @@ Styled Subgraphs	has comment	"Any of the existing standard formats can automatic
 //end base
 Triples	are	Tab separated
 Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
-Triples	format examples	https://research.ng-london.org.uk/modelling/?example=example_formats
+Triples	format examples	Example Formats|https://research.ng-london.org.uk/modelling/?example=example_formats
 Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
 // Blank node can be added as shown
 _BN	has type	Production	event_bn|

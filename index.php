@@ -1,10 +1,11 @@
 <?php
 
+// Added tests for hover text - it just uses a default example text just now
+// Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Graph LR fix
 $versions = array(
 	"jquery" => "3.6.0",
 	"bootstrap" => "5.1.3",
-	//"mermaid" => "8.14.0"
-	"mermaid" => "9.1.3"
+	"mermaid" => "9.1.4"
 	);
   
 if (isset($_GET["debug"])) {}
@@ -16,7 +17,8 @@ else
 
 if (isset($_SERVER["HTTP_X_FORWARDED_HOST"]) and  $_SERVER["HTTP_X_FORWARDED_HOST"] == "round4.ng-london.org.uk")
 	{$thisPage = "/ex".$thisPage;}
-	
+
+$fixlinks = false;	
 $orientation = "LR";
 $live_edit_link = "./";
 $default = file_get_contents("default.csv");
@@ -24,6 +26,13 @@ $config = getRemoteJsonDetails ("config.json", false, true);
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 $usedClasses = array();
 $allClasses = formatClassDef ($config["format"]);
+
+$doc_example_links = array(
+	"LRNF" => array("TBNF", "LRF", "LR"), 
+	"TBNF" => array("LRNF", "TBF", "TB"), 
+	"LRF" => array("TBF", "LRNF", "LR fix"), 
+	"TBF" => array("LRF", "TBNF", "TB fix"), 
+	);
 
 if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
   {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
@@ -33,26 +42,33 @@ else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
     {$triplesTxt = gzuncompress(base64_decode(urldecode($ex["data"])));}
   else
     {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}}
+else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]]))
+	{$triplesTxt = docExampleTriples ($doc_example_links[$_GET["example"]]);}
 else if (isset($_GET["url"]))
   {$triplesTxt = checkTriples (file_get_contents($_GET["url"]));}
 else if (isset($_GET["data"]))
   {$triplesTxt = gzuncompress(base64_decode($_GET["data"]));}
 else
-  {$triplesTxt = checkTriples ($default);}
+  {
+	$triplesTxt = docExampleTriples ($doc_example_links["LRNF"]);
+	//$triplesTxt = checkTriples ($default);
+	}
 
 // Thumbnail display might be possible with
 //    
 // O4 -- "crm:P48_has_preferred_identifier" -->O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]
 
+
 // The text "&nbsp"s are required to get the box to be bigger - it results in a slide like display.
-    
+// in 9.1.4 it seems to work without the "&nbsp"s
+// O4 -- "crm:P48_has_preferred_identifier" -->O6[<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>];    
 
 $data = urlencode(base64_encode(gzcompress($triplesTxt)));
 $bookmark = $thisPage.'?data='.$data;
 
 //prg(0, $triplesTxt);
 $triples = getCleanTriples($triplesTxt);
-//prg(1, $triples);
+//prg(0, $triples);
 $cleanTriplesTxt = implode("\n", $triples);
 //prg(0, $cleanTriplesTxt);
 $raw = getRaw($triples);
@@ -66,6 +82,31 @@ exit;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+function docExampleTriples ($ex)
+	{
+	global $default;
+	
+	$layout_comments = array(
+		"TB" => array ("Graph TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
+		"LR" => array ("Graph LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
+		"F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
+		"NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
+		);
+	
+	$triplesTxt = "//Graph $ex[2] \n".checkTriples ($default);	
+
+	$do = str_split($ex[0], 2);	
+	$triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
+	$triplesTxt .= "\n".$layout_comments[$do[0]][0]."\thas comment\t".json_encode($layout_comments[$do[0]][1]);
+	
+	$do = str_split($ex[1], 2);
+	$triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[1]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[1]";
+	$triplesTxt .= "\n".$layout_comments[$do[1]][0]."\thas comment\t".json_encode($layout_comments[$do[1]][1]);
+
+	return ($triplesTxt);
+	}
+	
 function buildExamplesDD ()
   {
   global $examples;
@@ -171,6 +212,11 @@ function buildPage ($triplesTxt, $mermaid)
 
 	$bw = "26px";
 	
+	$vs[0] = $versions["bootstrap"];
+	$vs[1] = $versions["jquery"];
+  $vs[2] = $versions["bootstrap"];
+  $vs[3] = $versions["mermaid"];
+	
   ob_start();
   echo <<<END
 
@@ -180,9 +226,30 @@ function buildPage ($triplesTxt, $mermaid)
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta charset="utf-8">
   <title>Dynamic Simple Modelling</title>
-  <link href="https://unpkg.com/bootstrap@${versions[bootstrap]}/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="https://unpkg.com/bootstrap@$vs[0]/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="local-dev.css" rel="stylesheet" type="text/css">
-  <style></style>
+  <style>
+  
+
+/* Added to get the hover texts or tooltips to appear and be formatted.
+based on values in https://unpkg.com/browse/mermaid@6.0.0/dist/mermaid.css */
+div.mermaidTooltip {
+  position: absolute;
+  text-align: center;
+  max-width: 300px;
+  padding: 5px;
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 1rem;
+  background: #ffffde;
+  border: 1px solid #aaaa33;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+  
+  
+  </style>
   <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2QQWTBKX7"></script>
 <script>
@@ -248,9 +315,9 @@ function buildPage ($triplesTxt, $mermaid)
 $modal
 </div><!-- CLOSE PAGE -->
       
-  <script src="https://unpkg.com/jquery@${versions[jquery]}/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
-  <script src="https://unpkg.com/bootstrap@${versions[bootstrap]}/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/mermaid@${versions[mermaid]}/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/jquery@$vs[1]/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
+  <script src="https://unpkg.com/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/mermaid@$vs[3]/dist/mermaid.min.js"></script>
   <script src="./svg-pan-zoom.js" crossorigin="anonymous"></script> 
    <script src="local.js"></script>
   <script></script>  
@@ -519,7 +586,7 @@ function getCleanTriples($triplesTxt)
 
 function getRaw($data)
   {
-  global $orientation, $config;
+  global $orientation, $config, $fixlinks;
 
   $au = $config["unique"]["regex"];
   $output = array();
@@ -568,6 +635,7 @@ function getRaw($data)
       else if((preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m)) or
         (preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
 	{$orientation = $m[1];
+	 if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
         $trip = array($line);}
       else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
 	{$trip = array("subgraph", $m[1], "");}
@@ -683,7 +751,7 @@ function formatClassDef ($formats)
   
 function Mermaid_formatData ($selected)
   {
-  global $orientation, $live_edit_link, $config, $allClasses, $usedClasses;
+  global $orientation, $live_edit_link, $config, $allClasses, $usedClasses, $fixlinks;
 
   $defs = "";
   $things = array();
@@ -708,7 +776,7 @@ function Mermaid_formatData ($selected)
 	 }
     else if (in_array($t[0], array("end")))
 	{
-	$defs .= "\n$t[0] $t[1]\n";
+	$defs .= "\n$t[0]\n";
 	$sgID = array_pop($sgIDs);
 	if ($t[1]) 
 	  {	  
@@ -717,14 +785,61 @@ function Mermaid_formatData ($selected)
 	  $defs .= "class $sgID $t[1]\n";
 	  }
 	}
+	else if ($t[1] == "tooltip")
+		{
+		// Some of this section is a duplication of the steps below so it might be good to look at moving this tooltips section down later
+		
+		// Allow the user to force the formatting classes used for the
+    // object and subject
+    $fcs = array(false, false);
+   
+    if(isset($t[3]))
+      {
+			$fcs = explode ("|", $t[3]);
+			if(!isset($fcs[1]))
+				{$fcs = explode ("@@", $t[3]);}
+						
+			if(!isset($fcs[1]))
+				{$fcs[1] = false;}
+			}
+			
+		if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
+				{$fcs = array(false, "note");}
+				
+		if (!isset($things[$t[0]]))
+			{$things[$t[0]] = "O".$no;
+      
+      // Default objects to object class
+      if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
+				{
+				if ($t["bn"] ) {$fcs[0] = "object_bn";}
+				else {$fcs[0] = "object";}
+				}
+				
+			$defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
+			$no++;}
+		$defs .= "click ".$things[$t[0]]." function \"$t[2]\"; \n";}
     else
-	{
-    // Format the displayed text, either wrapping or removing numbers
-    // used to indicate separate instances of the same text/name
-    if (count_chars($t[2]) > 60)
-      {$use = wordwrap($t[2], 60, "<br/>", true);}
-    else
-      {$use = $t[2];}
+			{
+			// Catch URL with an ALT text suffix
+			$t0extraLink = false;
+			$t2extraLink = false;
+				
+			if (preg_match("/^([^|]+)[|](http.+)$/", $t[0], $t0m) or
+				preg_match("/^([^|]+)[|](\?.+)$/", $t[0], $t0m))
+				{$t0extraLink = $t0m[2];
+				 $t[0] = $t0m[1];}				
+			if (preg_match("/^([^|]+)[|](http.+)$/", $t[2], $t2m) or
+				preg_match("/^([^|]+)[|](\?.+)$/", $t[2], $t2m))
+				{$t2extraLink = $t2m[2];
+				 $t[2] = $t2m[1];}
+				
+			// Format the displayed text, either wrapping or removing numbers
+			// used to indicate separate instances of the same text/name
+			if (count_chars($t[2]) > 60)
+				{$use = wordwrap($t[2], 60, "<br/>", true);}
+			else
+				{$use = $t[2];}
 
     // If entities have been numbered to force them to be unique
     // hide the number from being displayed
@@ -752,6 +867,8 @@ function Mermaid_formatData ($selected)
 			
 		if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
 				{$fcs = array(false, "note");}
+		else if (!$fcs[1] and $t2extraLink)
+			{$fcs[1] = "url";}
 								
     if (!isset($things[$t[0]]))
       {
@@ -767,15 +884,16 @@ function Mermaid_formatData ($selected)
 			$defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
 			$no++;
 			}
-
+		
     //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
     // NEED NEW RULES
     if (!isset($things[$t[2]]))
       {
       if (preg_match ("/^([a-zA-Z]+)([:].+)$/", $t[2], $m))
-	{$prf = strtolower($m[1]);
-	 //$t[2] = $prf.$m[2];
-	 }
+				{
+				$prf = strtolower($m[1]);
+				//$t[2] = $prf.$m[2];
+				}
       else
 	{$prf = false;}
 	
@@ -787,7 +905,17 @@ function Mermaid_formatData ($selected)
        else if (!$fcs[1] and  $t["type"] and !in_array(strtolower($prf), array_keys($config["prefix"])))
 	{$fcs[1] = "type";}
        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
-       $no++;}		
+       $no++;}	
+		
+			// If an ALT suffix was supplied for a link, add ref to the link back in with a tool tip.
+			if ($t0extraLink)
+				{$pp = pathinfo($t0extraLink);
+				 $tt = "Link to: $pp[dirname] ...";
+				 $defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$tt\"; \n";}
+			if ($t2extraLink)
+				{$pp = pathinfo($t2extraLink);
+				 $tt = "Link to: $pp[dirname] ...";
+				 $defs .= "click ".$things[$t[2]]." \"$t2extraLink\" \"$tt\"; \n";}
  
  // need to check for an image and if so update $use
  // O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]  
@@ -796,10 +924,17 @@ function Mermaid_formatData ($selected)
        $use = "[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp$tmp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]";}
     else
       {$use = "[\"".$use."\"]";}
-      
-    $defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
-      $use."\n";		
-	}
+    
+ 	if ($fixlinks)
+		{$lformat = " ---->|$t[1]|";}
+	else
+		{$lformat = " -- ".$t[1]. " -->";}
+			
+    //$defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
+		$defs .= $things[$t[0]].$lformat.$things[$t[2]].
+			$use."\n";		
+		}
+	
     }//exit;
 
   $defs = "graph $orientation\n".
@@ -840,7 +975,9 @@ function Mermaid_defThing ($var, $no, $fc=false)
 	    {
 	    $cls = $a["format"] ;
 	    if (isset($a["url"]))
-	      {$click = "click ".$code." \"".$a["url"]."$m[1]\"\n";}
+	      {$pp = pathinfo($a["url"]);
+				 $tt = "Link to: $pp[dirname] ...";
+				 $click = "click ".$code." \"".$a["url"]."$m[1]\" \"$tt\"; \n";}	      
 	    else if(preg_match("/^http.+$/", $var, $m))
 	      {$click = "click ".$code." \"".$var."\"\n";}
 	    break;
