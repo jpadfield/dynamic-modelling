@@ -10,14 +10,14 @@ Full details and instructions relating to how this system works is still being d
 This software is currently being developed and used as part of the work of the following project:
 
 ### The H2020 [IPERION-HS](https://www.iperionhs.eu/) project
-[<img height="64px" src="https://github.com/jpadfield/simple-modelling/blob/master/docs/graphics/IPERION-HS%20Logo.png" alt="IPERION-HS">](https://www.iperionhs.eu/)<br/>
-[<img height="32px" src="https://github.com/jpadfield/simple-modelling/blob/master/docs/graphics/iperionhs-eu-tag2.png" alt="IPERION-HS">](https://www.iperionhs.eu/)
+[<img height="64px" src="graphics/IPERION-HS%20Logo.png" alt="IPERION-HS">](https://www.iperionhs.eu/)<br/>
+[<img height="32px" src="graphics/iperionhs-eu-tag2.png" alt="IPERION-HS">](https://www.iperionhs.eu/)
 
 This software was initially developed, prepared and tested as part of:
 
 ### The H2020 [SSHOC](https://sshopencloud.eu/) project
-[<img height="64px" src="https://github.com/jpadfield/simple-modelling/blob/master/docs/graphics/sshoc-logo.png" alt="SSHOC">](https://sshopencloud.eu/)<br/>
-[<img height="32px" src="https://github.com/jpadfield/simple-modelling/blob/master/docs/graphics/sshoc-eu-tag2.png" alt="SSHOC">](https://sshopencloud.eu/)
+[<img height="64px" src="graphics/sshoc-logo.png" alt="SSHOC">](https://sshopencloud.eu/)<br/>
+[<img height="32px" src="graphics/sshoc-eu-tag2.png" alt="SSHOC">](https://sshopencloud.eu/)
 
 ### The AHRC Funded [Linked.Art](https://linked.art/) project
-[<img height="64px" src="https://github.com/jpadfield/simple-modelling/blob/master/docs/graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art">](https://ahrc.ukri.org/)
+[<img height="64px" src="graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art">](https://ahrc.ukri.org/)
