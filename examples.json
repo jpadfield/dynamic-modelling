@@ -1,27 +1,47 @@
 {
+  "documentation": {
+    "title": "Example documentation model",
+    "format": "triples",
+    "uri": "./default.csv"
+  },
   "artist": {
-    "title": "Artist CIDOC CRM",
+    "title": "IPERION-CH - Artist CIDOC CRM",
     "format": "triples",
     "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/artist/artist-triples.csv"
   },
   "object": {
-    "title": "Object CIDOC CRM",
+    "title": "IPERION-CH - Object CIDOC CRM",
     "format": "triples",
     "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/object/object-triples.csv"
   },
   "imaging": {
-    "title": "Simple Image Examination CIDOC CRM",
+    "title": "IPERION-CH - Image Examination CIDOC CRM",
     "format": "triples",
     "uri": "https://raw.githubusercontent.com/jpadfield/cidoc-crm.examples/master/models/imageexam/imageexam-triples.csv"
   },
   "object2":{
-    "title": "Object Linked Art Showcase 1 Getty example",
+    "title": "Linked Art - Getty Object Showcase 1",
     "format": "json",
     "uri": "https://raw.githubusercontent.com/linked-art/showcase1/master/data/getty/Object/02bac13e-7e54-45ab-ba3a-426b7e48a0d1.json"
   },
+  "sshoc_object":{
+    "title": "SSHOC - Object CIDOC CRM",
+    "format": "triples",
+    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-object.csv"
+  },
+  "sshoc_sample":{
+    "title": "SSHOC - Painting Sample CIDOC CRM",
+    "format": "triples",
+    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-sample.csv"
+  },
+  "sshoc_image":{
+    "title": "SSHOC - Image and IIIF CIDOC CRM",
+    "format": "triples",
+    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-image.csv"
+  },
   "example_formats":{
     "title": "Examples of all of the predefined config formats",
-    "format": "data",
-    "data": "eJx9UsFuwyAMPYPEP%2Bwb%2BINJ7aRJU287T5TSjS0JEdBJlfj4GRuSlCS7mGf78V6CrX3POjv8mMtTdCx%2B2eGTad8nRIJTYSaYXzNElvAQnLKm%2B3EeCgHQWsGdv40GCToFL3lLQJUJrmWUjs6zhIfglDVdlKhI8A2ri9O3Hn%2BoIsGn2pqGgotkUzPeR8NSjluGtg8gARGMMn5skQGBTfGxUxrU8RCcsqaLGhVlkfZtBtWDRI7rAY7GW3eB%2B3iCA%2BUtgTwqzCbteG6%2BYwmC4BktzF3M5hDbTmej8QpuFSA4cmdCiLfrFQXS%2B%2BlwfHk9HQ%2BCU3VmnVUAgxzzZ71R%2FdmvtlTilhPc4dHry7qGezR8X1k2bY%2BUhypptnIaimzWRtLeAIGyx5lJGpqkzVl27XB18I0sFSB4rSz0bW%2FCqGBuFYFLrTUrJMsCybIg8t8xrSi6UyGEeO9gEDP%2BA38Qhc8%3D"
+    "format": "triples",
+    "uri": "https://research.ng-london.org.uk/modelling/examples/doc-formats.csv"
   }
 }

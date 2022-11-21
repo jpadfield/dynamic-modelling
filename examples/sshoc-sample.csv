@@ -1,0 +1,65 @@
+N1c244cd259cc4bcdb8efc94652ec0290	sci:O5_removed	ngo:Y4M5-2P4X-GYFR-9WJP	event_bn|object
+N1c244cd259cc4bcdb8efc94652ec0290	sci:O3_sampled_from	ngo:0D0E-0001-0000-0000	|object
+N1c244cd259cc4bcdb8efc94652ec0290	sci:O4_sampled_at	N3017590f9ff54ca4b46ccdeac8e55903	|place_bn
+N1c244cd259cc4bcdb8efc94652ec0290	crm:P14_carried_out_by	ngo:WLTN-O3MV-PTQH-4CHX	|actor
+N1c244cd259cc4bcdb8efc94652ec0290	crm:P70_is_documented_in	N3c49ba4a0b3c411eb0f28315f97a70e1	|object_bn
+N1c244cd259cc4bcdb8efc94652ec0290	rdfs:comment	Actual textual content describing the sampling process (describes the event)	|note
+//subgraph Documentation			
+wd:Q1710397	rdfs:label	reason	|thing
+N3c49ba4a0b3c411eb0f28315f97a70e1	crm:P2_has_type	wd:Q1710397	|type
+N3c49ba4a0b3c411eb0f28315f97a70e1	rdfs:comment	As part of a general technical examination of the painting - documenting the material and techniques used in its production.	|note
+N3c49ba4a0b3c411eb0f28315f97a70e1	rdf:type	crm:E31_Document	|type
+N3c49ba4a0b3c411eb0f28315f97a70e1	crm:P2_has_type	crm:E31_Document	|type
+//end			
+N1c244cd259cc4bcdb8efc94652ec0290	rdf:type	sci:S2_Sample_Taking	|type
+N1c244cd259cc4bcdb8efc94652ec0290	crm:P2_has_type	sci:S2_Sample_Taking	|type
+//subgraph Sampled Location			
+aat:300241583	rdfs:label	components (object part)	thing|
+N3017590f9ff54ca4b46ccdeac8e55903	crm:P2_has_type	aat:300241583	place_bn|
+N3017590f9ff54ca4b46ccdeac8e55903	rdfs:label	Crimson of cope shadow above right hand 110x	|note
+N3017590f9ff54ca4b46ccdeac8e55903	rdf:type	crm:E53_Place	|type
+N3017590f9ff54ca4b46ccdeac8e55903	crm:P2_has_type	crm:E53_Place	|type
+//end			
+//subgraph Sample Embedding			
+ngo:MNEA-GXYR-WR13-5W4S	crm:P2_has_type	crm:E13_Attribute_Assignment	event|type
+aat:300034254	rdfs:label	cross sections	thing|
+aat:300014533	rdfs:label	epoxy resin	thing|
+ngo:MNEA-GXYR-WR13-5W4S	crm:P2_has_type	aat:300443464	
+aat:300443464	rdfs:label	embedding	thing|
+ngo:MNEA-GXYR-WR13-5W4S	crm:P16_used_specific_object	aat:300014533	
+ngo:MNEA-GXYR-WR13-5W4S	crm:P177_assigned_property_of_type	aat:300034254	
+ngo:MNEA-GXYR-WR13-5W4S	rdf:type	sci:S18_Alteration	|type
+ngo:MNEA-GXYR-WR13-5W4S	crm:P2_has_type	sci:S18_Alteration	|type
+//end			
+ngo:MNEA-GXYR-WR13-5W4S	crm:P140_assigned_attribute_to	ngo:Y4M5-2P4X-GYFR-9WJP	event_bn|object
+ngo:0D0E-0001-0000-0000	crm:P59_has_section	N3017590f9ff54ca4b46ccdeac8e55903	|object_bn
+//subgraph Sample Imaging			
+Nb23f47ae7f2543c99655735df33b2b6f	crm:P2_has_type	crm:E16_Measurement	event_bn|type
+aat:300379861	rdfs:label	imaging (image making process)	thing|
+Nb23f47ae7f2543c99655735df33b2b6f	crm:P2_has_type	aat:300379861	
+Nb23f47ae7f2543c99655735df33b2b6f	rdfs:label	Imaging of N-0027-00_inorganic_sample_012	|note
+Nb23f47ae7f2543c99655735df33b2b6f	rdf:type	crm:E16_Measurement	|type
+Nb23f47ae7f2543c99655735df33b2b6f	crm:P32_used_general_technique	aat:300379532	
+aat:300379532	rdfs:label	optical microscopy	
+//end			
+Nb23f47ae7f2543c99655735df33b2b6f	crm:P39_measured	ngo:Y4M5-2P4X-GYFR-9WJP	
+//subgraph Person Responsible			
+ngo:WLTN-O3MV-PTQH-4CHX	rdf:type	crm:E21_Person	|type
+aat:300025820	rdfs:label	conservation scientist	thing|
+ngo:WLTN-O3MV-PTQH-4CHX	crm:P2_has_type	aat:300025820	
+ngo:WLTN-O3MV-PTQH-4CHX	crm:P2_has_type	crm:E21_Person	|type
+ngo:WLTN-O3MV-PTQH-4CHX	rdfs:label	Example NG Staff Member	|note
+//end			
+//subgraph Sample			
+ngo:Y4M5-2P4X-GYFR-9WJP	crm:P138_represents	ngo:0D0E-0001-0000-0000	
+ngo:Y4M5-2P4X-GYFR-9WJP	rdfs:label	N-0027-00_inorganic_sample_012	|note
+ngo:Y4M5-2P4X-GYFR-9WJP	crm:P2_has_type	sci:S13_Sample	|type
+ngo:Y4M5-2P4X-GYFR-9WJP	sci:O25i_is_contained_in	ngo:0D0E-0001-0000-0000	
+ngo:Y4M5-2P4X-GYFR-9WJP	rdf:type	sci:S13_Sample	|type
+aat:300028875	rdfs:label	samples	thing|
+ngo:Y4M5-2P4X-GYFR-9WJP	crm:P2_has_type	aat:300028875	
+ngo:0D0E-0001-0000-0000	rdf:type	E24_Physical_Human_Made_Thing	
+ngo:0D0E-0001-0000-0000	rdfs:label	Portrait of Pope Julius II	|name
+//end			
+ngo:Y4M5-2P4X-GYFR-9WJP	crm:P2_has_type	aat:300034254	
+ngo:Y4M5-2P4X-GYFR-9WJP	sci:O18i_was_altered_by	ngo:MNEA-GXYR-WR13-5W4S	

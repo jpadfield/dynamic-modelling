@@ -1,0 +1,118 @@
+ngo:1ZFX-UT2V-87KR-N3EY	crm:P39_measured	ngo:0D0E-0001-0000-0000	event|object
+//subgraph Pyramid			
+//subgraph Pyramidal Levels			
+N02f1971b0b564dc6bf800010b96f9289	rdfs:label	Number of pyramidal levels	dims_bn|note
+N02f1971b0b564dc6bf800010b96f9289	crm:P90_has_value	6	|literal
+N02f1971b0b564dc6bf800010b96f9289	crm:P2_has_type	crm:E54_Dimension	|type
+N02f1971b0b564dc6bf800010b96f9289	rdf:type	crm:E54_Dimension	|type
+//end			
+ngo:3UFH-4E94-4ZCU-VSYE	crm:P1_is_identifed_by	Nc61a3e9bcd094264ada9250dc99a5d6cXX	object|object_bn
+ngo:3UFH-4E94-4ZCU-VSYE	crm:P43_has_dimension	N02f1971b0b564dc6bf800010b96f9289	
+//subgraph Pyramid File Name			
+Nc61a3e9bcd094264ada9250dc99a5d6cXX	crm:P2_has_type	wd:Q1144928	
+wd:Q1144928	rdfs:label	filename	
+Nc61a3e9bcd094264ada9250dc99a5d6cXX	crm:P2_has_type	crm:E42_Identifier	|type
+Nc61a3e9bcd094264ada9250dc99a5d6cXX	rdf:type	crm:E42_Identifier	|type
+Nc61a3e9bcd094264ada9250dc99a5d6cXX	rdfs:label	N-0027-00-000060-PYR.tif	
+//end			
+ngo:3UFH-4E94-4ZCU-VSYE	crm:P2_has_type	wd:Q3411251	
+wd:Q3411251	rdfs:label	pyramid	
+//end			
+N3017590f9ff54ca4b46ccdeac8e55903	rdf:type	dig:D3_Formal_Derivation	event_bn|type
+N3017590f9ff54ca4b46ccdeac8e55903	dig:L23_used_software_or_firmware	ngo:XE06-LC28-SMX0-OTVO	|object
+N3017590f9ff54ca4b46ccdeac8e55903	crm:P2_has_type	dig:D3_Formal_Derivation	
+N3017590f9ff54ca4b46ccdeac8e55903	dig:L21_used_as_derivation_source	ngo:3UFH-4E94-4ZCU-VSYE	|object
+N3017590f9ff54ca4b46ccdeac8e55903	dig:L22_created_derivative	ngo:62NG-RN57-CLEB-AMSM	|object
+//subgraph Digital Image of NG27			
+aat:300215302	rdfs:label	digital images	
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P108i_was_produced_by	ngo:1ZFX-UT2V-87KR-N3EY	object|event
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P43_has_dimension	N35acaf74c9a848eaaa6bd3a17be7ffe8	|dims_bn
+aat:300266226	rdfs:label	TIFF	
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P2_has_type	aat:300215302	
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P149_is_identified_by	Nc61a3e9bcd094264ada9250dc99a5d6c	|dims_bn
+//subgraph File Name			
+Nc61a3e9bcd094264ada9250dc99a5d6c	crm:P2_has_type	wd:Q1144928	
+wd:Q1144928	rdfs:label	filename	
+Nc61a3e9bcd094264ada9250dc99a5d6c	crm:P2_has_type	crm:E42_Identifier	|type
+Nc61a3e9bcd094264ada9250dc99a5d6c	rdf:type	crm:E42_Identifier	|type
+Nc61a3e9bcd094264ada9250dc99a5d6c	rdfs:label	N-0027-00-000060.tif	
+//end			
+//subgraph Bit Depth			
+wd:Q270159	rdfs:label	8-bit	
+aat:300265866	rdfs:label	bits (computing)	
+aat:300410392	rdfs:label	bit depth	
+N35acaf74c9a848eaaa6bd3a17be7ffe8	crm:P2_has_type	wd:Q270159	dims_bn|
+N35acaf74c9a848eaaa6bd3a17be7ffe8	rdf:type	crm:E54_Dimension	|type
+N35acaf74c9a848eaaa6bd3a17be7ffe8	crm:P2_has_type	aat:300410392	
+N35acaf74c9a848eaaa6bd3a17be7ffe8	crm:P91_has_unit	aat:300265866	
+N35acaf74c9a848eaaa6bd3a17be7ffe8	crm:P2_has_type	crm:E54_Dimension	|type
+//end			
+//subgraph X-Ray Imaging Event			
+aat:300056058	rdfs:label	x-ray (radiation)	
+aat:300379861	rdfs:label	imaging (image making process)	
+aat:300419323	rdfs:label	x-radiography	
+ngo:1ZFX-UT2V-87KR-N3EY	rdf:type	crm:E16_Measurement	event|type
+ngo:1ZFX-UT2V-87KR-N3EY	crm:P2_has_type	crm:E16_Measurement	
+ngo:1ZFX-UT2V-87KR-N3EY	crm:P2_has_type	aat:300379861	
+ngo:1ZFX-UT2V-87KR-N3EY	crm:P32_used_general_technique	aat:300419323	
+ngo:1ZFX-UT2V-87KR-N3EY	rdfs:comment	This event is really a composite of two events - the x-ray examination, which was taken on film, and the digitisation of that film	
+ngo:1ZFX-UT2V-87KR-N3EY	rdfs:label	X-Ray Examination of NG27	
+ngo:1ZFX-UT2V-87KR-N3EY	crm:P125_used_object_of_type	aat:300056058	
+//end			
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P70i_is_documented_in	ngo:4CBT-XTB5-GIHR-D7JO	|object
+ngo:4CBT-XTB5-GIHR-D7JO	rdfs:label	The National Gallery Collection Image Database	
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P43_has_dimension	N5337eb7a43994acfaae78e2d1571df56	|dims_bn
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P2_has_type	dig:D9_Data_Object	|type
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P2_has_type	aat:300266226	
+ngo:5TGX-GBZ4-XV2A-XQGC	dig:L56_has_pixel_width	3502	|literal
+ngo:5TGX-GBZ4-XV2A-XQGC	dig:L57_has_pixel_height	4435	|literal
+ngo:5TGX-GBZ4-XV2A-XQGC	rdf:type	dig:D9_Data_Object	
+//subgraph File Size			
+N5337eb7a43994acfaae78e2d1571df56	crm:P90_has_value	31093772	dims_bn|literal
+aat:300265863	rdfs:label	size for computer files	
+aat:300265869	rdfs:label	bytes	
+N5337eb7a43994acfaae78e2d1571df56	crm:P2_has_type	aat:300265863	
+N5337eb7a43994acfaae78e2d1571df56	crm:P2_has_type	crm:E54_Dimension	|type
+N5337eb7a43994acfaae78e2d1571df56	rdf:type	crm:E54_Dimension	|type
+N5337eb7a43994acfaae78e2d1571df56	crm:P91_has_unit	aat:300265869	
+//end			
+//end			
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P65_shows_visual_item	ngo:IKPB-MY0O-IQRM-Q1YS	|object
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P138_represents	ngo:0D0E-0001-0000-0000	
+ngo:5TGX-GBZ4-XV2A-XQGC	crm:P62_depicts	ngo:0D0E-0001-0000-0000	
+//subgraph Thumbnail			
+ngo:62NG-RN57-CLEB-AMSM	rdf:type	dig:D9_Data_Object	|type
+ngo:62NG-RN57-CLEB-AMSM	crm:P2_has_type	dig:D9_Data_Object	
+ngo:62NG-RN57-CLEB-AMSM	crm:P48_has_preferred_identifier	N256cc5005ca64c55ad70b0f7a84ba046	|dims_bn
+wd:Q873806	rdfs:label	thumbnail	
+ngo:62NG-RN57-CLEB-AMSM	crm:P2_has_type	wd:Q873806	
+//subgraph Thumbnail URI			
+N256cc5005ca64c55ad70b0f7a84ba046	rdf:type	crm:E42_Identifier	|type
+aat:300404629	rdfs:label	uniform resource identifiers	
+N256cc5005ca64c55ad70b0f7a84ba046	crm:P2_has_type	crm:E42_Identifier	|type
+N256cc5005ca64c55ad70b0f7a84ba046	rdf:value	https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-0027/16.1_X-Ray_Images/N-0027-00-000060-PYR.tif/full/,256/0/default.jpg	|url
+//end			
+//end			
+N256cc5005ca64c55ad70b0f7a84ba046	crm:P2_has_type	aat:300404629	
+ngo:62NG-RN57-CLEB-AMSM	crm:P62_depicts	ngo:0D0E-0001-0000-0000	
+ngo:62NG-RN57-CLEB-AMSM	crm:P65_shows_visual_item	ngo:IKPB-MY0O-IQRM-Q1YS	
+Nb23f47ae7f2543c99655735df33b2b6f	rdf:type	dig:D3_Formal_Derivation	event_bn|type
+Nb23f47ae7f2543c99655735df33b2b6f	dig:L22_created_derivative	ngo:3UFH-4E94-4ZCU-VSYE	|object
+Nb23f47ae7f2543c99655735df33b2b6f	crm:P2_has_type	dig:D3_Formal_Derivation	
+Nb23f47ae7f2543c99655735df33b2b6f	dig:L21_used_as_derivation_source	ngo:5TGX-GBZ4-XV2A-XQGC	
+//subgraph Visual Item representing an Image			
+ngo:IKPB-MY0O-IQRM-Q1YS	crm:P138_represents	ngo:0D0E-0001-0000-0000	
+ngo:IKPB-MY0O-IQRM-Q1YS	crm:P1i_is_identified_by	X-ray image of a detail from NG27	
+ngo:IKPB-MY0O-IQRM-Q1YS	rdf:type	crm:E36_Visual_Item	|type
+ngo:IKPB-MY0O-IQRM-Q1YS	crm:P2_has_type	crm:E36_Visual_Item	
+//end			
+//subgraph IIIF Server			
+ngo:XE06-LC28-SMX0-OTVO	rdf:type	dig:D14_Software	object|
+ngo:XE06-LC28-SMX0-OTVO	crm:P2_has_type	aat:300266043	
+ngo:XE06-LC28-SMX0-OTVO	crm:P2_has_type	dig:D14_Software	|type
+ngo:XE06-LC28-SMX0-OTVO	crm:P48_has_preferred_identifier	N6d994ff4ca1146d28ccd4f895688b4fa	
+aat:300266043	rdfs:label	servers (computer)	
+N6d994ff4ca1146d28ccd4f895688b4fa	crm:P2_has_type	crm:E42_Identifier	|type
+N6d994ff4ca1146d28ccd4f895688b4fa	rdf:value	https://research.ng-london.org.uk/iiif	|url
+N6d994ff4ca1146d28ccd4f895688b4fa	rdf:type	crm:E42_Identifier	|type
+//end			

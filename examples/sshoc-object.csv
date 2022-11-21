@@ -1,0 +1,81 @@
+//subgraph Width and Height			
+aat:300055644	rdfs:label	height	
+aat:300055647	rdfs:label	width	
+aat:300379098	rdfs:label	centimeters	
+N00b58fc196f84ad6b4c432a53f4c9fd9	rdf:type	crm:E54_Dimension	dims_bn|type
+N00b58fc196f84ad6b4c432a53f4c9fd9	crm:P90_has_value	81	
+N00b58fc196f84ad6b4c432a53f4c9fd9	crm:P2_has_type	crm:E54_Dimension	|type
+N00b58fc196f84ad6b4c432a53f4c9fd9	crm:P91_has_unit	aat:300379098	
+N00b58fc196f84ad6b4c432a53f4c9fd9	crm:P2_has_type	aat:300055647	
+N95d46b3529834d41b65338714016a3dc	crm:P90_has_value	108.7	dims_bn|
+N95d46b3529834d41b65338714016a3dc	crm:P91_has_unit	aat:300379098	
+N95d46b3529834d41b65338714016a3dc	crm:P2_has_type	crm:E54_Dimension	|type
+N95d46b3529834d41b65338714016a3dc	rdf:type	crm:E54_Dimension	|type
+N95d46b3529834d41b65338714016a3dc	crm:P2_has_type	aat:300055644	
+//end			
+//subgraph ID Number			
+aat:300404626	rdfs:label	identification numbers	
+N9a9193589c244bdd90cd1a8a3be22b15	crm:P2_has_type	aat:300404626	
+N9a9193589c244bdd90cd1a8a3be22b15	crm:P2_has_type	crm:E42_Identifier	|type
+N9a9193589c244bdd90cd1a8a3be22b15	rdfs:label	NG27	
+N9a9193589c244bdd90cd1a8a3be22b15	rdf:type	crm:E42_Identifier	
+//end			
+ngo:0D0E-0001-0000-0000	crm:P2_has_type	aat:300033799	object|
+//subgraph Title			
+ngo:01CE-1F84-PVN2-I0KB	crm:P2_has_type	crm:E35_Title	name|type
+aat:300417208	rdfs:label	brief title	
+aat:300417209	rdfs:label	full title	
+ngo:01CE-1F84-PVN2-I0KB	crm:P2_has_type	aat:300417208	
+ngo:01CE-1F84-PVN2-I0KB	rdfs:label	Portrait of Pope Julius II	
+ngo:01CE-1F84-PVN2-I0KB	crm:P108i_was_produced_by	This set of triples points to a production event that exists elsewhere in our database but overcomplicates the presentation when mapped here.	|note
+ngo:01CE-1F84-PVN2-I0KB	rdf:type	crm:E35_Title	
+ngo:01CE-1F84-PVN2-I0KB	crm:P2_has_type	aat:300417209	
+//end			
+ngo:0D0E-0001-0000-0000	crm:P102_has_title	ngo:01CE-1F84-PVN2-I0KB	object|
+aat:300033799	rdfs:label	oil paintings (visual works)@en	
+ngo:0D0E-0001-0000-0000	rdf:type	crm:E24_Physical_Human_Made_Thing	|type
+ngo:0D0E-0001-0000-0000	crm:P46_forms_part_of	ngo:ZGSO-VAD2-9Z05-06C8	|object
+ngo:0D0E-0001-0000-0000	crm:P48_has_preferred_identifier	N9a9193589c244bdd90cd1a8a3be22b15	
+aat:300033618	rdfs:label	paintings (visual items)	
+ngo:0D0E-0001-0000-0000	crm:P2_has_type	aat:300033618	
+ngo:0D0E-0001-0000-0000	crm:P43_has_dimension	N00b58fc196f84ad6b4c432a53f4c9fd9	
+ngo:0D0E-0001-0000-0000	crm:P53_has_former_or_current_location	ngo:86O6-Z6YG-YL6M-10CR	|place
+ngo:0D0E-0001-0000-0000	crm:P46_is_composed_of	ngo:EKIQ-ZJ5P-V90O-7W9G	|object
+ngo:0D0E-0001-0000-0000	crm:P2_has_type	crm:E24_Physical_Human_Made_Thing	
+ngo:0D0E-0001-0000-0000	crm:P43_has_dimension	N95d46b3529834d41b65338714016a3dc	
+ngo:0D0E-0001-0000-0000	crm:P46_is_composed_of	ngo:92X1-C8TT-C1MA-RNRN	|object
+//subgraph Location			
+ngo:86O6-Z6YG-YL6M-10CR	crm:P2_has_type	crm:E53_Place	|type
+ngo:86O6-Z6YG-YL6M-10CR	rdf:type	crm:E53_Place	
+ngo:86O6-Z6YG-YL6M-10CR	rdfs:label	Room 8	
+//end			
+ngo:0D0E-0001-0000-0000	crm:P2_has_type	aat:300033656	
+aat:300033656	rdfs:label	panel paintings (paintings by form)@en	
+//subgraph Support Material			
+ngo:92X1-C8TT-C1MA-RNRN	rdf:type	crm:E24_Physical_Human_Made_Thing	|type
+aat:300014844	rdfs:label	supports (artists' materials)	
+aat:300012363	rdfs:label	poplar (wood)@en	
+ngo:92X1-C8TT-C1MA-RNRN	crm:P45_consists_of	aat:300012363	
+ngo:92X1-C8TT-C1MA-RNRN	crm:P2_has_type	aat:300014844	
+ngo:92X1-C8TT-C1MA-RNRN	crm:P2_has_type	crm:E24_Physical_Human_Made_Thing	|type
+//end			
+//subgraph Media			
+ngo:EKIQ-ZJ5P-V90O-7W9G	rdf:type	crm:E24_Physical_Human_Made_Thing	|type
+Nacb7e7b2294043598d642b35c199fe06	crm:P2_has_type	aat:300014286	object_bn|
+Nacb7e7b2294043598d642b35c199fe06	crm:P2_has_type	aat:300014720	
+aat:300014720	rdfs:label	binder (materials)	
+aat:300014286	rdfs:label	drying oil	
+ngo:EKIQ-ZJ5P-V90O-7W9G	crm:P45_consists_of	Nacb7e7b2294043598d642b35c199fe06	
+ngo:EKIQ-ZJ5P-V90O-7W9G	crm:P2_has_type	aat:300015050	
+ngo:EKIQ-ZJ5P-V90O-7W9G	crm:P2_has_type	aat:300163343	
+aat:300015050	rdfs:label	oil paint (paint)@en	
+aat:300163343	rdfs:label	media (artists' material)	
+ngo:EKIQ-ZJ5P-V90O-7W9G	crm:P2_has_type	crm:E24_Physical_Human_Made_Thing	|type
+//end			
+//subgraph Collection			
+ngo:ZGSO-VAD2-9Z05-06C8	crm:P2_has_type	crm:E78_Curated_Holding	|type
+aat:300443858	rdfs:label	collections (repositories)	
+ngo:ZGSO-VAD2-9Z05-06C8	crm:P2_has_type	aat:300443858	
+ngo:ZGSO-VAD2-9Z05-06C8	rdf:type	crm:E78_Curated_Holding	|type
+ngo:ZGSO-VAD2-9Z05-06C8	rdfs:label	The National Gallery Collection	
+//end			

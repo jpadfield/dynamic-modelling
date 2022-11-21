@@ -1,5 +1,7 @@
 {
   "format": {
+    "group": {
+      "stroke": "white", "fill": "white", "color": "black"},
     "base": {
       "stroke": "black", "fill": "white", "color": "black", "rx": "5px", "ry": "5px"},
     "thing": {
@@ -11,7 +13,11 @@
     "object": {
       "stroke": "#2C5D98", "fill": "#2C5D98", "color": "white"},           
     "object_bn": {
-      "stroke": "#1E3F67", "fill": "#94abc5", "color": "#1E3F67", "rx": "20px", "ry": "20px"},      
+      "stroke": "#1E3F67", "fill": "#94abc5", "color": "#1E3F67", "rx": "20px", "ry": "20px"},          
+    "idea": {
+      "stroke": "#1f0e9a", "fill": "#1f0e9a", "color": "white"},           
+    "idea_bn": {
+      "stroke": "#1f0e9a", "fill": "#e7e5f6", "color": "#1f0e9a", "rx": "20px", "ry": "20px"},      
     "document": {
       "stroke": "#2C5D98", "fill": "#33B0FF", "color": "2C5D98"},           
     "document_bn": {
@@ -33,7 +39,9 @@
     "place_bn": {
       "stroke": "#9D390F","fill":"#eecaba", "color":"#9D390F","rx":"20px","ry":"20px;"},      
     "type": {
-      "stroke": "#502604", "fill": "#FAB565",  "color":"#502604", "rx":"20px","ry":"20px;"},
+      "stroke": "#502604", "fill": "#FAB565",  "color":"#502604", "rx":"20px","ry":"20px;"}, 
+    "type_bn": {
+      "stroke": "#502604", "fill": "#F9E1C3",  "color":"#6C3304", "rx":"20px","ry":"20px;"},
     "name": {
       "stroke": "#563800", "fill": "#FEF3BA", "color":"#563800", "rx": "20px", "ry": "20px"},
     "literal": {
@@ -92,7 +100,7 @@
 	"long": "http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/](.+)"},
       "format": "type",
       "url": "http://vocab.getty.edu/aat/"
-      },   
+      },    
     "ulan": {
       "match": {
 	"short": "[Uu][Ll][Aa][nN][:](.+)",

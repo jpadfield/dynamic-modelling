@@ -40,9 +40,19 @@ Dynamic Modeller	carries out	_BN
 _BN	produces	Flow-diagrams	|thing
 Flow-diagrams	can be saved by	"Copying the triples and saving them as a text file."
 Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark Link options, under the Links menu, after an update."
-Flow-diagrams	can be saved by	Saving an image	|event
-Saving an image	has comment	"Following the link under the Get Image link, under the Links menu, and using the options provided."
-Saving an image	is achieved using the	https://mermaid-js.github.io/mermaid-live-editor
+
+Flow-diagrams	can be saved by	Downloading an image	|event
+Downloading an image	has comment	"Following the link under the Download Image link, under the Links menu, and using the options provided."
+Downloading an image	is achieved using	https://mermaid.ink/
+
+Flow-diagrams	can also be edited in	The Mermaid Live Editor	|event
+The Mermaid Live Editor	has comment	"Following the link under the Mermaid Editor link, under the Links menu, and using the options provided."
+The Mermaid Live Editor	has url	https://mermaid-js.github.io/mermaid-live-editor
 _BN	has type	Author	actor_bn|
 _BN	has comment	"New Blank Nodes, or any other entities can refer back to a previous Blank Node by adding a suffix to indicate how many Blank Nodes back one wants to refer to, i.e. the previous blank node would be referenced as '_BN-1' and the one before that would be '_BN-2' and so on."
 _BN	assigned	_BN-1
+
+Dynamic Modeller	can display	Free Font Awesome 5 Icons|https://fontawesome.com/v5/icons/
+Free Font Awesome 5 Icons	for example	far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code
+far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code	has note	The Font Awesome icons can be added by formatting the icon details, provided on the Font Awesome website, like:<br/>far : fa-user-circle<br/>(without the spaces around the colon).
+

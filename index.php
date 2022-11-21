@@ -1,60 +1,106 @@
 <?php
 
+// Added option to link subgraphs as nodes - needs diagram to be set as "flowchart" and not "graph"
 // Added tests for hover text - it just uses a default example text just now
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Graph LR fix
 $versions = array(
-	"jquery" => "3.6.0",
-	"bootstrap" => "5.1.3",
-	"mermaid" => "9.1.4"
-	);
+  "jquery" => "3.6.1",
+  "bootstrap" => "5.2.2",
+  "mermaid" => "9.1.7", // 9.2.2 available but it breaks the zoom option, so would need to check.
+  "tether" => "2.0.0",
+  "pako" => "2.1.0",
+  "base64" => "3.7.3"
+  );
   
 if (isset($_GET["debug"])) {}
-	
-if (isset($_SERVER["SCRIPT_URL"]))
-	{$thisPage = $_SERVER["SCRIPT_URL"];}
+  
+if (isset($_SERVER["SCRIPT_URI"]))
+  {$thisPage = $_SERVER["SCRIPT_URI"];}
 else
-	{$thisPage = "./";}
+  {$thisPage = "./";}
 
-if (isset($_SERVER["HTTP_X_FORWARDED_HOST"]) and  $_SERVER["HTTP_X_FORWARDED_HOST"] == "round4.ng-london.org.uk")
-	{$thisPage = "/ex".$thisPage;}
-
-$fixlinks = false;	
+$pako = false;
+$diagram = "graph";
+$fixlinks = false;  
 $orientation = "LR";
-$live_edit_link = "./";
+
 $default = file_get_contents("default.csv");
 $config = getRemoteJsonDetails ("config.json", false, true);
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 $usedClasses = array();
+$subGraphs = array();
 $allClasses = formatClassDef ($config["format"]);
 
 $doc_example_links = array(
-	"LRNF" => array("TBNF", "LRF", "LR"), 
-	"TBNF" => array("LRNF", "TBF", "TB"), 
-	"LRF" => array("TBF", "LRNF", "LR fix"), 
-	"TBF" => array("LRF", "TBNF", "TB fix"), 
-	);
+  "LRNF" => array("TBNF", "LRF", "LR"), 
+  "TBNF" => array("LRNF", "TBF", "TB"), 
+  "LRF" => array("TBF", "LRNF", "LR fix"), 
+  "TBF" => array("LRF", "TBNF", "TB fix"), 
+  );
 
-if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
+// Expects pako compressed data and pulls image directly from https://mermaid.ink
+if (isset($_GET["image"]))
+  {getModelImage($_GET["image"]);
+	 exit;}  
+
+// Default process of using the tool - receiving data from POST form.
+else if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
   {$triplesTxt = checkTriples ($_POST["triplesTxt"]);}
+  
+// Pulls in prepared data from local examples of defined files
+// TODO - local data needs to be updated to pako compression
 else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
-  {$ex = $examples[$_GET["example"]];
+  {
+	$ex = $examples[$_GET["example"]];
   if (isset($ex["data"]))
     {$triplesTxt = gzuncompress(base64_decode(urldecode($ex["data"])));}
   else
-    {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}}
+    {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
+  
+  if ($_GET["example"] == "object2")
+    {$triplesTxt = "//Graph LR fix\n".$triplesTxt;}
+  }
+  
+// Used to ad additional format options to the default "instructions diagram
 else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]]))
-	{$triplesTxt = docExampleTriples ($doc_example_links[$_GET["example"]]);}
+  {$triplesTxt = docExampleTriples ($doc_example_links[$_GET["example"]]);}
+  
+// TODO works with an external data source 
 else if (isset($_GET["url"]))
   {$triplesTxt = checkTriples (file_get_contents($_GET["url"]));}
+  
+// TODO Need to update to allow data to be sent as pako compressed - three options 
+// 1: Duplicate pako JavaScript compression (used by MLE) in PHP
+// 2: Call local Javascript function via Node JS to preform the compression
+// 3: Move all data formatting to AJAX processes and make use of the default pako compression as needed.
+// CURRENT PLAN is to follow option 3
+else if (isset($_GET["data"]) and preg_match("/^[p][a][k][o][:](.+)$/", $_GET["data"], $m))
+  {
+	$triplesTxt = "Please wait	tooltip	Processing supplied data";
+	$pako = $m[1];//$_GET["data"];
+  //prg(1, $triplesTxt);
+  }
+else if (isset($_POST["triples"]))
+  {
+	$triples = getCleanTriples($_POST["triples"]);
+	$cleanTriplesTxt = implode("\n", $triples);
+	$raw = getRaw($triples);
+	$mermaid = Mermaid_formatData ($raw["test"]);
+	
+	header('Content-Type: application/json');
+	header("Access-Control-Allow-Origin: *");
+	echo json_encode(array("triples" => $cleanTriplesTxt, "mermaid" => $mermaid));
+	exit;
+  }    
+// TODO simple PHP based compression option (URLs much longer) want to still have the option as a fall back
 else if (isset($_GET["data"]))
   {$triplesTxt = gzuncompress(base64_decode($_GET["data"]));}
+  
+// Default instructions diagram
 else
-  {
-	$triplesTxt = docExampleTriples ($doc_example_links["LRNF"]);
-	//$triplesTxt = checkTriples ($default);
-	}
+  {$triplesTxt = docExampleTriples ($doc_example_links["LRNF"]);}
 
-// Thumbnail display might be possible with
+// TODO Thumbnail display in diagram nodes might be possible with - but needs to be re-examined as it was not sorted
 //    
 // O4 -- "crm:P48_has_preferred_identifier" -->O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]
 
@@ -63,19 +109,16 @@ else
 // in 9.1.4 it seems to work without the "&nbsp"s
 // O4 -- "crm:P48_has_preferred_identifier" -->O6[<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>];    
 
+// TODO move process into JavaScript with pako compression
 $data = urlencode(base64_encode(gzcompress($triplesTxt)));
 $bookmark = $thisPage.'?data='.$data;
 
-//prg(0, $triplesTxt);
+// TODO move to JavaScript and AJAX processes.
 $triples = getCleanTriples($triplesTxt);
-//prg(0, $triples);
 $cleanTriplesTxt = implode("\n", $triples);
-//prg(0, $cleanTriplesTxt);
 $raw = getRaw($triples);
-//prg(0, $raw);
 $mermaid = Mermaid_formatData ($raw["test"]);
-//prg(0, $mermaid);
-	
+  
 $html = buildPage ($cleanTriplesTxt, $mermaid);
 echo $html;
 exit;
@@ -84,29 +127,29 @@ exit;
 
 
 function docExampleTriples ($ex)
-	{
-	global $default;
-	
-	$layout_comments = array(
-		"TB" => array ("Graph TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
-		"LR" => array ("Graph LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
-		"F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
-		"NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
-		);
-	
-	$triplesTxt = "//Graph $ex[2] \n".checkTriples ($default);	
+  {
+  global $default;
+  
+  $layout_comments = array(
+    "TB" => array ("Graph TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
+    "LR" => array ("Graph LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
+    "F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
+    "NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
+    );
+  
+  $triplesTxt = "//Graph $ex[2] \n".checkTriples ($default);  
 
-	$do = str_split($ex[0], 2);	
-	$triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
-	$triplesTxt .= "\n".$layout_comments[$do[0]][0]."\thas comment\t".json_encode($layout_comments[$do[0]][1]);
-	
-	$do = str_split($ex[1], 2);
-	$triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[1]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[1]";
-	$triplesTxt .= "\n".$layout_comments[$do[1]][0]."\thas comment\t".json_encode($layout_comments[$do[1]][1]);
+  $do = str_split($ex[0], 2);  
+  $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
+  $triplesTxt .= "\n".$layout_comments[$do[0]][0]."\thas comment\t".json_encode($layout_comments[$do[0]][1]);
+  
+  $do = str_split($ex[1], 2);
+  $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[1]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[1]";
+  $triplesTxt .= "\n".$layout_comments[$do[1]][0]."\thas comment\t".json_encode($layout_comments[$do[1]][1]);
 
-	return ($triplesTxt);
-	}
-	
+  return ($triplesTxt);
+  }
+  
 function buildExamplesDD ()
   {
   global $examples;
@@ -132,17 +175,23 @@ END;
   
 function buildLinksDD ()
   {
-  global $live_edit_link, $bookmark;
+  global $bookmark;
 
+  $date = date('Y-m-d_H-i-s');
+  
   ob_start(); //style="margin-right: 8px; float:right; margin-bottom: 16px;" 
+  
+  // 
   echo <<<END
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLinks" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Links
     </a>
   <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuLinks">
-    <a class="dropdown-item" title="Mermaid Live Editor" href=" $live_edit_link" target="_blank">Get Image</a>
-    <a class="dropdown-item" title="Bookmark Link" href=" $bookmark" target="_blank">Bookmark Link</a>
+    <a class="dropdown-item" id="downloadLink" title="Mermaid Get PNG" href="" download="model_$date.png">Download Image</a>    
+    <!-- <a class="dropdown-item" title="Bookmark Link" href="$bookmark" target="_blank">Bookmark Link</a> -->
+		<a class="dropdown-item" id="bookmark" title="Bookmark Link" href="" target="_blank">Bookmark Link</a>
+    <a class="dropdown-item" id="mermaidLink" title="Edit further in the Mermaid Live Editor" href="" target="_blank">Mermaid Editor</a>
 END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
@@ -179,11 +228,11 @@ function debugJsonConversaion ($json, $php, $triples)
  
     <div class="row" style="padding:0px;margin:0px;">
       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
-	<pre style="height:100%;overflow:scroll;">$json</pre></div>
+  <pre style="height:100%;overflow:scroll;">$json</pre></div>
       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:#efefef;">
-	<pre style="height:100%;overflow:scroll;">$php</pre></div>
+  <pre style="height:100%;overflow:scroll;">$php</pre></div>
       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
-	<pre style="height:100%;overflow:scroll;">$triples</pre></div>
+  <pre style="height:100%;overflow:scroll;">$triples</pre></div>
     </div>
     <br>
     
@@ -204,19 +253,37 @@ END;
   
 function buildPage ($triplesTxt, $mermaid)
   {
-  global  $live_edit_link, $bookmark, $thisPage, $versions;
-
+  global  $thisPage, $versions, $pako;
+  
   $exms = buildExamplesDD ();
   $links = buildLinksDD ();
   $modal = buildModal ();
+  
+  $code = array(
+    "code" => $mermaid,
+    "mermaid" => array(
+      "theme" => "default",
+      //"securityLevel" => "loose", This option forces an alert in the live editor
+      "logLevel" => "warn",
+      "flowchart" => array( 
+    "curve" => "basis",
+    "htmlLabels" => true)
+      ));
+ 
+  $json_code = json_encode($code);
 
-	$bw = "26px";
-	
-	$vs[0] = $versions["bootstrap"];
-	$vs[1] = $versions["jquery"];
+  $bw = "26px";
+  
+  $vs[0] = $versions["bootstrap"];
+  $vs[1] = $versions["jquery"];
   $vs[2] = $versions["bootstrap"];
   $vs[3] = $versions["mermaid"];
-	
+  $vs[4] = $versions["tether"];
+  $vs[5] = $versions["pako"];
+  $vs[6] = $versions["base64"];
+  
+  $jslib = "https://unpkg.com";
+  $jslib = "https://cdn.jsdelivr.net/npm";
   ob_start();
   echo <<<END
 
@@ -226,8 +293,9 @@ function buildPage ($triplesTxt, $mermaid)
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
   <meta charset="utf-8">
   <title>Dynamic Simple Modelling</title>
-  <link href="https://unpkg.com/bootstrap@$vs[0]/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="local-dev.css" rel="stylesheet" type="text/css">
+  <link href="$jslib/bootstrap@$vs[0]/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="css/local.css" rel="stylesheet" type="text/css">
   <style>
   
 
@@ -268,8 +336,8 @@ div.mermaidTooltip {
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
       <a title="GitHub Dynamic Modelling" href="https://github.com/jpadfield/dynamic-modelling"  target="_blank"  class="imbutton" style="float:right;" >
-	<img alt="GitHub Logo" aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" style="margin-left:10px;" width="32" /></a>
-	
+  <img alt="GitHub Logo" aria-label="GitHub Logo" src="graphics/GitHub-Mark-64px.png" style="margin-left:10px;" width="32" /></a>
+  
       <h1 class="navbar-brand" style="font-size:1.5rem;margin:0px 16px 0px 16px;">Simple Dynamic Modelling</h1>
       
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -278,49 +346,63 @@ div.mermaidTooltip {
       <div class="collapse navbar-collapse float-end" id="navbarSupportedContent">
       
       <span class="navbar-text w-100">
-		  
-	<ul class="navbar-nav ml-auto float-end">
-	  $exms
-	  $links
-	  <li class="nav-item">
-	    <a href="#myModal" data-bs-toggle="modal" data-bs-target="#helpModalCenter" class="nav-link me-4">Info</a></li>
-	</ul>
-	</span>
+      
+  <ul class="navbar-nav ml-auto float-end">
+    $exms
+    $links
+    <li class="nav-item">
+      <a href="#myModal" data-bs-toggle="modal" data-bs-target="#helpModalCenter" class="nav-link me-4">Info</a></li>
+  </ul>
+  </span>
       </div>
       
     </nav> <!-- CLOSE LEVEL 1 -->
     <!-- LEVEL 2 -->
     <div class="" style=""  role="region" >
       <form id="triplesFrom" action="$thisPage" method="post">
-	<div  id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
-	  <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
-	  <div class="tbtns" style="">
-	      <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="$bw" /></button>
-	      <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="$bw" /></button>
-	      <button title="Help" class="btn btn-default textbtn" id="help" type="button" data-bs-toggle="modal" data-bs-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="$bw" /></button>
-	      <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
-	  </div>
-	</div>
+  <div  id="textholder" class="textareadiv form-group flex-grow-1 d-flex flex-column">
+    <textarea class="form-control flex-grow-1 rounded-0 detectTab" id="triplesTxt" name="triplesTxt"  style="overflow-y:scroll;" aria-label="Textarea for triples" rows="10">$triplesTxt</textarea>
+    <div class="tbtns" style="">
+        <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="$bw" /></button>
+        <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="$bw" /></button>
+        <button title="Help" class="btn btn-default textbtn" id="help" type="button" data-bs-toggle="modal" data-bs-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="$bw" /></button>
+        <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
+    </div>
+  </div>
       </form>
     </div><!-- CLOSE LEVEL 2 -->
     <!-- LEVEL 3 -->
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
-	<div class="tbtns" style="">
-	    <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button></div>
-	<!-- <div style="overflow: hidden; height: 100%;" tabindex=0> -->
-	$mermaid
-	<!-- </div> -->
+  <div class="tbtns" style="">
+      <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button></div>
+  <!-- <div style="overflow: hidden; height: 100%;" tabindex=0> -->
+  <div id="modelDiv" style="height:100%" class="mermaid">$mermaid</div>
+  <!-- </div> -->
     </div><!-- CLOSE LEVEL 3 -->
   </div><!-- CLOSE FLEX DIV -->
 $modal
 </div><!-- CLOSE PAGE -->
       
-  <script src="https://unpkg.com/jquery@$vs[1]/dist/jquery.min.js"></script>	<script src="https://unpkg.com/tether@1.4.7/dist/js/tether.min.js"></script>
-  <script src="https://unpkg.com/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/mermaid@$vs[3]/dist/mermaid.min.js"></script>
-  <script src="./svg-pan-zoom.js" crossorigin="anonymous"></script> 
-   <script src="local.js"></script>
-  <script></script>  
+  <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
+  <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
+  <script src="$jslib/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script>
+  <script src="$jslib/pako@$vs[5]/dist/pako.min.js"></script>
+  <script src="$jslib/js-base64@$vs[6]/base64.min.js"></script>
+  <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
+  <script src="./js/local.js"></script>
+  <script>
+ 
+  let code = JSON.stringify($json_code);
+  let pcode = '$pako';
+  console.log (pcode);
+  $( document ).ready(function() { 
+  
+	
+  });
+  
+  
+  </script>  
   </body>
 </html>
 
@@ -336,20 +418,20 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Summary" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tools makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents and example set or data, and the generated model, this example demonstrate the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. It is also possible to generate a static image version of any given model by following the <b>Get Image</b> option and using the tools provide by the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>.
+    "Summary" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tools makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents and example set or data, and the generated model, this example demonstrate the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
     <br/><br/>
     <h5>This specific project was supported by:</h5>
 <br/>
-		<h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
-<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
-<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
+    <h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
+<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="./graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
+<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="./graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
 <br/>
 <h6></a>The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project</h6>
-<p dir="auto"><a href="https://www.iperionhs.eu/" rel="nofollow"><img height="42px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%;"></a>&nbsp;&nbsp;
-<a href="https://www.iperionhs.eu/" rel="nofollow"><img height="32px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/iperionhs-eu-tag2.png" alt="IPERION-HS" style="max-width: 100%;"></a></p>
+<p dir="auto"><a href="https://www.iperionhs.eu/" rel="nofollow"><img height="42px" src="./graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%;"></a>&nbsp;&nbsp;
+<a href="https://www.iperionhs.eu/" rel="nofollow"><img height="32px" src="./graphics/iperionhs-eu-tag2.png" alt="IPERION-HS" style="max-width: 100%;"></a></p>
 <br/>
 <h6>The AHRC Funded <a href="https://linked.art/" rel="nofollow">Linked.Art</a> project</h6>
-<p><a href="https://ahrc.ukri.org/" rel="nofollow"><img height="48px" src="https://github.com/jpadfield/simple-modelling/raw/master/docs/graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art" style="max-width: 100%;"></a></p>',
+<p><a href="https://ahrc.ukri.org/" rel="nofollow"><img height="48px" src="./graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art" style="max-width: 100%;"></a></p>',
     //"Blank Nodes" => 'Details to be added',
     //"Formatting" => 'Details to be added',
     //"Aliases" => 'Details to be added'
@@ -365,17 +447,17 @@ function buildModal ()
     $dno = sprintf('%02d', $no);
 
     $tabHeaders .= "  
-			<li class=\"nav-item\">
-				<a href=\"#tab$dno\" class=\"nav-link $active\" data-bs-toggle=\"tab\">$k</a>
-			</li>";
-		
+      <li class=\"nav-item\">
+        <a href=\"#tab$dno\" class=\"nav-link $active\" data-bs-toggle=\"tab\">$k</a>
+      </li>";
+    
     $tabContents .= "  
-			<div class=\"tab-pane fade show $active\" id=\"tab$dno\">
-				<h5 class=\"text-center mb-4 mt-0 pt-4\">$k</h5>
-				<div class=\"m-4\">$ht</div>
-			</div>";
-		
-		$active = "";	
+      <div class=\"tab-pane fade show $active\" id=\"tab$dno\">
+        <h5 class=\"text-center mb-4 mt-0 pt-4\">$k</h5>
+        <div class=\"m-4\">$ht</div>
+      </div>";
+    
+    $active = "";  
     $no++;
     }
   
@@ -385,19 +467,19 @@ function buildModal ()
   <div id="helpModalCenter" tabindex="-1" role="dialog" aria-label="Help Modal" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-				
-				<ul class="nav nav-tabs" id="myTab">
-					$tabHeaders
-				</ul>
-				<div class="tab-content">
-					$tabContents
-				</div>
-			<div class="line"></div>
-			<div class="modal-footer d-flex flex-column justify-content-center border-0">
-				<p class="text-muted">More questions or issues? - <a href="https://github.com/jpadfield/dynamic-modelling/issues">Try Github</a>.</p>
-			</div>
-				
-			</div>
+        
+        <ul class="nav nav-tabs" id="myTab">
+          $tabHeaders
+        </ul>
+        <div class="tab-content">
+          $tabContents
+        </div>
+      <div class="line"></div>
+      <div class="modal-footer d-flex flex-column justify-content-center border-0">
+        <p class="text-muted">More questions or issues? - <a href="https://github.com/jpadfield/dynamic-modelling/issues">Try Github</a>.</p>
+      </div>
+        
+      </div>
     </div>
     
   </div>
@@ -517,19 +599,19 @@ function buildModalDefault()
   <div id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-	<!-- Tab headers, numbered from tab01 -> tab0n, etc -->
-	<div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
-	      $tHeaders
-	</div>
-	<div class="line"></div>
-	<!-- Tab Contents, numbered from tab011 -> tab0n1, etc -->
-	<div class="modal-body p-0">
-	  $tFields
+  <!-- Tab headers, numbered from tab01 -> tab0n, etc -->
+  <div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
+        $tHeaders
+  </div>
+  <div class="line"></div>
+  <!-- Tab Contents, numbered from tab011 -> tab0n1, etc -->
+  <div class="modal-body p-0">
+    $tFields
         </div>
         <div class="line"></div>
         <div class="modal-footer d-flex flex-column justify-content-center border-0">
-	  <p class="text-muted">Can't find what you're looking for?</p> <button type="button" class="btn btn-primary">Contact Support Team</button>
-	</div>
+    <p class="text-muted">Can't find what you're looking for?</p> <button type="button" class="btn btn-primary">Contact Support Team</button>
+  </div>
       </div>
     </div>
   </div>
@@ -545,52 +627,52 @@ function getCleanTriples($triplesTxt)
   {
 
   $lastLine = 0;
-	$cleanData = array();
-	
-	$data = explode("\n", $triplesTxt);
-	
-	foreach ($data as $k => $line) 
-		{
-		if (preg_match("/^.+\t.+\t.+$/", $line, $m))
-			{$trip = explode ("\t", $line);}
-		else if (preg_match("/^.+[,].+[,].+$/", $line, $m))
-			{$trip = explode (",", $line);}
-		else
-			{$trip = array($line);}
+  $cleanData = array();
+  
+  $data = explode("\n", $triplesTxt);
+  
+  foreach ($data as $k => $line) 
+    {
+    if (preg_match("/^.+\t.+\t.+$/", $line, $m))
+      {$trip = explode ("\t", $line);}
+    else if (preg_match("/^.+[,].+[,].+$/", $line, $m))
+      {$trip = explode (",", $line);}
+    else
+      {$trip = array($line);}
       
-		$trip = array_map('trim', $trip);
+    $trip = array_map('trim', $trip);
 
     // Starting things with @ can upset mermaid
-		foreach ($trip as $tk => $tv)
-			{
+    foreach ($trip as $tk => $tv)
+      {
       if (preg_match("/^[\@](.+$)/", $tv, $m))
-				{$tv = $m[1];}
+        {$tv = $m[1];}
         
       $trip[$tk] = parseEntities($tv);
       }
-		
-		//only consider the first 4 values - removes spaces coming from spreadsheets
-		$trip = array_slice($trip, 0, 4);
-		
-		// Considered as a data line
-		if ($trip[0])
-			{$lastLine = $k;}
-				
-		// Allow gaps of up to two lines between blocks of triples and remove others.
-		if ($k <= $lastLine + 2)
-			{$cleanData[] = implode("\t", $trip);}
-		}
-		
-	return ($cleanData);
-	}
+    
+    //only consider the first 4 values - removes spaces coming from spreadsheets
+    $trip = array_slice($trip, 0, 4);
+    
+    // Considered as a data line
+    if ($trip[0])
+      {$lastLine = $k;}
+        
+    // Allow gaps of up to two lines between blocks of triples and remove others.
+    if ($k <= $lastLine + 2)
+      {$cleanData[] = implode("\t", $trip);}
+    }
+    
+  return ($cleanData);
+  }
 
 function getRaw($data)
   {
-  global $orientation, $config, $fixlinks;
+  global $orientation, $config, $fixlinks, $diagram, $subGraphs, $things;
 
   $au = $config["unique"]["regex"];
   $output = array();
-	
+  
   $no = 0;
   $bn = 0;
   $tn = 0;
@@ -608,116 +690,136 @@ function getRaw($data)
   //pair rdf:type and crm:p2_has_type "objects"
   $typeObjects = array();
 
-    foreach ($data as $k => $line) 
-      {
-      if (preg_match("/^.+\t.+\t.+$/", $line, $m))
-	{$trip = explode ("\t", $line);}
-      else if (preg_match("/^.+[,].+[,].+$/", $line, $m))
-	{$trip = explode (",", $line);}
-      else
-	{$trip = array($line);}
+  foreach ($data as $k => $line) 
+    {
+    if (preg_match("/^.+\t.+\t.+$/", $line, $m))
+      {$trip = explode ("\t", $line);}
+    else if (preg_match("/^.+[,].+[,].+$/", $line, $m))
+      {$trip = explode (",", $line);}
+    else
+      {$trip = array($line);}
       
-      $trip = array_map('trim', $trip);
+    $trip = array_map('trim', $trip);
 
-      // Starting things with @ can upset mermaid
-      foreach ($trip as $tk => $tv)
-	{if (preg_match("/^[\@](.+$)/", $tv, $m))
-	  {$trip[$tk] = $m[1];}}
-	
-      $trip["bn"] = false; //used to flag new blank nodes and possibly other formatting controls
-      $trip["type"] = false; //used to flag new blank nodes and possibly other formatting controls
+    // Starting things with @ can upset mermaid
+    foreach ($trip as $tk => $tv)
+      {if (preg_match("/^[\@](.+$)/", $tv, $m))
+        {$trip[$tk] = $m[1];}}
+  
+    $trip["bn"] = false; //used to flag new blank nodes and possibly other formatting controls
+    $trip["type"] = false; //used to flag new blank nodes and possibly other formatting controls
       
-      // Increment triple number
-      $tn++;
-	
-      if(preg_match("/^[\/][\/][ ]Model[:][\s]*([a-zA-Z0-9 ]+)[\s]*[\/][\/](.+)$/", $line, $m))
-	{$output[$tag]["comment"] = $m[2];}
-      else if((preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m)) or
-        (preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
-	{$orientation = $m[1];
-	 if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
-        $trip = array($line);}
-      else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
-	{$trip = array("subgraph", $m[1], "");}
-      else if(preg_match("/^[\/][\/][ ]*[eE][nN][dD][ ]*(.*)$/", $line, $m))
-	{$trip = array("end", $m[1], "");}
+    // Increment triple number
+    $tn++;
+  
+    if(preg_match("/^[\/][\/][ ]Model[:][\s]*([a-zA-Z0-9 ]+)[\s]*[\/][\/](.+)$/", $line, $m))
+      {$output[$tag]["comment"] = $m[2];}
+    else if((preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m)) or
+      (preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
+      {$orientation = $m[1];
+       if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
+       $trip = array($line);}
+    else if((preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LT][BR])(.*)$/", $line, $m)) or
+      (preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
+      {$orientation = $m[1];
+       $diagram = "flowchart";
+       if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
+       $trip = array($line);}
+    else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
+      {
+      $sgdts = array();
+      $sg = trim ($m[1]);
+      
+      if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $sg, $sm))
+        {$sgdts["id"] = str_replace(' ', "", $sm[1]);
+         $sgdts["lab"] = "[\"&nbsp;\"]";}
+      else
+        {$sgdts["id"] = str_replace(' ', "", $sg);          
+         $sgdts["lab"] = "[\"$sg\"]";}
+         
+      $subGraphs[$sg] = $sgdts;
+      $things[$sg] = $sgdts["id"];
+      $trip = array("subgraph", $sg, "");
+      }
+    else if(preg_match("/^[\/][\/][ ]*[eE][nN][dD][ ]*(.*)$/", $line, $m))
+  {$trip = array("end", $m[1], "");}
       // ignore lines that are commented out
       else if(preg_match("/^[\/#][\/#].*$/", $line, $m)) 
-	{$trip = array($line);}
+  {$trip = array($line);}
 
       // Ignore notes, empty lines or commented lines
       if (isset($trip[2]))
-	{
-	if (in_array(strtolower($trip[0]), array("_blank node", "_bn")))
-	  {$bnd = true;
-	   $trip["bn"] = true;}
-	else
-	  {$bnd = false;}
+  {
+  if (in_array(strtolower($trip[0]), array("_blank node", "_bn")))
+    {$bnd = true;
+     $trip["bn"] = true;}
+  else
+    {$bnd = false;}
 
-	$typeCheck = preg_replace('/[. ]/', "_", strtolower($trip[1]));
-	//echo "<!-- $typeCheck -->\n";
-	// Defining a thing as have type "Type" is a special case so the "Type" is left as a literal by default
-	if (in_array ($typeCheck, array(
-	  "crm:p2_has_type", "has_type", "type", "rdf:type")) and strtolower($trip[2]) != "type")
-	  {$pt = true;
-	   $trip["type"] = true;}
-	else
-	  {$pt = false;}
+  $typeCheck = preg_replace('/[. ]/', "_", strtolower($trip[1]));
+  //echo "<!-- $typeCheck -->\n";
+  // Defining a thing as have type "Type" is a special case so the "Type" is left as a literal by default
+  if (in_array ($typeCheck, array(
+    "crm:p2_has_type", "has_type", "type", "rdf:type")) and strtolower($trip[2]) != "type")
+    {$pt = true;
+     $trip["type"] = true;}
+  else
+    {$pt = false;}
 
-	// Ensure subsequent Blank Nodes are seen as new. 
-	if ( $bnd and  $pt and !$bnew) {
-	    $bn++;
-	    $bnew=true;}
-	// Flag as not a new blank node after listing other predicates or typing something else 
-	else if ((!$bnd and $pt) or !$pt) {
-	    $bnew=false;}
+  // Ensure subsequent Blank Nodes are seen as new. 
+  if ( $bnd and  $pt and !$bnew) {
+      $bn++;
+      $bnew=true;}
+  // Flag as not a new blank node after listing other predicates or typing something else 
+  else if ((!$bnd and $pt) or !$pt) {
+      $bnew=false;}
 
-	// Number each blank node to make it unique							
-	if ($bnd)
-	  {$trip[0] = $trip[0]."-N".$bn;}
-	// Catching reference to a previous blank node
-	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[0], $m))
-	  {$trip[0] = "$m[1]-N".($bn-$m[2]);}
-				
-	// Current process is assuming that the subject and the object can not both be a new Blank Nodes
-	if (in_array(strtolower($trip[2]), array("_blank node", "_bn")))
-	  {$trip[2] = $trip[2]."-N".$bn;
-	   $bnew=false;}
-	else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[2], $m))
-	  {$trip[2] = $m[1]."-N".($bn-$m[2]);}
+  // Number each blank node to make it unique              
+  if ($bnd)
+    {$trip[0] = $trip[0]."-N".$bn;}
+  // Catching reference to a previous blank node
+  else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[0], $m))
+    {$trip[0] = "$m[1]-N".($bn-$m[2]);}
+        
+  // Current process is assuming that the subject and the object can not both be a new Blank Nodes
+  if (in_array(strtolower($trip[2]), array("_blank node", "_bn")))
+    {$trip[2] = $trip[2]."-N".$bn;
+     $bnew=false;}
+  else if (preg_match("/^(_[bB][a-z]*[ ]*[Nn][a-z]*)[-]([0-9]+)$/", $trip[2], $m))
+    {$trip[2] = $m[1]."-N".($bn-$m[2]);}
 
-	// Number the predicates so they are all unique
-	// NOT REQUIRED 									
-	//$trip[1] = $trip[1]."-N".$tn;
+  // Number the predicates so they are all unique
+  // NOT REQUIRED                   
+  //$trip[1] = $trip[1]."-N".$tn;
 
-	// Ensure that all refs to listed unique classes are unique so the diagram
-	// does not Overlap too much - only parsing "subjects"
-	foreach ($au  as $rxk => $rxv)
-		{
-		if(preg_match("/^$rxv$/", $trip[2], $m))
-			{
-			$check = strtolower($trip[0]."-".$trip[2]);
-			if (isset($typeObjects[$check]))
-				{$trip[2] = $typeObjects[$check];}//$trip[2]."-". $tn;}
-			else
-				{$typeObjects[$check] = $trip[2]."-". $tn;
-				 $trip[2] = $trip[2]."-". $tn;}
-			break 1;
-			}
-		}
+  // Ensure that all refs to listed unique classes are unique so the diagram
+  // does not Overlap too much - only parsing "subjects"
+  foreach ($au  as $rxk => $rxv)
+    {
+    if(preg_match("/^$rxv$/", $trip[2], $m))
+      {
+      $check = strtolower($trip[0]."-".$trip[2]);
+      if (isset($typeObjects[$check]))
+        {$trip[2] = $typeObjects[$check];}//$trip[2]."-". $tn;}
+      else
+        {$typeObjects[$check] = $trip[2]."-". $tn;
+         $trip[2] = $trip[2]."-". $tn;}
+      break 1;
+      }
+    }
 
-	// list unique "objects"
-	if (!in_array($trip[0], $output[$tag]["objects"]))
-	  {$output[$tag]["objects"][] = $trip[0];}
-	  
-	$output[$tag]["triples"][] = $trip;
-	$output[$tag]["count"]++;
-	}
+  // list unique "objects"
+  if (!in_array($trip[0], $output[$tag]["objects"]))
+    {$output[$tag]["objects"][] = $trip[0];}
+    
+  $output[$tag]["triples"][] = $trip;
+  $output[$tag]["count"]++;
+  }
       else //Empty lines will force a new Blank node to be considered
-	{$bnew=false;}
-			
+  {$bnew=false;}
+      
       if ($trip[0] == "// Stop") // For debugging
-	{break;}
+  {break;}
       }
 
   return ($output);
@@ -748,10 +850,49 @@ function formatClassDef ($formats)
  
   return ($allClasses);//$classDef);
   }
+ 
+function checkForSubgraphId ($id)
+  {
+  global $subGraphs;
+  
+  if (isset($subGraphs[$id]))
+    {return ($subGraphs[$id]["id"]);}
+  else
+    {return ($id);}
+  }
+ 
+function Mermaid_displayLabel ($str)
+  {
+  global $config;  
+  
+  // Format the displayed text, either wrapping or removing numbers
+  // used to indicate separate instances of the same text/name
+  if (count_chars($str) > 60)
+    {$out = wordwrap($str, 60, "<br/>", true);}
+  else
+    {$out = $str;}
+  
+  $au = $config["unique"]["regex"];
+        
+  // If entities have been numbered to force them to be unique
+  // hide the number from being displayed
+  foreach ($au  as $pk => $pr)
+    {
+    if(preg_match("/^(.+)[#][-][0-9]+$/", $out, $m))
+      {$out = $m[1];
+        break 1;}
+    else if(preg_match("/^(${pr})[-][0-9]+$/", $out, $m))
+      {$out = $m[1];
+       break 1;}
+    }
+      
+  return($out);
+  }
+  
   
 function Mermaid_formatData ($selected)
   {
-  global $orientation, $live_edit_link, $config, $allClasses, $usedClasses, $fixlinks;
+  global $orientation, $config, $allClasses, $usedClasses, $fixlinks, $diagram, $subGraphs, $thisPage;
 
   $defs = "";
   $things = array();
@@ -759,260 +900,299 @@ function Mermaid_formatData ($selected)
   $objs = array();
   $au = $config["unique"]["regex"];
   $sgIDs = array();
+  
+  if ($diagram == "flowchart")
+    {foreach ($subGraphs as $n => $a)
+      {$things[$n] = $a["id"];}}
 
   // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
     {
-		$t[1] = check_string($t[1]);
+    $ot = $t;
+    $t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
     $t[2] = str_replace('?', "#63;", $t[2]);
     //$t[2] = check_string($t[2]);
     
     // Updated to allow formats classes to be added to subgraphs - 05/07/22 JPadfield
+    // Commenting out a subgraph name with "//" will hide the subgraph label. - 17/08/22 JPadfield
     if (in_array($t[0], array("subgraph")))
-	{$tid = str_replace(' ', "", $t[1]);
-	 $sgIDs[] = $tid;
-	 $defs .= "\n$t[0] $tid [\"$t[1]\"]\n";
-	 }
+      {
+      $sgdts = $subGraphs[$t[1]];
+      //prg(0, $sgdts);
+      
+      //if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $t[1], $sm))
+//        {$tid = str_replace(' ', "", $sm[1]);
+         //$tlab = "[\"&nbsp;\"]";}
+      //else
+//        {$tid = str_replace(' ', "", $t[1]);          
+         //$tlab = "[\"$t[1]\"]";}
+         
+      $sgIDs[] = $sgdts["id"];//$tid;   
+      $defs .= "\n$t[0] $sgdts[id] $sgdts[lab]\n";
+      //prg(0, "\n$t[0] $sgdts[id] $sgdts[lab]\n");
+      //prg(1, "\n$t[0] $tid $tlab\n");
+      }
     else if (in_array($t[0], array("end")))
-	{
-	$defs .= "\n$t[0]\n";
-	$sgID = array_pop($sgIDs);
-	if ($t[1]) 
-	  {	  
-	  if(isset($allClasses[$t[1]]))
-	    {$usedClasses[$t[1]] = $allClasses[$t[1]];}
-	  $defs .= "class $sgID $t[1]\n";
-	  }
-	}
-	else if ($t[1] == "tooltip")
-		{
-		// Some of this section is a duplication of the steps below so it might be good to look at moving this tooltips section down later
-		
-		// Allow the user to force the formatting classes used for the
-    // object and subject
-    $fcs = array(false, false);
-   
-    if(isset($t[3]))
       {
-			$fcs = explode ("|", $t[3]);
-			if(!isset($fcs[1]))
-				{$fcs = explode ("@@", $t[3]);}
-						
-			if(!isset($fcs[1]))
-				{$fcs[1] = false;}
-			}
-			
-		if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
-				{$fcs = array(false, "note");}
-				
-		if (!isset($things[$t[0]]))
-			{$things[$t[0]] = "O".$no;
+      $defs .= "\n$t[0]\n";
+      $sgID = array_pop($sgIDs);
       
-      // Default objects to object class
-      if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
-				{
-				if ($t["bn"] ) {$fcs[0] = "object_bn";}
-				else {$fcs[0] = "object";}
-				}
-				
-			$defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
-			$no++;}
-		$defs .= "click ".$things[$t[0]]." function \"$t[2]\"; \n";}
+      if ($t[1]) 
+        {    
+        if(isset($allClasses[$t[1]]))
+          {$usedClasses[$t[1]] = $allClasses[$t[1]];}
+        $defs .= "class $sgID $t[1]\n";
+        }
+      }
+    else if ($t[1] == "tooltip")
+      {
+      // Some of this section is a duplication of the steps below so it might be good to look at moving this tooltips section down later
+    
+      // Allow the user to force the formatting classes used for the
+      // object and subject
+      $fcs = array(false, false);
+   
+      if(isset($t[3]))
+        {
+        $fcs = explode ("|", $t[3]);
+        if(!isset($fcs[1]))
+          {$fcs = explode ("@@", $t[3]);}
+            
+        if(!isset($fcs[1]))
+          {$fcs[1] = false;}
+        }
+      
+      if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
+        {$fcs = array(false, "note");}
+        
+      if (!isset($things[$t[0]]))
+        {
+        $things[$t[0]] = "O".$no;
+      
+        // Default objects to object class
+        if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
+          {
+          if ($t["bn"] ) {$fcs[0] = "object_bn";}
+          else {$fcs[0] = "object";}
+          }
+        
+        $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
+        $no++;
+        }
+      
+      $use_0 = "[\"".Mermaid_displayLabel ($t[0])."\"]";
+      // Adding a display label after the click does not work so it is
+      // added to a single node before hand      
+      $defs .=  $things[$t[0]].$use_0."\n";
+      $defs .= "click ".$things[$t[0]]." function \"$t[2]\"; \n";
+      }
     else
-			{
-			// Catch URL with an ALT text suffix
-			$t0extraLink = false;
-			$t2extraLink = false;
-				
-			if (preg_match("/^([^|]+)[|](http.+)$/", $t[0], $t0m) or
-				preg_match("/^([^|]+)[|](\?.+)$/", $t[0], $t0m))
-				{$t0extraLink = $t0m[2];
-				 $t[0] = $t0m[1];}				
-			if (preg_match("/^([^|]+)[|](http.+)$/", $t[2], $t2m) or
-				preg_match("/^([^|]+)[|](\?.+)$/", $t[2], $t2m))
-				{$t2extraLink = $t2m[2];
-				 $t[2] = $t2m[1];}
-				
-			// Format the displayed text, either wrapping or removing numbers
-			// used to indicate separate instances of the same text/name
-			if (count_chars($t[2]) > 60)
-				{$use = wordwrap($t[2], 60, "<br/>", true);}
-			else
-				{$use = $t[2];}
-
-    // If entities have been numbered to force them to be unique
-    // hide the number from being displayed
-    foreach ($au  as $pk => $pr)
-      {if(preg_match("/^(.+)[#][-][0-9]+$/", $use, $m))
-        {$use = $m[1];
-	  break 1;}
-       else if(preg_match("/^(${pr})[-][0-9]+$/", $use, $m))
-	{$use = $m[1];
-	 break 1;}}
-
-    // Allow the user to force the formatting classes used for the
-    // object and subject
-    $fcs = array(false, false);
-   
-    if(isset($t[3]))
       {
-			$fcs = explode ("|", $t[3]);
-			if(!isset($fcs[1]))
-				{$fcs = explode ("@@", $t[3]);}
-						
-			if(!isset($fcs[1]))
-				{$fcs[1] = false;}
-			}
-			
-		if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
-				{$fcs = array(false, "note");}
-		else if (!$fcs[1] and $t2extraLink)
-			{$fcs[1] = "url";}
-								
-    if (!isset($things[$t[0]]))
-      {
-			$things[$t[0]] = "O".$no;
+      // Catch URL with an ALT text suffix
+      $t0extraLink = false;
+      $t2extraLink = false;
+        
+      if (preg_match("/^([^|]+)[|](http.+)$/", $t[0], $t0m) or
+        preg_match("/^([^|]+)[|](\?.+)$/", $t[0], $t0m))
+        {$t0extraLink = $t0m[2];
+         $t[0] = $t0m[1];}        
+    
+      if (preg_match("/^([^|]+)[|](http.+)$/", $t[2], $t2m) or
+        preg_match("/^([^|]+)[|](\?.+)$/", $t[2], $t2m))
+        {$t2extraLink = $t2m[2];
+         $t[2] = $t2m[1];}
       
-      // Default objects to object class
-      if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
-				{
-				if ($t["bn"] ) {$fcs[0] = "object_bn";}
-				else {$fcs[0] = "object";}
-				}
-				
-			$defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
-			$no++;
-			}
-		
-    //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
-    // NEED NEW RULES
-    if (!isset($things[$t[2]]))
-      {
-      if (preg_match ("/^([a-zA-Z]+)([:].+)$/", $t[2], $m))
-				{
-				$prf = strtolower($m[1]);
-				//$t[2] = $prf.$m[2];
-				}
+      $use_0 = Mermaid_displayLabel ($t[0]);
+      $use_2 = Mermaid_displayLabel ($t[2]);
+        
+      /*// Format the displayed text, either wrapping or removing numbers
+      // used to indicate separate instances of the same text/name
+      if (count_chars($t[2]) > 60)
+        {$use = wordwrap($t[2], 60, "<br/>", true);}
       else
-	{$prf = false;}
-	
-      $things[$t[2]] = "O".$no;
+        {$use = $t[2];}
+        
+      // Consider allowing wrapping for the subjects as well.
+      if (count_chars($t[0]) > 60)
+        {$use0 = wordwrap($t[0], 60, "<br/>", true);}
+      else
+        {$use0 = $t[0];}
+      
+      // If entities have been numbered to force them to be unique
+      // hide the number from being displayed
+      foreach ($au  as $pk => $pr)
+        {
+        if(preg_match("/^(.+)[#][-][0-9]+$/", $use0, $m))
+          {$use0 = $m[1];
+           break 1;}
+        else if(preg_match("/^(${pr})[-][0-9]+$/", $use0, $m))
+          {$use0 = $m[1];
+           break 1;}
+        }
+      ////////////////////////////////////////////////////////////  
+        
+      // If entities have been numbered to force them to be unique
+      // hide the number from being displayed
+      foreach ($au  as $pk => $pr)
+        {
+        if(preg_match("/^(.+)[#][-][0-9]+$/", $use, $m))
+          {$use = $m[1];
+           break 1;}
+        else if(preg_match("/^(${pr})[-][0-9]+$/", $use, $m))
+          {$use = $m[1];
+           break 1;}
+        }*/
 
-       // Default objects to object class
-       if (!$fcs[1] and !$prf and isset($objs[$t[2]]))
-	{$fcs[1] = "object";}
-       else if (!$fcs[1] and  $t["type"] and !in_array(strtolower($prf), array_keys($config["prefix"])))
-	{$fcs[1] = "type";}
-       $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
-       $no++;}	
-		
-			// If an ALT suffix was supplied for a link, add ref to the link back in with a tool tip.
-			if ($t0extraLink)
-				{$pp = pathinfo($t0extraLink);
-				 $tt = "Link to: $pp[dirname] ...";
-				 $defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$tt\"; \n";}
-			if ($t2extraLink)
-				{$pp = pathinfo($t2extraLink);
-				 $tt = "Link to: $pp[dirname] ...";
-				 $defs .= "click ".$things[$t[2]]." \"$t2extraLink\" \"$tt\"; \n";}
+      // Allow the user to force the formatting classes used for the
+      // object and subject
+        $fcs = array(false, false);
+   
+      if(isset($t[3]))
+        {
+        $fcs = explode ("|", $t[3]);
+      
+        if(!isset($fcs[1]))
+          {$fcs = explode ("@@", $t[3]);}
+            
+        if(!isset($fcs[1]))
+          {$fcs[1] = false;}
+        }
+      
+      if (!$fcs[1] and isset($t[1]) and $t[1] == "has note")
+        {$fcs = array(false, "note");}
+      else if (!$fcs[1] and $t2extraLink)
+        {$fcs[1] = "url";}
+                
+      if (!isset($things[$t[0]]))
+        {
+        $things[$t[0]] = "O".$no;
+      
+        // Default objects to object class
+        if (!$fcs[0] and !preg_match ("/^[a-zA-Z]+[:].+$/", $t[0], $m))
+          {
+          if ($t["bn"] ) {$fcs[0] = "object_bn";}
+          else {$fcs[0] = "object";}
+          }
+        
+        $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
+        $no++;
+        }
+    
+      //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
+      // NEED NEW RULES
+      if (!isset($things[$t[2]]))
+        {
+        if (preg_match ("/^([a-zA-Z]+)([:].+)$/", $t[2], $m))
+          {
+          $prf = strtolower($m[1]);
+          //$t[2] = $prf.$m[2];
+          }
+        else
+          {$prf = false;}
+  
+        $things[$t[2]] = "O".$no;
+
+        // Default objects to object class
+        if (!$fcs[1] and !$prf and isset($objs[$t[2]]))
+          {$fcs[1] = "object";}
+        else if (!$fcs[1] and  $t["type"] and !in_array(strtolower($prf), array_keys($config["prefix"])))
+          {$fcs[1] = "type";}
+        $defs .= Mermaid_defThing($t[2], $no, $fcs[1]);
+        $no++;
+        }  
+    
+      // If an ALT suffix was supplied for a link, add ref to the link back in with a tool tip.
+      if ($t0extraLink)
+        {$pp = pathinfo($t0extraLink);
+         $tt = "Link to: $pp[dirname] ...";
+         $defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$tt\"; \n";}
+      if ($t2extraLink)
+        {$pp = pathinfo($t2extraLink);
+         $tt = "Link to: $pp[dirname] ...";
+         $defs .= "click ".$things[$t[2]]." \"$t2extraLink\" \"$tt\"; \n";}
  
  // need to check for an image and if so update $use
  // O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]  
-    if (preg_match ("/^IGNOREJUSTNOWASITDOESNOTSEEMTOWORKhttp.+[jpegpn]+$/", $t[2], $m))
-      {$tmp = check_string("<img src='$t[2]'/>");
-       $use = "[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp$tmp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]";}
-    else
-      {$use = "[\"".$use."\"]";}
+      if (preg_match ("/^IGNOREJUSTNOWASITDOESNOTSEEMTOWORKhttp.+[jpegpn]+$/", $t[2], $m))
+        {$tmp = check_string("<img src='$t[2]'/>");
+         $use_2 = "[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp$tmp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]";}
+      else
+        {$use_0 = "[\"".$use_0."\"]";
+         $use_2 = "[\"".$use_2."\"]";}
     
- 	if ($fixlinks)
-		{$lformat = " ---->|$t[1]|";}
-	else
-		{$lformat = " -- ".$t[1]. " -->";}
-			
-    //$defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
-		$defs .= $things[$t[0]].$lformat.$things[$t[2]].
-			$use."\n";		
-		}
-	
+      if ($fixlinks)
+        {$lformat = " ---->|$t[1]|";}
+      else
+        {$lformat = " -- ".$t[1]. " -->";}
+      
+      //$defs .= $things[$t[0]]." -- ".$t[1]. " -->".$things[$t[2]].
+      $defs .= $things[$t[0]].$use_0.$lformat.$things[$t[2]].
+      $use_2."\n";    
+      }
+  
     }//exit;
 
-  $defs = "graph $orientation\n".
+  $defs = "$diagram $orientation\n".
     implode("", $usedClasses).
     "\n$defs;";
   
-  //prg(1, $defs);
-  $code = array(
-    "code" => $defs,
-    "mermaid" => array(
-      "theme" => "default",
-      "securityLevel" => "loose",
-      "logLevel" => "warn",
-      "flowchart" => array( 
-	  "curve" => "basis",
-    "htmlLabels" => true)
-      ));
-  $json = json_encode($code);
-  $code = base64_encode($json);
-  $live_edit_link = 'https://mermaid-js.github.io/mermaid-live-editor/#/edit/'.$code;
-  $defs = "<div id=\"modelDiv\" style=\"height:100%\" class=\"mermaid\">".$defs."</div>";
-	
   return ($defs);
-  }	
+  }  
 
 function Mermaid_defThing ($var, $no, $fc=false)
-	{
-	global $config, $usedClasses, $allClasses;		
+  {
+  global $config, $usedClasses, $allClasses;    
 
-	$prefix = $config["prefix"];
-	$click = false;
-	$code  = "O".$no;
-	$cls = "literal";
-	
-	foreach($prefix as $nm => $a)
-	  {
-	  if(preg_match("/^".$a["match"]["short"]."$/", $var, $m))
-	    {
-	    $cls = $a["format"] ;
-	    if (isset($a["url"]))
-	      {$pp = pathinfo($a["url"]);
-				 $tt = "Link to: $pp[dirname] ...";
-				 $click = "click ".$code." \"".$a["url"]."$m[1]\" \"$tt\"; \n";}	      
-	    else if(preg_match("/^http.+$/", $var, $m))
-	      {$click = "click ".$code." \"".$var."\"\n";}
-	    break;
-	    }	  
-	  }
-	if ($fc) {$cls = $fc;}
+  $prefix = $config["prefix"];
+  $click = false;
+  $code  = "O".$no;
+  $cls = "literal";
+  
+  foreach($prefix as $nm => $a)
+    {
+    if(preg_match("/^".$a["match"]["short"]."$/", $var, $m))
+      {
+      $cls = $a["format"] ;
+      if (isset($a["url"]))
+        {$pp = pathinfo($a["url"]);
+         $tt = "Link to: $pp[dirname] ...";
+         $click = "click ".$code." \"".$a["url"]."$m[1]\" \"$tt\"; \n";}        
+      else if(preg_match("/^http.+$/", $var, $m))
+        {$click = "click ".$code." \"".$var."\"\n";}
+      break;
+      }    
+    }
+  if ($fc) {$cls = $fc;}
 
-	if(isset($allClasses[$cls]))
-	  {$usedClasses[$cls] = $allClasses[$cls];}
-				 
-	$str = "\n$code(\"$var\")\nclass $code $cls;\n".$click;	    
-	
-	return ($str);
-	}
+  if(isset($allClasses[$cls]))
+    {$usedClasses[$cls] = $allClasses[$cls];}
+         
+  $str = "\n$code(\"$var\")\nclass $code $cls;\n".$click;      
+  
+  return ($str);
+  }
 
 function prg($exit=false, $alt=false, $noecho=false)
-	{
-	if ($alt === false) {$out = $GLOBALS;}
-	else {$out = $alt;}
-	
-	ob_start();
-	echo "<pre class=\"wrap\">";
-	if (is_object($out))
-		{var_dump($out);}
-	else
-		{print_r ($out);}
-	echo "</pre>";
-	$out = ob_get_contents();
+  {
+  if ($alt === false) {$out = $GLOBALS;}
+  else {$out = $alt;}
+  
+  ob_start();
+  echo "<pre class=\"wrap\">";
+  if (is_object($out))
+    {var_dump($out);}
+  else
+    {print_r ($out);}
+  echo "</pre>";
+  $out = ob_get_contents();
   ob_end_clean(); // Don't send output to client
   
-	if (!$noecho) {echo $out;}
-		
-	if ($exit) {exit;}
-	else {return ($out);}
-	}
+  if (!$noecho) {echo $out;}
+    
+  if ($exit) {exit;}
+  else {return ($out);}
+  }
 
 function checkTriples ($data)
   {  
@@ -1063,10 +1243,10 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
     if (is_array($v))
       {
       if(isset($v["id"]))
-	{$out .= laj2trips($v, $sub, $k);}
+  {$out .= laj2trips($v, $sub, $k);}
       else
-	{foreach ($v as $n => $a)
-	  {$out .= laj2trips($a, $sub, $k);}}
+  {foreach ($v as $n => $a)
+    {$out .= laj2trips($a, $sub, $k);}}
       }
     else
       {
@@ -1094,32 +1274,126 @@ function parseEntities($name)
 
   return($out);
   }
-
-function getRemoteJsonDetails ($uri, $format=false, $decode=false)
-	{if ($format) {$uri = $uri.".".$format;}
-	 $fc = file_get_contents($uri);
-	 if ($decode)
-		{$output = json_decode($fc, true);}
-	 else
-		{$output = $fc;}
-	 return ($output);}
-	 
-function check_string($my_string)
+  
+function getsslfile ($uri, $decode=true)
 	{
-	// Excluded: ";", '#59;' - "#", '#35;' - "@", '#64;' - ":", '#58;' - "/", '#47;'
-	$chars = array('!', '*', '"', "'", "(", ")", "&", "=", "+", 
-		"$", ",", "?", "%", "[", "]", "\\");
+	$arrContextOptions=array(
+    "ssl"=>array(
+        "verify_peer"=>false,
+        "verify_peer_name"=>false,),);  
+
+	$response = @file_get_contents($uri, false, stream_context_create($arrContextOptions));
+	
+	if ($decode)
+		{return (json_decode($response, true));}
+	else
+		{return ($response);}
+	}
+  
+function getRemotePage ($uri)
+	{
+  // Initialize a connection with cURL (ch = cURL handle, or "channel")
+$ch = curl_init();
+
+// Set the URL
+curl_setopt($ch, CURLOPT_URL, $uri);
+
+// Set the HTTP method
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+// Return the response instead of printing it out
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+// Send the request and store the result in $response
+$response = curl_exec($ch);
+
+//echo 'HTTP Status Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . PHP_EOL;
+//echo 'Response Body: ' . $response . PHP_EOL;
+
+// Close cURL resource to free up system resources
+curl_close($ch);  
+    
+  return ($response);
+  }
+  
+function getRemoteJsonDetails ($uri, $format=false, $decode=false)
+  {if ($format) {$uri = $uri.".".$format;}
+   $fc = file_get_contents($uri);
+   if ($decode)
+    {$output = json_decode($fc, true);}
+   else
+    {$output = $fc;}
+   return ($output);}
+   
+function check_string($my_string)
+  {
+  // Excluded: ";", '#59;' - "#", '#35;' - "@", '#64;' - ":", '#58;' - "/", '#47;'
+  $chars = array('!', '*', '"', "'", "(", ")", "&", "=", "+", 
+    "$", ",", "?", "%", "[", "]", "\\");
   $codes = array('#33;', '#42;', '#34;', '#39;', '#40;', '#41;', '#38;', '#61;',
-		'#43;', '#36;', '#44;', '#63;', '#37;', '#91;', '#93;', 
-		'#92;');
+    '#43;', '#36;', '#44;', '#63;', '#37;', '#91;', '#93;', 
+    '#92;');
   
   $my_string = trim ($my_string);
   
-	if (preg_match('/^.*[^a-zA-Z0-9 |_#-].*$/', $my_string))
-		{$my_string = trim ($my_string, '"');
-		 $my_string = '"'.str_replace($chars, $codes, $my_string).'"';}
-		
-	return ($my_string);
-	}
+  if (preg_match('/^.*[^a-zA-Z0-9 |_#-].*$/', $my_string))
+    {$my_string = trim ($my_string, '"');
+     $my_string = '"'.str_replace($chars, $codes, $my_string).'"';}
+    
+  return ($my_string);
+  }
+  
+function getModelImage ($code)
+  {  
+  $live_img_link = 'https://mermaid.ink/img/pako:'.$code.'?type=png';
+  $im = imagecreatefrompng($live_img_link);
+  imageAlphaBlending($im, true);
+  imageSaveAlpha($im, true);
+  
+  header('Content-Type: image/png');
+  imagepng($im);
+  imagedestroy($im);
+  exit;  
+  }
 
+function getTriplesDetails ($id, $decode=false)
+	{
+  global $thisPage;
+  
+  $uri = $thisPage."infl.php?data=".$id;
+  $fc = getRemotePage ($uri);
+  //exit;
+  //prg(0, $uri);
+  //$fc = file_get_contents($uri);
+  //echo "######################################################<pre>";
+  // prg(0, $fc); 
+  //echo "</pre>######################################################";
+	//$fc = file_get_contents($id."/export/json");
+	//$fc = explode("\n", $fc);
+//  prg(1, $fc);
+	$out = "";
+	$echo = false;
+	 
+	foreach ($fc as $k => $line)
+		{
+    prg(0, $line);
+		if ($line == "<pre class=\"triples\">")
+			{$line = "{";
+			 $echo = true;}
+		else if ($line == "</pre>")
+			{$echo = false;}
+		
+		if ($echo)
+			{$out .= $line."\n";}
+		}
+		
+	$out = htmlspecialchars_decode($out);
+	 
+	if ($decode)
+		{$output = json_decode($out, true);}
+	else
+		{$output = $out;}
+		
+	return ($output);
+	}
 ?>

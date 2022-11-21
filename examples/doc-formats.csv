@@ -1,0 +1,43 @@
+crm	linked to	thing	crm|thing
+thing	linked to	event	|event
+event	linked to	event_bn	|event_bn
+thing	linked to	object	|object
+object	linked to	object_bn	|object_bn
+thing	linked to	actor	|actor
+actor	linked to	actor_bn	|actor_bn
+
+object	linked to	idea	|idea
+idea	linked to	idea_bn	|idea_bn
+
+object	linked to	document	|document
+document	linked to	document_bn	|document_bn
+
+object	linked to	type	|type
+object	linked to	dims	|dims
+dims	linked to	dims_bn	|dims_bn
+
+object	linked to	place	|place
+place	linked to	place_bn	|place_bn
+
+actor	linked to	name	|name
+event	linked to	period	|period
+period	linked to	period_bn	|period_bn
+
+thing	linked to	url	|url
+url	linked to	note	|note
+url	linked to	literal	|literal
+note	linked to	stuff	note|UNDEFINED
+stuff	linked to	base	|base
+
+Linked Art	linked to	event2	crm|event2
+Linked Art	linked to	object2	|object2
+Linked Art	linked to	actor2	|actor2
+Linked Art	linked to	dims2	|dims2
+
+actor2	linked to	type2	|type2
+type2	linked to	name2	|name2
+dims2	linked to	infoobj	|infoobj
+infoobj	linked to	timespan	|timespan
+timespan	linked to	place2	|place2
+event2	linked to	literal	|literal
+event2	linked to	classstyle	|classstyle
