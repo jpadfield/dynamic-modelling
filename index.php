@@ -67,7 +67,8 @@ else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]])
   
 // TODO works with an external data source 
 else if (isset($_GET["url"]))
-  {$triplesTxt = checkTriples (file_get_contents($_GET["url"]));}
+  {$fc = getRemoteURL ($_GET["url"]);
+   $triplesTxt = checkTriples ($fc);}
   
 // TODO Need to update to allow data to be sent as pako compressed - three options 
 // 1: Duplicate pako JavaScript compression (used by MLE) in PHP
@@ -1316,8 +1317,26 @@ curl_close($ch);
   return ($response);
   }
   
+function getRemoteURL ($url)
+  {
+  $bits = explode("/", $url);
+  $b1 = array_shift($bits);
+  
+  foreach ($bits as $k => $v)
+    {$bits[$k] = rawurlencode($v);}
+    
+  $url = $b1."/".implode("/", $bits);
+  
+  $fc = file_get_contents($url);  
+  
+  return ($fc);
+  }
+  
 function getRemoteJsonDetails ($uri, $format=false, $decode=false)
-  {if ($format) {$uri = $uri.".".$format;}
+  {
+  
+  
+  if ($format) {$uri = $uri.".".$format;}
    $fc = file_get_contents($uri);
    if ($decode)
     {$output = json_decode($fc, true);}
