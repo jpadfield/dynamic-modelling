@@ -29,6 +29,7 @@ $config = getRemoteJsonDetails ("config.json", false, true);
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 $usedClasses = array();
 $subGraphs = array();
+$subGraphCount = 0;
 $allClasses = formatClassDef ($config["format"]);
 
 $doc_example_links = array(
@@ -669,7 +670,7 @@ function getCleanTriples($triplesTxt)
 
 function getRaw($data)
   {
-  global $orientation, $config, $fixlinks, $diagram, $subGraphs, $things;
+  global $orientation, $config, $fixlinks, $diagram, $subGraphs, $things,$subGraphCount;
 
   $au = $config["unique"]["regex"];
   $output = array();
@@ -728,12 +729,20 @@ function getRaw($data)
        $trip = array($line);}
     else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
       {
+      $subGraphCount++;
       $sgdts = array();
       $sg = trim ($m[1]);
       
       if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $sg, $sm))
         {$sgdts["id"] = str_replace(' ', "", $sm[1]);
          $sgdts["lab"] = "[\"&nbsp;\"]";}
+      else if (preg_match("/^[\/][\/](.+)$/", $sg, $sm))
+        {$sgdts["id"] = str_replace(' ', "", $sm[1]);
+         $sgdts["lab"] = "[\"&nbsp;\"]";}
+      else if (!$sg)
+	{$sgdts["id"] = "sgID-".$subGraphCount;
+         $sgdts["lab"] = "[\"&nbsp;\"]";
+	 $sg = "//".$sgdts["id"];}
       else
         {$sgdts["id"] = str_replace(' ', "", $sg);          
          $sgdts["lab"] = "[\"$sg\"]";}
@@ -919,7 +928,8 @@ function Mermaid_formatData ($selected)
     // Commenting out a subgraph name with "//" will hide the subgraph label. - 17/08/22 JPadfield
     if (in_array($t[0], array("subgraph")))
       {
-      $sgdts = $subGraphs[$t[1]];
+      //prg(0, $t);
+      $sgdts = $subGraphs[trim($t[1], "\"")];
       //prg(0, $sgdts);
       
       //if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $t[1], $sm))
