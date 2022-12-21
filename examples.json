@@ -10,7 +10,7 @@
     "uri": "examples/doc-formats.csv"
   },
   "example_flowchart":{
-    "title": "Examples of formatting and linking subgraphs",
+    "title": "Examples of formatting and linking Subgraphs",
     "format": "triples",
     "uri": "examples/flowchart-subgraph.csv"
   },
