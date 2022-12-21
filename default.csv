@@ -18,7 +18,7 @@ https://github.com/ariutta/svg-pan-zoom	has comment	"svg-pan-zoom is used to all
 // Comments can be added simply by starting a line with // or ##
 //subgraph Example Subgraph Title
 Subgraphs	are	Grouped sections of a graph
-Subgraphs	has comment	"Subgraph are started by adding a special comment  before the relevant triples - //Subgraph GROUP TITLE "
+Subgraphs	has comment	"Subgraph are started by adding a special comment  before the relevant triples - //Subgraph GROUP TITLE"<br/><br/>"The GROUP TITLE or subgraph label is optional and can be hidden using the following syntax - //Subgraph //GROUP TITLE"<br/><br/>"Alternatively the GROUP TITLE can be omitted completely - //Subgraph"
 Subgraphs	has comment	"Subgraph are ended by adding a special comment  after the relevant triples - //end"
 Subgraphs	can be nested as	Sub-Subgraphs
 //subgraph Example Sub-Subgraph Title
@@ -55,4 +55,3 @@ _BN	assigned	_BN-1
 Dynamic Modeller	can display	Free Font Awesome 5 Icons|https://fontawesome.com/v5/icons/
 Free Font Awesome 5 Icons	for example	far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code
 far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code	has note	The Font Awesome icons can be added by formatting the icon details, provided on the Font Awesome website, like:<br/>far : fa-user-circle<br/>(without the spaces around the colon).
-
