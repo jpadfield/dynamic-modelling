@@ -1,0 +1,13 @@
+//flowchart LR
+
+//subgraph SB One
+This	is an	Example
+//end name
+
+//subgraph SB Two
+This#-1	is another	Example#-1
+//end base
+
+SB One	can be linked to	SB Two
+SB One	has note	At the time of writing the formatting of Subgraph links within more complex models can be less clear as the property label can be displaced and the arrows can be obscured by other parts of the diagram.
+SB Two	has note	The option for linking Subgraphs, via their label/title, requires the diagram to be flagged, on the first line, as a "flowchart" rather than the old "graph" syntax.

@@ -2,7 +2,7 @@
 
 // Added option to link subgraphs as nodes - needs diagram to be set as "flowchart" and not "graph"
 // Added tests for hover text - it just uses a default example text just now
-// Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Graph LR fix
+// Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
 $versions = array(
   "jquery" => "3.6.1",
   "bootstrap" => "5.2.2",
@@ -11,7 +11,7 @@ $versions = array(
   "pako" => "2.1.0",
   "base64" => "3.7.3"
   );
-  
+
 if (isset($_GET["debug"])) {}
   
 if (isset($_SERVER["SCRIPT_URI"]))
@@ -20,7 +20,7 @@ else
   {$thisPage = "./";}
 
 $pako = false;
-$diagram = "graph";
+$diagram = "flowchart";
 $fixlinks = false;  
 $orientation = "LR";
 
@@ -52,14 +52,17 @@ else if (isset($_POST["triplesTxt"]) and $_POST["triplesTxt"])
 // TODO - local data needs to be updated to pako compression
 else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
   {
-	$ex = $examples[$_GET["example"]];
+  $ex = $examples[$_GET["example"]];
+  
   if (isset($ex["data"]))
     {$triplesTxt = gzuncompress(base64_decode(urldecode($ex["data"])));}
   else
     {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
   
   if ($_GET["example"] == "object2")
-    {$triplesTxt = "//Graph LR fix\n".$triplesTxt;}
+    {$triplesTxt = "//Flowchart LR fix\n".$triplesTxt;}
+  else if ($_GET["example"] == "documentation")
+    {$triplesTxt = docExampleTriples ($doc_example_links["LRNF"], $triplesTxt);}
   }
   
 // Used to ad additional format options to the default "instructions diagram
@@ -128,18 +131,20 @@ exit;
 ////////////////////////////////////////////////////////////////////////
 
 
-function docExampleTriples ($ex)
+function docExampleTriples ($ex, $use=false)
   {
   global $default;
   
+  if(!$use) {$use = $default;}
+  
   $layout_comments = array(
-    "TB" => array ("Graph TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
-    "LR" => array ("Graph LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
+    "TB" => array ("Flowchart TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
+    "LR" => array ("Flowchart LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
     "F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
     "NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
     );
   
-  $triplesTxt = "//Graph $ex[2] \n".checkTriples ($default);  
+  $triplesTxt = "//Flowchart $ex[2] \n".checkTriples ($use);  
 
   $do = str_split($ex[0], 2);  
   $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
@@ -718,7 +723,8 @@ function getRaw($data)
       {$output[$tag]["comment"] = $m[2];}
     else if((preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $line, $m)) or
       (preg_match("/^[\/][\/][ ]*[gG]raph[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
-      {$orientation = $m[1];
+      {$orientation = $m[1];	
+       $diagram = "graph";
        if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
        $trip = array($line);}
     else if((preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LT][BR])(.*)$/", $line, $m)) or

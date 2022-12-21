@@ -4,6 +4,16 @@
     "format": "triples",
     "uri": "./default.csv"
   },
+  "example_formats":{
+    "title": "Examples of all of the predefined config formats",
+    "format": "triples",
+    "uri": "examples/doc-formats.csv"
+  },
+  "example_flowchart":{
+    "title": "Examples of formatting and linking subgraphs",
+    "format": "triples",
+    "uri": "examples/flowchart-subgraph.csv"
+  },
   "artist": {
     "title": "IPERION-CH - Artist CIDOC CRM",
     "format": "triples",
@@ -27,21 +37,16 @@
   "sshoc_object":{
     "title": "SSHOC - Object CIDOC CRM",
     "format": "triples",
-    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-object.csv"
+    "uri": "examples/sshoc-object.csv"
   },
   "sshoc_sample":{
     "title": "SSHOC - Painting Sample CIDOC CRM",
     "format": "triples",
-    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-sample.csv"
+    "uri": "examples/sshoc-sample.csv"
   },
   "sshoc_image":{
     "title": "SSHOC - Image and IIIF CIDOC CRM",
     "format": "triples",
-    "uri": "https://research.ng-london.org.uk/modelling/examples/sshoc-image.csv"
-  },
-  "example_formats":{
-    "title": "Examples of all of the predefined config formats",
-    "format": "triples",
-    "uri": "https://research.ng-london.org.uk/modelling/examples/doc-formats.csv"
+    "uri": "examples/sshoc-image.csv"
   }
 }
