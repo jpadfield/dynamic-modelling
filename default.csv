@@ -29,7 +29,7 @@ Sub-Subgraphs	has comment	"Care needs to be taken to make sure which Subgraph no
 Subgraphs	can be styled	Styled Subgraphs
 Styled Subgraphs	has comment	"Any of the existing standard formats can automatically be applied to a subgraph by simply adding the name of the format after the //end line. For example this subgraph has been styled with the line //end base"
 //end base
-Triples	are	Tab separated
+Triples	are	Tab separated	|type
 Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
 Triples	format examples	Example Formats|https://research.ng-london.org.uk/modelling/?example=example_formats
 Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
