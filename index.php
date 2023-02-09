@@ -325,7 +325,7 @@ div.mermaidTooltip {
   
   
   </style>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- Global site tag (gtag.js) - Google Analytics 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P2QQWTBKX7"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -333,7 +333,7 @@ div.mermaidTooltip {
   gtag('js', new Date());
 
   gtag('config', 'G-P2QQWTBKX7');
-</script>
+</script>-->
 </head>
 <body>
 <div id="page" class="container-fluid">
