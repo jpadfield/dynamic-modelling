@@ -4,9 +4,9 @@
 // Added tests for hover text - it just uses a default example text just now
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
 $versions = array(
-  "jquery" => "3.6.1",
-  "bootstrap" => "5.2.2",
-  "mermaid" => "9.1.7", // 9.2.2 available but it breaks the zoom option, so would need to check.
+  "jquery" => "3.6.4",
+  "bootstrap" => "5.2.3",
+  "mermaid" => "9.4.3", // 9.2.2 available but it breaks the zoom option, so would need to check.
   "tether" => "2.0.0",
   "pako" => "2.1.0",
   "base64" => "3.7.3"
@@ -373,7 +373,7 @@ div.mermaidTooltip {
         <button title="Refresh Model" class="btn btn-default textbtn" id="refreshM" type="submit"  aria-label="Refresh Model"><img aria-label="Refresh Model"  alt="Refresh Model" src="graphics/view-refresh.png" width="$bw" /></button>
         <button title="Clear Text" class="btn btn-default textbtn" id="clear" type="button"  aria-label="Clear Textarea"><img aria-label="Clear Text" alt="Clear Text" src="graphics/clear-text.png" width="$bw" /></button>
         <button title="Help" class="btn btn-default textbtn" id="help" type="button" data-bs-toggle="modal" data-bs-target="#helpModalCenter" aria-label="Open Help Modal"><img alt="Help" aria-label="Help" src="graphics/help.png" width="$bw" /></button>
-        <button title="Toggle Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
+        <button title="Toggle Text Fullscreen" class="btn btn-default textbtn" id="tfs" type="button"  aria-label="Toggle Textarea Full-screen" onclick="togglefullscreen('tfs', 'textholder')"><img alt="Toggle Fullscreen" aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
     </div>
   </div>
       </form>
@@ -381,7 +381,12 @@ div.mermaidTooltip {
     <!-- LEVEL 3 -->
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
   <div class="tbtns" style="">
-      <button class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button></div>
+    <div class="form-check form-switch">
+			<input title="Toggle Pan & Zoom function" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" style="margin-right:0.5em; margin-bottom:2px; width:3em; height:1.5em;" onclick="modelZoom()">  
+			<button title="Toggle Model Fullscreen" class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
+		</div>
+</div>
+      
   <!-- <div style="overflow: hidden; height: 100%;" tabindex=0> -->
   <div id="modelDiv" style="height:100%" class="mermaid">$mermaid</div>
   <!-- </div> -->
@@ -393,7 +398,21 @@ $modal
   <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
   <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
   <script src="$jslib/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script>
+  <!-- <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script> -->
+  <script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';    
+    let config = {
+    maxTextSize: 900000,
+    startOnLoad:true, 
+    securityLevel: "loose",
+    logLevel: 0,
+    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true },
+    mermaid: {
+      callback:function(id) {modelZoom ()}
+      }}
+  mermaid.initialize(config);
+
+</script>
   <script src="$jslib/pako@$vs[5]/dist/pako.min.js"></script>
   <script src="$jslib/js-base64@$vs[6]/base64.min.js"></script>
   <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
@@ -631,8 +650,7 @@ END;
 
 
 function getCleanTriples($triplesTxt)
-  {
-
+  {	
   $lastLine = 0;
   $cleanData = array();
   
@@ -776,7 +794,7 @@ function getRaw($data)
   //echo "<!-- $typeCheck -->\n";
   // Defining a thing as have type "Type" is a special case so the "Type" is left as a literal by default
   if (in_array ($typeCheck, array(
-    "crm:p2_has_type", "has_type", "type", "rdf:type")) and strtolower($trip[2]) != "type")
+    "crm:p2_has_type", "has_type", "type", "rdf:type", "classified_as")) and strtolower($trip[2]) != "type")
     {$pt = true;
      $trip["type"] = true;}
   else
@@ -1281,11 +1299,11 @@ function parseEntities($name)
   {
 
   if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/]([0-9]+)$/", $name, $m))
-    {$out = "aat:$m[1]";}
+    {$out = "aat:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
-    {$out = "ng:$m[1]";}
+    {$out = "ng:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+linked[.]art[\/]example[\/]([a-z]+[\/][0-9]+)$/", $name, $m))
-    {$out = "lae:$m[1]";}
+    {$out = "lae:$m[1]|$name";}
   else
     {$out = $name;}
 

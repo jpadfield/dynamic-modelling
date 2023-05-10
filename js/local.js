@@ -28,31 +28,45 @@ $(function () {
 });
 
 var panZoom;
-  
+
 function modelZoom ()
     {
+    console.log("modelZoom");    
     
-    var md = $( "svg" ).first();
-    $(md).width("100%");
-    $(md).height("100%");
+    if (typeof panZoom !== 'undefined') {
+      // Variable is defined
+      // Your code here
+      panZoom.destroy();
+      panZoom = undefined;
+      $(window).off('resize');      
+      } 
+    else {
+      // Variable is not defined
+      // Your code here
+      var md = $( "svg" ).first();      
+      $(md).width("100%");
+      $(md).height("100%");
     
-    // Expose to window namespase for testing purposes
-    panZoom = svgPanZoom('#' + $(md).attr('id'), {
-      zoomEnabled: true,
-      minZoom: 0.1,
-      maxZoom: 75,
-      controlIconsEnabled: true,
-      fit: true,
-      center: true
-      });
+      // Expose to window namespase for testing purposes
+      panZoom = svgPanZoom('#' + $(md).attr('id'), {
+        zoomEnabled: true,
+        minZoom: 0.1,
+        maxZoom: 75,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true
+        });
       
-    $(window).resize(function(){
-      modelResize ();
-      });      
+      $(window).resize(function(){
+        modelResize ();
+        });    
+      
+        }    
     }
     
 function modelResize ()
   {
+  console.log("modelResize");
   panZoom.resize();
   panZoom.fit();
   panZoom.center();  
@@ -83,6 +97,7 @@ function togglefullscreen (b, divID)
 
 $(document).ready(function(){
 
+//mermaid.initialize({ startOnLoad: false });
           
 $(".tabs").click(function(){
   $(".tabs").removeClass("active");
@@ -134,7 +149,9 @@ processTriples (d2);
     $("#mermaidLink").attr("href", mleURL);
     $("#downloadLink").attr("href", imURL);
    
-mermaid.initialize({
+
+
+/*mermaid.initialize({
     maxTextSize: 900000,
     startOnLoad:true, 
     securityLevel: "loose",
@@ -148,7 +165,8 @@ mermaid.initialize({
             callback:function(id) {
                 modelZoom ()
             }
-        }});
+        }});*/
+     
 });
 
 function processTriples (triples)
@@ -167,6 +185,6 @@ function processTriples (triples)
       const bmData = Base64.fromUint8Array(bmCompressed, true);
       const bmURL = "./?data=pako:"+bmData;
       $("#bookmark").attr("href", bmURL);
-      //console.log(result);      
+      //console.log(result);  
       });     
   }

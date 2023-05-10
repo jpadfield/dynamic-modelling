@@ -2,6 +2,7 @@
 // Extra formats can be selected using a | separated pair of terms - the format only needs to be defined the first time an entities is referenced
 Dynamic Modeller	was created by	Joseph Padfield|https://orcid.org/0000-0002-2572-6428	object|actor
 Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
+Dynamic Modeller	can toggle	Zooming (toggle control in upper right of model window)	|name2
 Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
 Dynamic Modeller	works with	Triples
 Dynamic Modeller	can use	Subgraphs
