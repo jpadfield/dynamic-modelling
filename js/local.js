@@ -31,14 +31,16 @@ var panZoom;
 
 function modelZoom ()
     {
-    console.log("modelZoom");    
+    console.log("modelZoom"); 
+    console.log($('zoom-toggle'));   
     
     if (typeof panZoom !== 'undefined') {
       // Variable is defined
       // Your code here
       panZoom.destroy();
       panZoom = undefined;
-      $(window).off('resize');      
+      $(window).off('resize'); 
+      $('#zoom-toggle').prop('checked', false);
       } 
     else {
       // Variable is not defined
@@ -56,6 +58,8 @@ function modelZoom ()
         fit: true,
         center: true
         });
+        
+      $('#zoom-toggle').prop('checked', true);
       
       $(window).resize(function(){
         modelResize ();
@@ -86,88 +90,87 @@ function togglefullscreen (b, divID)
   $(':focus').blur();
   modelResize ();
   }
-  
-
-// TODO need option to redo svgPanZoom - if the model is updated.
-
-///////////////////////////////////////////////////////////////////////
-// Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
-///////////////////////////////////////////////////////////////////////
 
 
-$(document).ready(function(){
-
-//mermaid.initialize({ startOnLoad: false });
+$(document).ready(function()
+  {
+  ///////////////////////////////////////////////////////////////////////
+  // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
+  ///////////////////////////////////////////////////////////////////////
           
-$(".tabs").click(function(){
-  $(".tabs").removeClass("active");
-  $(".tabs h6").removeClass("font-weight-bold");
-  $(".tabs h6").addClass("text-muted");
-  $(this).children("h6").removeClass("text-muted");
-  $(this).children("h6").addClass("font-weight-bold");
-  $(this).addClass("active");
+  $(".tabs").click(function(){
+    $(".tabs").removeClass("active");
+    $(".tabs h6").removeClass("font-weight-bold");
+    $(".tabs h6").addClass("text-muted");
+    $(this).children("h6").removeClass("text-muted");
+    $(this).children("h6").addClass("font-weight-bold");
+    $(this).addClass("active");
 
-  current_fs = $(".active");
-  next_fs = $(this).attr('id');
-  next_fs = "#" + next_fs + "1";
+    current_fs = $(".active");
+    next_fs = $(this).attr('id');
+    next_fs = "#" + next_fs + "1";
 
-  $("fieldset").removeClass("show");
-  $(next_fs).addClass("show");
+    $("fieldset").removeClass("show");
+    $(next_fs).addClass("show");
 
-  current_fs.animate({}, {
-    step: function() {
-      current_fs.css({
-        'display': 'none',
-        'position': 'relative'
-        });
-      next_fs.css({
-        'display': 'block'
-        });
-      }
+    current_fs.animate({}, {
+      step: function() {
+        current_fs.css({
+          'display': 'none',
+          'position': 'relative'
+          });
+        next_fs.css({
+          'display': 'block'
+          });
+        }
+      });
     });
-  });
-
-// Compressing data and AJAX calls
-const d1 = Base64.toUint8Array(pcode);
-console.log("D1");
-const d2 = pako.inflate(d1, { to: 'string' })
-console.log("D2");
-console.log(d2);
-processTriples (d2);
-//$("#triplesTxt").text(d2);
-
-   
+  //////////////////////////////////////////////////////////////////////
+  
+  //////////////////////////////////////////////////////////////////////
+  // Compressing data and AJAX calls
+  //////////////////////////////////////////////////////////////////////
+    
+  if (pcode) {
+    const d1 = Base64.toUint8Array(pcode);
+    const d2 = pako.inflate(d1, { to: 'string' })
+    console.log("Pako String");
+    console.log(d2);
+    processTriples (d2);
+    }
+   else {
+    f1(); 
+    }
 	const bmCompressed = pako.deflate($("#triplesTxt").text().trim(), { level: 9 });
 	const bmData = Base64.fromUint8Array(bmCompressed, true);
 	const bmURL = "./?data=pako:"+bmData;
 	$("#bookmark").attr("href", bmURL);
 	
-    const compressed = pako.deflate(code, { level: 9 });
-    const send = Base64.fromUint8Array(compressed, true) 
-    const mleURL = "https://mermaid-js.github.io/mermaid-live-editor/edit#pako:"+send;
-    const imURL = "./?image="+send;
-    $("#mermaidLink").attr("href", mleURL);
-    $("#downloadLink").attr("href", imURL);
+  const compressed = pako.deflate(code, { level: 9 });
+  const send = Base64.fromUint8Array(compressed, true) 
+  const mleURL = "https://mermaid-js.github.io/mermaid-live-editor/edit#pako:"+send;
+  const imURL = "./?image="+send;
+  $("#mermaidLink").attr("href", mleURL);
+  $("#downloadLink").attr("href", imURL);
    
 
 
-/*mermaid.initialize({
-    maxTextSize: 900000,
-    startOnLoad:true, 
-    securityLevel: "loose",
-    logLevel: 0,
-    flowchart: { 
-    curve: 'basis',
-    useMaxWidth: false,
-    htmlLabels: true
-  },
-        mermaid: {
-            callback:function(id) {
-                modelZoom ()
-            }
-        }});*/
      
 });
+
+function resolveAfterTime(x) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(x);
+    }, x);
+  });
+}
+
+async function f1() {
+  const x = await resolveAfterTime(1000);
+  modelZoom();
+}
+
 
 function processTriples (triples)
   { 
@@ -185,6 +188,9 @@ function processTriples (triples)
       const bmData = Base64.fromUint8Array(bmCompressed, true);
       const bmURL = "./?data=pako:"+bmData;
       $("#bookmark").attr("href", bmURL);
+      
+      f1();
+      
       //console.log(result);  
       });     
   }

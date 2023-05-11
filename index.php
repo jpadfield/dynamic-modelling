@@ -382,7 +382,7 @@ div.mermaidTooltip {
     <div  role="main" aria-label="Holder for the actual flow diagram model"  id="holder" class="flex-grow-1 moddiv">
   <div class="tbtns" style="">
     <div class="form-check form-switch">
-			<input title="Toggle Pan & Zoom function" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" style="margin-right:0.5em; margin-bottom:2px; width:3em; height:1.5em;" onclick="modelZoom()">  
+			<input title="Toggle Pan & Zoom function" class="form-check-input" type="checkbox" role="switch" id="zoom-toggle" style="margin-right:0.5em; margin-bottom:2px; margin-top:8px; width:3em; height:1.5em;" onclick="modelZoom()">  
 			<button title="Toggle Model Fullscreen" class="btn btn-default nav-button textbtn" id="fs"  aria-label="Toggle Model Full-screen"  style="top:0px;left:0px;" onclick="togglefullscreen('fs', 'holder')"><img   alt="Toggle Fullscreen"  aria-label="Toggle Fullscreen" src="graphics/view-fullscreen.png" width="$bw" /></button>
 		</div>
 </div>
@@ -405,7 +405,7 @@ $modal
     maxTextSize: 900000,
     startOnLoad:true, 
     securityLevel: "loose",
-    logLevel: 0,
+    logLevel: 4,
     flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true },
     mermaid: {
       callback:function(id) {modelZoom ()}
@@ -421,13 +421,7 @@ $modal
  
   let code = JSON.stringify($json_code);
   let pcode = '$pako';
-  console.log (pcode);
-  $( document ).ready(function() { 
-  
-	
-  });
-  
-  
+    
   </script>  
   </body>
 </html>
@@ -444,17 +438,18 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Summary" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tools makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents and example set or data, and the generated model, this example demonstrate the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
+    "Information" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD (experimental) into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tool makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents an example set or data, and the generated model demonstrates the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
     <br/><br/>
-    <h5>This specific project was supported by:</h5>
-<br/>
-    <h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
-<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="./graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
-<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="./graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
-<br/>
-<h6></a>The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project</h6>
+    <h5>Acknowledgements:</h5>
+This tool was originally developed within the National Gallery, but its continue development and public presentation has also been supported by:
+<br/><br/>
+    <h6></a>The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project</h6>
 <p dir="auto"><a href="https://www.iperionhs.eu/" rel="nofollow"><img height="42px" src="./graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%;"></a>&nbsp;&nbsp;
 <a href="https://www.iperionhs.eu/" rel="nofollow"><img height="32px" src="./graphics/iperionhs-eu-tag2.png" alt="IPERION-HS" style="max-width: 100%;"></a></p>
+<br/>
+<h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
+<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="./graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
+<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="./graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
 <br/>
 <h6>The AHRC Funded <a href="https://linked.art/" rel="nofollow">Linked.Art</a> project</h6>
 <p><a href="https://ahrc.ukri.org/" rel="nofollow"><img height="48px" src="./graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art" style="max-width: 100%;"></a></p>',
