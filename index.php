@@ -941,27 +941,14 @@ function Mermaid_formatData ($selected)
     $t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
     $t[2] = str_replace('?', "#63;", $t[2]);
-    //$t[2] = check_string($t[2]);
     
     // Updated to allow formats classes to be added to subgraphs - 05/07/22 JPadfield
     // Commenting out a subgraph name with "//" will hide the subgraph label. - 17/08/22 JPadfield
     if (in_array($t[0], array("subgraph")))
       {
-      //prg(0, $t);
       $sgdts = $subGraphs[trim($t[1], "\"")];
-      //prg(0, $sgdts);
-      
-      //if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $t[1], $sm))
-//        {$tid = str_replace(' ', "", $sm[1]);
-         //$tlab = "[\"&nbsp;\"]";}
-      //else
-//        {$tid = str_replace(' ', "", $t[1]);          
-         //$tlab = "[\"$t[1]\"]";}
-         
-      $sgIDs[] = $sgdts["id"];//$tid;   
-      $defs .= "\n$t[0] $sgdts[id] $sgdts[lab]\n";
-      //prg(0, "\n$t[0] $sgdts[id] $sgdts[lab]\n");
-      //prg(1, "\n$t[0] $tid $tlab\n");
+      $sgIDs[] = $sgdts["id"];  
+      $defs .= "\n$t[0] $sgdts[id] $sgdts[lab]\n";      
       }
     else if (in_array($t[0], array("end")))
       {
@@ -972,6 +959,20 @@ function Mermaid_formatData ($selected)
         {    
         if(isset($allClasses[$t[1]]))
           {$usedClasses[$t[1]] = $allClasses[$t[1]];}
+        else //added the option to used custom dashes on the border line initially for subgraphs but also added for nodes - J Padfield 22/6/23
+          {
+					if (preg_match("/^(.+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm))
+						{
+						if(isset($allClasses[$cm[1]]))
+							{
+							$tc = rtrim(trim($allClasses[$cm[1]]), ';');
+							$tc = preg_replace("/classDef $cm[1]/", "classDef $t[1]", $tc);
+							$tc = $tc.",stroke-dasharray:$cm[2] $cm[3];\n";
+							$allClasses[$t[1]] = $tc;
+							$usedClasses[$t[1]] = $allClasses[$t[1]];
+							}								
+						}	
+					}
         $defs .= "class $sgID $t[1]\n";
         }
       }
@@ -1106,7 +1107,7 @@ function Mermaid_formatData ($selected)
           }
         
         $defs .= Mermaid_defThing($t[0], $no, $fcs[0]);
-        $no++;
+        $no++; 
         }
     
       //  NEED TO REVISIT THE AUTOMATIC ASSIGNMENT OF object class
@@ -1197,6 +1198,20 @@ function Mermaid_defThing ($var, $no, $fc=false)
 
   if(isset($allClasses[$cls]))
     {$usedClasses[$cls] = $allClasses[$cls];}
+  else //added the option to used custom dashes on the border line initially for subgraphs but also added for nodes - J Padfield 22/6/23
+    {
+		if (preg_match("/^(.+)[-]([0-9]+)[-]([0-9]+)$/", $cls, $cm))
+			{
+			if(isset($allClasses[$cm[1]]))
+				{
+				$tc = rtrim(trim($allClasses[$cm[1]]), ';');
+				$tc = preg_replace("/classDef $cm[1]/", "classDef $cls", $tc);
+				$tc = $tc.",stroke-dasharray:$cm[2] $cm[3];\n";
+				$allClasses[$cls] = $tc;
+				$usedClasses[$cls] = $allClasses[$cls];
+				}								
+			}	
+		}
          
   $str = "\n$code(\"$var\")\nclass $code $cls;\n".$click;      
   
