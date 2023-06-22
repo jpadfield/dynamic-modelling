@@ -135,8 +135,7 @@ $(document).ready(function()
     const d1 = Base64.toUint8Array(pcode);
     const d2 = pako.inflate(d1, { to: 'string' })
     console.log("Pako String");
-    console.log(d2);
-    processTriples (d2);
+    processTriples (d2);    
     }
    else {
     f1(); 
@@ -152,10 +151,7 @@ $(document).ready(function()
   const imURL = "./?image="+send;
   $("#mermaidLink").attr("href", mleURL);
   $("#downloadLink").attr("href", imURL);
-   
-
-
-     
+    
 });
 
 function resolveAfterTime(x) {
@@ -167,30 +163,33 @@ function resolveAfterTime(x) {
 }
 
 async function f1() {
-  const x = await resolveAfterTime(1000);
+  const x = await resolveAfterTime(100000);
   modelZoom();
 }
 
+async function f2(period) {
+  const x = await resolveAfterTime(period);
+}
 
 function processTriples (triples)
   { 
   console.log("processTriples");
-  console.log(triples);
+  //console.log(triples);
   $.ajax({ method: "POST", url: "index.php", 
       data: {'triples': triples},
       }).done(function( data ) { 
-      console.log(data.triples);
+      //console.log(data.triples);
       //var result = $.parseJSON(data); 
       $("#triplesTxt").html(data.triples);
       $("#modelDiv").html(data.mermaid);
-      
+
       const bmCompressed = pako.deflate($("#triplesTxt").text().trim(), { level: 9 });
       const bmData = Base64.fromUint8Array(bmCompressed, true);
       const bmURL = "./?data=pako:"+bmData;
       $("#bookmark").attr("href", bmURL);
       
       f1();
-      
-      //console.log(result);  
+      $( "#refreshM" ).trigger( "click" );
+      //console.log(data);  
       });     
   }
