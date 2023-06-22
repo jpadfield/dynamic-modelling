@@ -163,7 +163,7 @@ function resolveAfterTime(x) {
 }
 
 async function f1() {
-  const x = await resolveAfterTime(100000);
+  const x = await resolveAfterTime(1000);
   modelZoom();
 }
 
