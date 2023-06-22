@@ -37,11 +37,11 @@
     "place": {
       "stroke": "#bd4512","fill":"#bd4512", "color":"white"},
     "place_bn": {
-      "stroke": "#9D390F","fill":"#eecaba", "color":"#9D390F","rx":"20px","ry":"20px;"},      
+      "stroke": "#9D390F","fill":"#eecaba", "color":"#9D390F","rx":"20px","ry":"20px"},      
     "type": {
-      "stroke": "#502604", "fill": "#FAB565",  "color":"#502604", "rx":"20px","ry":"20px;"}, 
+      "stroke": "#502604", "fill": "#FAB565",  "color":"#502604", "rx":"20px","ry":"20px"}, 
     "type_bn": {
-      "stroke": "#502604", "fill": "#F9E1C3",  "color":"#6C3304", "rx":"20px","ry":"20px;"},
+      "stroke": "#502604", "fill": "#F9E1C3",  "color":"#6C3304", "rx":"20px","ry":"20px"},
     "name": {
       "stroke": "#563800", "fill": "#FEF3BA", "color":"#563800", "rx": "20px", "ry": "20px"},
     "literal": {
@@ -52,13 +52,13 @@
       "stroke": "#2C5D98", "fill": "#D8FDFF", "color": "#2C5D98"},
 
     "object2": {
-      "stroke": "black","fill":"#E1BA9C","rx":"20px","ry":"20px;"},
+      "stroke": "black","fill":"#E1BA9C","rx":"20px","ry":"20px"},
     "actor2": {
-      "stroke": "black","fill":"#FFBDCA","rx":"20px","ry":"20px;"},    
+      "stroke": "black","fill":"#FFBDCA","rx":"20px","ry":"20px"},    
     "dims2": {
-      "stroke": "black","fill":"#c6c6c6","rx":"20px","ry":"20px;"},
+      "stroke": "black","fill":"#c6c6c6","rx":"20px","ry":"20px"},
     "type2": {
-      "stroke": "red", "fill": "#FAB565",  "rx":"20px","ry":"20px;"},
+      "stroke": "red", "fill": "#FAB565",  "rx":"20px","ry":"20px"},
     "name2": {
       "stroke": "orange", "fill": "#FEF3BA", "rx": "20px", "ry": "20px"},
     "infoobj": {
@@ -71,13 +71,12 @@
       "stroke": "blue","fill":"#96e0f6","rx":"20px","ry":"20px"},
     "classstyle": {
       "stroke": "black","fill":"white"},
+    "crm": {
+      "stroke": "#333333", "fill": "#DCDCDC", "color": "#333333"},
     "sg1": {
       "stroke": "black", "fill": "#fefcf4", "color":"black", "rx": "10px", "ry": "10px"},
-      
-
-    "crm": {
-      "stroke": "#333333", "fill": "#DCDCDC", "color": "#333333"}
-      
+    "sg2": {
+      "stroke": "black", "fill": "#fffffb", "color":"black", "rx": "10px", "ry": "10px"}
   },
   "prefix" : {
     "ngo": {
