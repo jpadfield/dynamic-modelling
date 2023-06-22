@@ -6,6 +6,9 @@ object	linked to	object_bn	|object_bn
 thing	linked to	actor	|actor
 actor	linked to	actor_bn	|actor_bn
 
+thing	useful for subgraphs	sg1	|sg1
+thing	useful for subgraphs	sg2	|sg2
+
 object	linked to	idea	|idea
 idea	linked to	idea_bn	|idea_bn
 
