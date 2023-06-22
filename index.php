@@ -83,7 +83,6 @@ else if (isset($_GET["data"]) and preg_match("/^[p][a][k][o][:](.+)$/", $_GET["d
   {
 	$triplesTxt = "Please wait	tooltip	Processing supplied data";
 	$pako = $m[1];//$_GET["data"];
-  //prg(1, $triplesTxt);
   }
 else if (isset($_POST["triples"]))
   {
@@ -410,6 +409,7 @@ $modal
     mermaid: {
       callback:function(id) {modelZoom ()}
       }}
+      
   mermaid.initialize(config);
 
 </script>
