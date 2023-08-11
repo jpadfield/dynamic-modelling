@@ -4,12 +4,12 @@
 // Added tests for hover text - it just uses a default example text just now
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
 $versions = array(
-  "jquery" => "3.6.4",
-  "bootstrap" => "5.2.3",
-  "mermaid" => "9.4.3", // 9.2.2 available but it breaks the zoom option, so would need to check.
+  "jquery" => "3.7.0",
+  "bootstrap" => "5.3.1",
+  "mermaid" => "10.3.0", // 9.2.2 available but it breaks the zoom option, so would need to check.
   "tether" => "2.0.0",
   "pako" => "2.1.0",
-  "base64" => "3.7.3"
+  "base64" => "3.7.5"
   );
 
 if (isset($_GET["debug"])) {}
@@ -300,7 +300,7 @@ function buildPage ($triplesTxt, $mermaid)
   <meta charset="utf-8">
   <title>Dynamic Simple Modelling</title>
   <link href="$jslib/bootstrap@$vs[0]/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="css/local.css" rel="stylesheet" type="text/css">
   <style>
   
@@ -894,6 +894,8 @@ function Mermaid_displayLabel ($str)
   {
   global $config;  
   
+  //We do not want to display "/r" at all.
+  $str = str_replace('\r', "", $str);
   // Format the displayed text, either wrapping or removing numbers
   // used to indicate separate instances of the same text/name
   if (count_chars($str) > 60)
@@ -1245,14 +1247,22 @@ function checkTriples ($data)
 
   if($json)
     {
-    
-    if (isset($json["@context"]))
-      {$triplesTxt = "This Model\thas context\t".$json["@context"]."\n";
+    $triplesTxt = "//flowchart TB fix\n";
+    //prg(0, $json);
+    //var_dump($json);
+    if (isset($json[0]["@context"]))
+      {$json = $json[0];
+       $triplesTxt .= "This Model\thas context\t".$json["@context"]."\n";
+       unset($json["@context"]);}
+    else if (isset($json["@context"]))
+      {$triplesTxt .= "This Model\thas context\t".$json["@context"]."\n";
        unset($json["@context"]);}
     else
-      {$triplesTxt = false;}
+      {}
     
-    $triplesTxt .= laj2trips ($json);    
+    $triplesTxt .= laj2trips ($json);
+    //prg(1, $triplesTxt);
+    
     //debugJsonConversaion ($data, $json, $triplesTxt);
     }
   else
@@ -1261,12 +1271,67 @@ function checkTriples ($data)
   return ($triplesTxt);
   }
 
+function isArrayAssociative($array) {
+    return array_keys($array) !== range(0, count($array) - 1);
+}
 
-// NEED TO CATCH IF $arr is not an array !!!!
+$bn_number = "0";
+$la_formats = array();
+function pickLaFormat ($s, $p, $o)
+  {
+  global $la_formats;
+  
+  $oformat = "";
+  $sformat = "";
+  
+  if ($p == "type")
+    {$oformat = "classstyle";}
+  elseif (in_array($p, array("_label", "content")))
+    {$oformat = "literal";}
+  elseif (in_array($p, array("part", "equivalent")))
+    {
+    if (isset($la_formats[$s]))
+      {$oformat = $la_formats[$s];}      
+    }
+  elseif (in_array($p, array("member_of")))
+    {$oformat = "actor2";}
+  elseif (in_array($p, array("born", "died", "formed_by", "dissolved_by", "carried_out")))
+    {$oformat = "event2";}
+  elseif (in_array($p, array("timespan")))
+    {$oformat = "timespan";}
+  elseif (in_array($p, array("member_of", "representation", "referred_to_by", "subject_of")))
+    {$oformat = "infoobj";}
+  elseif (in_array($p, array("took_place_at")))
+    {$oformat = "place2";}
+  elseif (in_array($p, array("classified_as")))
+    {$oformat = "type2";}
+  elseif (in_array($p, array("identified_by", "contact_point")))
+    {$oformat = "name2";}
+    
+  if (in_array($o, array("Person", "Group", "Actor")))
+    {$sformat = "actor2";}
+    
+  if ($oformat)
+    {$la_formats[$o] = $oformat;}
+  if ($sformat)
+    {$la_formats[$s] = $sformat;}
+      
+  if ($oformat or $sformat)
+    {$format = "\t$sformat|$oformat";}
+  else
+    {$format = "";}
+  
+  return ($format);  
+  }
+  
+// Seem to be getting duplicates, might be good to drop all of the triples into an array
+// remove the duplicates and then order them, add formats and then output
 function laj2trips ($arr, $pSub=false, $pPred=false)
   {
-  //if (!is_array($arr))
-  //  {prg(1, $arr);}
+  global $bn_number;
+  
+  if (!is_array($arr))
+    {$arr = array("id" => $arr);}
     
   $out = "";
   
@@ -1274,31 +1339,60 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
     {$sub = $arr["id"];
      unset($arr["id"]);}
   else
-    {$sub = "_BN";}
+    {if ($bn_number)
+      {$sub = "_#-".$bn_number;}
+     else
+      {$sub = "_#-0";}
+     $bn_number++;}
   
   if ($pSub and $pPred)
     {
+    //$out .= "//Link triple\n";
     $pSub = parseEntities($pSub);
     $sub = parseEntities($sub);
     $pPred = parseEntities($pPred);
-    $out .= "$pSub\t$pPred\t$sub\n";}
+    
+    $fr = pickLaFormat ($pSub,$pPred,$sub);
+    $out .= "$pSub\t$pPred\t$sub$fr\n";}
     
   foreach ($arr as $k => $v)
     {
     if (is_array($v))
       {
       if(isset($v["id"]))
-  {$out .= laj2trips($v, $sub, $k);}
+        {$out .= laj2trips($v, $sub, $k);}
+      elseif (!isArrayAssociative($v))
+        {//$out .= "//Simple Array\n";
+         foreach ($v as $n => $a)
+          {
+          if (is_array($a)) {$out .= laj2trips($a, $sub, $k);}
+          else {
+            $a = parseEntities($a);
+            $sub = parseEntities($sub);
+            $k = parseEntities($k);
+            $fr = pickLaFormat ($sub,$k,$a);
+            $out .= "$sub\t$k\t$a$fr\n";
+            }          
+          }
+        }      
       else
-  {foreach ($v as $n => $a)
-    {$out .= laj2trips($a, $sub, $k);}}
+        {//$out .= "//Associative Array\n";
+         $out .= laj2trips($v, $sub, $k);
+         //foreach ($v as $n => $a)
+         // {$out .= laj2trips($a, $sub, $k);}
+         }
       }
     else
       {
+      //$out .= "//Simple Triple\n";
       $v = parseEntities($v);
+      //needed to cope with complex newlines
+      if (in_array($k, array("_label", "content")))
+        {$v = json_encode($v);}
       $sub = parseEntities($sub);
       $k = parseEntities($k);
-      $out .= "$sub\t$k\t$v\n";
+      $fr = pickLaFormat ($sub,$k,$v);
+      $out .= "$sub\t$k\t$v$fr\n";
       }
     }
 
@@ -1310,7 +1404,11 @@ function parseEntities($name)
 
   if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]aat[\/]([0-9]+)$/", $name, $m))
     {$out = "aat:$m[1]|$name";}
+  else if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]ulan[\/]([0-9]+)$/", $name, $m))
+    {$out = "ulan:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
+    {$out = "ng:$m[1]|$name";}
+  else if (preg_match("/^http[s]*[:][\/]+data[.]ng[.]ac[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
     {$out = "ng:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+linked[.]art[\/]example[\/]([a-z]+[\/][0-9]+)$/", $name, $m))
     {$out = "lae:$m[1]|$name";}
