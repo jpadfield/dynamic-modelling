@@ -13,11 +13,15 @@ $versions = array(
   );
 
 if (isset($_GET["debug"])) {}
+
+if (isset($_GET["simple"])) {$simple = true;}
+else {$simple = false;}
   
 if (isset($_SERVER["SCRIPT_URI"]))
   {$thisPage = $_SERVER["SCRIPT_URI"];}
 else
   {$thisPage = "./";}
+  
 
 $pako = false;
 $diagram = "flowchart";
@@ -26,11 +30,17 @@ $orientation = "LR";
 
 $default = file_get_contents("default.csv");
 $config = getRemoteJsonDetails ("config.json", false, true);
+$uniqueClasses = getRemoteJsonDetails ("unique_classes.json", false, true);
 $examples = getRemoteJsonDetails ("examples.json", false, true);
 $usedClasses = array();
 $subGraphs = array();
 $subGraphCount = 0;
 $allClasses = formatClassDef ($config["format"]);
+
+$bn_number = "0";
+$usedFormats = array();
+$jsonData = array();
+$jsonDataBlank = array(false, false, false, false, false);
 
 $doc_example_links = array(
   "LRNF" => array("TBNF", "LRF", "LR"), 
@@ -60,7 +70,7 @@ else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
     {$triplesTxt = checkTriples (file_get_contents($ex["uri"]));}
   
   if ($_GET["example"] == "object2")
-    {$triplesTxt = "//Flowchart LR fix\n".$triplesTxt;}
+    {$triplesTxt = replaceFCDefIfExists ($triplesTxt, "//Flowchart LR fix");}
   else if ($_GET["example"] == "documentation")
     {$triplesTxt = docExampleTriples ($doc_example_links["LRNF"], $triplesTxt);}
   }
@@ -123,12 +133,27 @@ $cleanTriplesTxt = implode("\n", $triples);
 $raw = getRaw($triples);
 $mermaid = Mermaid_formatData ($raw["test"]);
   
-$html = buildPage ($cleanTriplesTxt, $mermaid);
+if ($simple)
+  {$html = buildPageSimple ($cleanTriplesTxt, $mermaid);}
+else
+  {$html = buildPage ($cleanTriplesTxt, $mermaid);}
 echo $html;
 exit;
 
 ////////////////////////////////////////////////////////////////////////
 
+function replaceFCDefIfExists ($string, $newline=false)
+  {
+  $lines = explode("\n", $string, 2); // Split into an array with at most 2 elements
+
+  if (isset($lines[0]) && preg_match('/^\/\/flowchart.+$/', strtolower($lines[0]))) {
+    $replacement = "New first line";
+    $newString = $newline . "\n" . (isset($lines[1]) ? $lines[1] : '');
+    return ($newString);
+    } 
+  else 
+    {return ($newline . "\n" . $string);} 
+  }
 
 function docExampleTriples ($ex, $use=false)
   {
@@ -198,6 +223,7 @@ function buildLinksDD ()
     <!-- <a class="dropdown-item" title="Bookmark Link" href="$bookmark" target="_blank">Bookmark Link</a> -->
 		<a class="dropdown-item" id="bookmark" title="Bookmark Link" href="" target="_blank">Bookmark Link</a>
     <a class="dropdown-item" id="mermaidLink" title="Edit further in the Mermaid Live Editor" href="" target="_blank">Mermaid Editor</a>
+    <a class="dropdown-item" id="mermaidCode" title="Copy Mermaid Code to Clipboard" onclick="copyMermaid()" href="">Mermaid Code</a>
 END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
@@ -324,15 +350,6 @@ div.mermaidTooltip {
   
   
   </style>
-  <!-- Global site tag (gtag.js) - Google Analytics 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-P2QQWTBKX7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-P2QQWTBKX7');
-</script>-->
 </head>
 <body>
 <div id="page" class="container-fluid">
@@ -388,11 +405,125 @@ div.mermaidTooltip {
       
   <!-- <div style="overflow: hidden; height: 100%;" tabindex=0> -->
   <div id="modelDiv" style="height:100%" class="mermaid">$mermaid</div>
+  <div id="modelDivTxt" style="display:none">$mermaid</div>
   <!-- </div> -->
     </div><!-- CLOSE LEVEL 3 -->
   </div><!-- CLOSE FLEX DIV -->
 $modal
 </div><!-- CLOSE PAGE -->
+      
+  <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
+  <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
+  <script src="$jslib/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script> -->
+  <script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';    
+    let config = {
+    maxTextSize: 900000,
+    startOnLoad:true, 
+    securityLevel: "loose",
+    logLevel: 4,
+    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true },
+    mermaid: {
+      callback:function(id) {modelZoom ()}
+      }}
+      
+  mermaid.initialize(config);
+
+</script>
+  <script src="$jslib/pako@$vs[5]/dist/pako.min.js"></script>
+  <script src="$jslib/js-base64@$vs[6]/base64.min.js"></script>
+  <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
+  <script src="./js/local.js"></script>
+  <script>
+ 
+  let code = JSON.stringify($json_code);
+  let pcode = '$pako';
+    
+  </script>  
+  </body>
+</html>
+
+END;
+$html = ob_get_contents();
+ob_end_clean(); // Don't send output to client
+
+return($html);
+}
+
+function buildPageSimple ($triplesTxt, $mermaid)
+  {
+  global  $thisPage, $versions, $pako;
+  
+  $exms = buildExamplesDD ();
+  $links = buildLinksDD ();
+  $modal = buildModal ();
+  
+  $code = array(
+    "code" => $mermaid,
+    "mermaid" => array(
+      "theme" => "default",
+      //"securityLevel" => "loose", This option forces an alert in the live editor
+      "logLevel" => "warn",
+      "flowchart" => array( 
+    "curve" => "basis",
+    "htmlLabels" => true)
+      ));
+ 
+  $json_code = json_encode($code);
+
+  $bw = "26px";
+  
+  $vs[0] = $versions["bootstrap"];
+  $vs[1] = $versions["jquery"];
+  $vs[2] = $versions["bootstrap"];
+  $vs[3] = $versions["mermaid"];
+  $vs[4] = $versions["tether"];
+  $vs[5] = $versions["pako"];
+  $vs[6] = $versions["base64"];
+  
+  $jslib = "https://unpkg.com";
+  $jslib = "https://cdn.jsdelivr.net/npm";
+  ob_start();
+  echo <<<END
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta charset="utf-8">
+  <title>Dynamic Simple Modelling</title>
+  <link href="$jslib/bootstrap@$vs[0]/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="css/local.css" rel="stylesheet" type="text/css">
+  <style>
+  
+
+/* Added to get the hover texts or tooltips to appear and be formatted.
+based on values in https://unpkg.com/browse/mermaid@6.0.0/dist/mermaid.css */
+div.mermaidTooltip {
+  position: absolute;
+  text-align: center;
+  max-width: 300px;
+  padding: 5px;
+  font-family: 'trebuchet ms', verdana, arial;
+  font-size: 1rem;
+  background: #ffffde;
+  border: 1px solid #aaaa33;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 10000;
+}  
+  </style>
+</head>
+<body class="vh-100" style="overflow:hidden" >
+  <div class="tbtns" style="">
+    <div class="form-check form-switch">
+			<input title="Toggle Pan & Zoom function" class="form-check-input" type="checkbox" role="switch" id="zoom-toggle" style="margin-right:0.5em; margin-bottom:2px; margin-top:8px; width:3em; height:1.5em;" onclick="modelZoom()">  
+		</div>
+</div>
+<div id="modelDiv" style="height:100%" class="mermaid">$mermaid</div>
+<div id="modelDivTxt" style="display:none">$mermaid</div>
       
   <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
   <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
@@ -943,6 +1074,8 @@ function Mermaid_formatData ($selected)
     $t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
     $t[2] = str_replace('?', "#63;", $t[2]);
+    $t[2] = str_replace('<', "#60;", $t[2]);
+    $t[2] = str_replace('>', "#62;", $t[2]);
     
     // Updated to allow formats classes to be added to subgraphs - 05/07/22 JPadfield
     // Commenting out a subgraph name with "//" will hide the subgraph label. - 17/08/22 JPadfield
@@ -1241,33 +1374,206 @@ function prg($exit=false, $alt=false, $noecho=false)
   else {return ($out);}
   }
 
+function checkForAlias ($originalString)
+  {
+  $originalString = trim($originalString);
+  
+  // Check if the string contains a '|'
+  $pipePosition = strpos($originalString, '|http');
+
+  // If '|' is found, extract the text before it; otherwise, leave the string unchanged
+  if ($pipePosition !== false) {
+    $resultString = substr($originalString, 0, $pipePosition);
+  } else {
+    $resultString = $originalString;
+    }
+    
+  return ($resultString);
+  }
+ 
+
+//DEBUG check iperion-ch examples they are being changed a bit much.
+function checkFormatReferences ($a, $dupeCheck=false)
+  { 
+ 
+  // double check all requested formats and make sure they are mapped to 
+  // the first instances of each related entity
+  if (!is_array($a))
+    {
+    // Split the input string into rows based on newline characters
+    $rows = explode("\n", $a);
+    $a = array();
+    // Loop through the rows and split each row into columns based on tab characters
+    foreach ($rows as $row) {
+      $columns = explode("\t", $row);
+      $columns = array_pad($columns, 3, false);
+      
+      if (!isset($columns[3]))
+        {$columns[3] = false;
+         $columns[4] = false;}
+      else if (!isset($columns[4]))
+        {
+         //the system initially used @@ to deliminator formats
+         //moved to | with the current system.
+         $columns[3] = preg_replace('/@@/', '|', $columns[3]);
+         $tf = explode("|", $columns[3]); 
+         $columns[3] = $tf[0];
+         $columns[4] = $tf[1];}
+      $a[] = $columns;
+      }
+    }
+  
+  $formatPair = array();
+  $lbn = 0;
+  
+  foreach ($a as $k => &$r) {
+    list($val0, $val1, $val2, $val3, $val4) = $r;
+    
+    //prg(0, array($val0, $val1, $val2, $val3, $val4));
+    //experimenting with checkforalias function to check formatting on the display
+    //text rather than also including the underlying links
+    //$val0 = checkForAlias($val0);
+    $val0 = trim($val0);
+    $val1 = trim($val1);
+    //$val2 = checkForAlias($val2);
+    $val2 = trim($val2);
+    $val3 = trim($val3);
+    $val4 = trim($val4);
+    //prg(0, array($val0, $val1, $val2, $val3, $val4));
+    
+    if (isset ($formatPair[$val0]))
+      {if($val3)
+        {$formatPair[$val0][2] = $val3;}}
+    else
+      {$formatPair[$val0] = array($k, 0, $val3);}
+    
+    if (isset ($formatPair[$val2]))
+      {if($val4)
+        {$formatPair[$val2][2] = $val4;}}
+    else
+      {$formatPair[$val2] = array($k, 2, $val4);}
+     
+    if (!isset($r[0])) {$r[0] = false;}
+    if (!isset($r[1])) {$r[1] = false;}
+    if (!isset($r[2])) {$r[2] = false;}
+    $r[3] = false;
+    $r[4] = false;
+  }
+
+  unset($r); // Unset the reference to the last element
+
+  if ($dupeCheck)
+    {$a = removeDuplicates($a);}
+
+  foreach ($formatPair as $k => $v) {  
+    if ($v[1])
+      {$a[$v[0]][4] = $v[2];}
+    else
+      {$a[$v[0]][3] = $v[2];}
+    }  
+    
+  $str = "";
+
+  foreach ($a as $k =>$ar)
+    {
+    // Some type are forced to be unique later in the process this ensures 
+    // that they will still have the correct formatting
+    if ($ar[1] == "type" and !$ar[4])
+      {$ar[4] = "classstyle";}
+      
+    if ($ar[3] or $ar[4])
+      {$str .= "$ar[0]\t$ar[1]\t$ar[2]\t$ar[3]|$ar[4]\n";}
+     else
+      {$str .= "$ar[0]\t$ar[1]\t$ar[2]\n";}
+    }
+
+//prg(1, $str);
+  return ($str);
+  }
+  
+function removeDuplicates ($originalArray)
+  {
+  // but ignore all of the comment and subgraph controls.
+  $uniqueArray = [];
+  $duplicateComments = [];
+
+  foreach ($originalArray as $key => $row) {
+    if (count($row) > 0 && is_string($row[0]) && strpos($row[0], '//') === 0) {
+        // Ignore rows with first value starting with "//"
+        $uniqueArray[$key] = $row;
+        continue;
+      }
+    else if (!$row[0]) {
+        // Ignore blank rows
+        $uniqueArray[$key] = $row;
+        continue;
+      }
+
+    $serialized = serialize($row);
+    if (!isset($duplicateComments[$serialized])) {
+        $duplicateComments[$serialized] = true;
+        $uniqueArray[$key] = $row;
+      }
+    }
+    
+  return ($uniqueArray);
+  }
+  
 function checkTriples ($data)
   {  
+  global $jsonData, $config, $uniqueClasses;
+  
   $json = json_decode($data, true);
 
   if($json)
     {
+    $context = false;
     $triplesTxt = "//flowchart TB fix\n";
     //prg(0, $json);
     //var_dump($json);
+    
     if (isset($json[0]["@context"]))
       {$json = $json[0];
        $triplesTxt .= "This Model\thas context\t".$json["@context"]."\n";
+       $context = $json["@context"];
        unset($json["@context"]);}
     else if (isset($json["@context"]))
       {$triplesTxt .= "This Model\thas context\t".$json["@context"]."\n";
+       $context = $json["@context"];
        unset($json["@context"]);}
     else
       {}
     
-    $triplesTxt .= laj2trips ($json);
-    //prg(1, $triplesTxt);
+    // Temp process to force LA types to be unique - this needs to be replaced 
+    // with a condition based on a pair of P and O rather than just the O
+    if (in_array ($context, array(
+      "https://linked.art/ns/v1/linked-art.json")))
+      {$config["unique"]["regex"] = array_merge($config["unique"]["regex"], 
+       $uniqueClasses["Linked.Art"]);}
     
-    //debugJsonConversaion ($data, $json, $triplesTxt);
+    if (in_array ($context, array(
+      "http://richardofsussex.me.uk/ng/jskos.json",
+      "https://gbv.github.io/jskos/context.json",
+      "https://linked.art/ns/v1/linked-art.json")))
+      {json2trips ($json);
+       $triplesTxt .= checkFormatReferences($jsonData, true);
+       }
+    else
+      {$triplesTxt .= laj2trips ($json);}
     }
   else
-    {$triplesTxt = $data;}    
-  
+    {
+    // Temp process to force LA types to be unique - this needs to be replaced 
+    // with a condition based on a pair of P and O rather than just the O
+    if (strpos($data, "has context	https://linked.art/ns/v1/linked-art.json") !== false) 
+      {$config["unique"]["regex"] = array_merge($config["unique"]["regex"], 
+       $uniqueClasses["Linked.Art"]);} 
+    $triplesTxt = $data;    
+    }
+    // Using checkFormatReferences($data) here is broken by the use of 
+    // blank nodes and the automatic re-numbering system this would need 
+    // to be revisited    
+
   return ($triplesTxt);
   }
 
@@ -1275,11 +1581,9 @@ function isArrayAssociative($array) {
     return array_keys($array) !== range(0, count($array) - 1);
 }
 
-$bn_number = "0";
-$la_formats = array();
 function pickLaFormat ($s, $p, $o)
   {
-  global $la_formats;
+  global $usedFormats;
   
   $oformat = "";
   $sformat = "";
@@ -1290,12 +1594,12 @@ function pickLaFormat ($s, $p, $o)
     {$oformat = "literal";}
   elseif (in_array($p, array("part", "equivalent")))
     {
-    if (isset($la_formats[$s]))
-      {$oformat = $la_formats[$s];}      
+    if (isset($usedFormats[$s]))
+      {$oformat = $usedFormats[$s];}      
     }
-  elseif (in_array($p, array("member_of")))
+  elseif (in_array($p, array("member_of", "carried_out_by")))
     {$oformat = "actor2";}
-  elseif (in_array($p, array("born", "died", "formed_by", "dissolved_by", "carried_out")))
+  elseif (in_array($p, array("born", "died", "formed_by", "dissolved_by", "carried_out", "produced_by")))
     {$oformat = "event2";}
   elseif (in_array($p, array("timespan")))
     {$oformat = "timespan";}
@@ -1303,18 +1607,22 @@ function pickLaFormat ($s, $p, $o)
     {$oformat = "infoobj";}
   elseif (in_array($p, array("took_place_at")))
     {$oformat = "place2";}
-  elseif (in_array($p, array("classified_as")))
+  elseif (in_array($p, array("classified_as", "technique")))
     {$oformat = "type2";}
   elseif (in_array($p, array("identified_by", "contact_point")))
     {$oformat = "name2";}
     
   if (in_array($o, array("Person", "Group", "Actor")))
     {$sformat = "actor2";}
+  else if (in_array($o, array("HumanMadeObject")))
+    {$sformat = "object2";}
+  else if (in_array($o, array("Event")))
+    {$sformat = "event2";}
     
   if ($oformat)
-    {$la_formats[$o] = $oformat;}
+    {$usedFormats[$o] = $oformat;}
   if ($sformat)
-    {$la_formats[$s] = $sformat;}
+    {$usedFormats[$s] = $sformat;}
       
   if ($oformat or $sformat)
     {$format = "\t$sformat|$oformat";}
@@ -1322,6 +1630,204 @@ function pickLaFormat ($s, $p, $o)
     {$format = "";}
   
   return ($format);  
+  }
+  
+
+function addAutoFormats ($t)//$s, $p, $o)
+  {
+  global $usedFormats;
+
+  $tx = array_pad($t, 5, false);
+  $new = true;
+  
+  if ($t[1] == "type")
+    {$tx[4] = "classstyle";}
+
+  elseif (in_array($t[1], array("_label", "content")))
+    {$tx[4] = "literal";}
+  elseif (in_array($t[1], array("part", "equivalent")))
+    {
+    if (isset($usedFormats[$t[0]]))
+      {$tx[4] = $usedFormats[$t[0]];
+       $new = false;}      
+    }
+  elseif (in_array($t[1], array("member_of", "carried_out_by")))
+    {$tx[4] = "actor2";}
+  elseif (in_array($t[1], array("born", "died", "formed_by", "dissolved_by", 
+    "carried_out", "produced_by", "assigned_by", "removed_by", "destroyed_by",
+    "created_by")))
+    {$tx[4] = "event2";}
+  elseif (in_array($t[1], array("timespan")))
+    {$tx[4] = "timespan";}
+  elseif (in_array($t[1], array("member_of", "representation", "referred_to_by", 
+    "subject_of", "shows")))
+    {$tx[4] = "infoobj";}
+  elseif (in_array($t[1], array("took_place_at", "current_location")))
+    {$tx[4] = "place2";}
+  elseif (in_array($t[1], array("classified_as", "technique")))
+    {$tx[4] = "type2";}
+  elseif (in_array($t[1], array("language", "made_of", "unit", "currency", "about")) and 
+    preg_match("/^aat.+$/", $t[2], $m))
+    {$tx[4] = "type2";}
+  elseif (in_array($t[1], array("identified_by", "contact_point")))
+    {$tx[4] = "name2";}
+  elseif (in_array($t[1], array("duration", "dimension")))
+    {$tx[4] = "dims2";}
+
+  elseif (in_array($t[1], array("prefLabel")))
+    {$tx[4] = "name";}
+  elseif (in_array($t[1], array("scopeNote", "definition")))
+    {$tx[4] = "note";}
+  elseif (in_array($t[1], array("location")))
+    {$tx[4] = "place";}
+  elseif (in_array($t[1], array("coordinates")))
+    {$tx[4] = "dims";}
+    
+  if (preg_match("/^_#-[0-9]+$/", $t[2], $m) and $tx[4] and $new)
+    {$tx[4] .= "_bn";}
+    
+  if (in_array($t[2], array("Person", "Group", "Actor")))
+    {$tx[3] = "actor2";}
+  else if (in_array($t[2], array("DigitalObject", "DigitalService")))
+    {$tx[3] = "digital2";}
+  else if (in_array($t[2], array("HumanMadeObject")))
+    {$tx[3] = "object2";}
+  else if (in_array($t[2], array("InformationObject", "PropositionalObject", 
+    "Set", "LinguisticObject")))
+    {$tx[3] = "infoobj";}
+  else if (in_array($t[2], array("Place")))
+    {$tx[3] = "place2";}
+  else if (in_array($t[2], array("Name")))
+    {$tx[3] = "name2";}
+  else if (in_array($t[2], array("MonetaryAmount")))
+    {$tx[3] = "dims2";}
+  else if (in_array($t[2], array("Event", "Activity", "Production", "AttributeAssignment", "Addition")))
+    {$tx[3] = "event2";}
+    
+  if ($tx[4])
+    {$usedFormats[$t[2]] = $tx[4];}
+  if ($tx[3])
+    {$usedFormats[$t[0]] = $tx[3];}
+    
+  return ($tx);  
+  }
+ 
+function checkForBigTexts ($str)
+  {
+  $new = $str;
+  $tooltip = false;
+  if (strlen($str) > 300)
+    {$new = substr($str, 0, 295) . " ....";
+     $tooltip = true;}
+     
+  return (array($new, $tooltip));  
+  }
+ 
+// Seem to be getting duplicates, might be good to drop all of the triples into an array
+// remove the duplicates and then order them, add formats and then output
+function json2trips ($arr, $pSub=false, $pPred=false)
+  {
+  global $bn_number, $jsonData, $jsonDataBlank;
+  
+  if (!is_array($arr))
+    {$arr = array("id" => $arr);}
+    
+  $out = "";
+  
+  $debug = false;
+  
+  if (isset($arr["id"]))
+    {$sub = $arr["id"];
+     unset($arr["id"]);}
+  else if (isset($arr["uri"]))
+    {$sub = $arr["uri"];
+     unset($arr["uri"]);}
+  else
+    {if ($bn_number)
+      {$sub = "_#-".$bn_number;}
+     else
+      {$sub = "_#-0";}
+     $bn_number++;}
+  
+  if ($pSub and $pPred)
+    {$tt = checkForBigTexts ($sub);
+     $jsonData[] = addAutoFormats (
+      array_map('parseEntities', array($pSub,$pPred,$tt[0])));
+     if ($debug)
+      {echo "Insert One\n";
+       prg(0, array($pSub,$pPred,$tt[0]));}
+              
+     if ($tt[1])
+      {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
+    
+  foreach ($arr as $k => $v)
+    {
+    if (is_array($v))
+      {
+      if(isset($v["id"]))
+        {json2trips($v, $sub, $k);}
+      elseif (!isArrayAssociative($v))
+        {
+        foreach ($v as $n => $a)
+          {          
+          if (is_array($a)) {json2trips($a, $sub, $k);}
+          else {
+            $tt = checkForBigTexts ($a);
+            $jsonData[] = addAutoFormats (
+              array_map('parseEntities', array($sub,$k,$tt[0])));
+            if ($debug)
+              {echo "Insert Two\n";
+                prg(0, array($sub,$k,$tt[0]));}
+         
+            if ($tt[1])
+              {$jsonData[] = array($tt[0], "tooltip", $a);}            
+            }          
+          }
+        }      
+      else
+        {
+        // These avoid the additional step of blank nodes. other predicates can be added as required.
+        if (in_array($k, array("prefLabel", "scopeNote", "definition")))
+          {
+          foreach ($v as $l => $val)
+            {
+            if (is_string($val)) {$val = array($val);}
+            foreach ($val as $lk => $valk)
+              {$tt = checkForBigTexts ($valk);
+               $jsonData[] = addAutoFormats (
+                  array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
+               if ($debug)
+                {echo "Insert Three\n";
+                  prg(0, array($sub,$k,$tt[0]));}
+              
+               if ($tt[1])
+                {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
+               }
+            }
+          }
+        else
+          {json2trips($v, $sub, $k);}
+        }
+      }
+    else
+      {$tt = checkForBigTexts ($v);
+       $jsonData[] = addAutoFormats (
+        array_map('parseEntities', array($sub,$k,$tt[0])));
+       if ($debug)
+        {echo "Insert Four\n";
+         prg(0, array($sub,$k,$tt[0]));}
+       if ($tt[1])
+        {$jsonData[] = array($tt[0], "tooltip", $v);}
+       }
+    }
+  }
+
+function cleanNewlines ($str)  
+  {
+  $str = preg_replace('/\r\n|\r/', '\n', $str);
+  $str = preg_replace('/\t/', ' ', $str);
+
+  return ($str);
   }
   
 // Seem to be getting duplicates, might be good to drop all of the triples into an array
@@ -1353,6 +1859,9 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
     $pPred = parseEntities($pPred);
     
     $fr = pickLaFormat ($pSub,$pPred,$sub);
+    //if ($pPred == "type") 
+    //  {$sub = $sub."#-".$bn_number;
+    //   $bn_number++;}
     $out .= "$pSub\t$pPred\t$sub$fr\n";}
     
   foreach ($arr as $k => $v)
@@ -1371,6 +1880,9 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
             $sub = parseEntities($sub);
             $k = parseEntities($k);
             $fr = pickLaFormat ($sub,$k,$a);
+            //if ($k == "type") 
+            //  {$a = $a."#-".$bn_number;
+            //    $bn_number++;}
             $out .= "$sub\t$k\t$a$fr\n";
             }          
           }
@@ -1392,6 +1904,9 @@ function laj2trips ($arr, $pSub=false, $pPred=false)
       $sub = parseEntities($sub);
       $k = parseEntities($k);
       $fr = pickLaFormat ($sub,$k,$v);
+      //if ($k == "type") 
+      //  {$v = $v."#-".$bn_number;
+      //  $bn_number++;}
       $out .= "$sub\t$k\t$v$fr\n";
       }
     }
@@ -1406,6 +1921,8 @@ function parseEntities($name)
     {$out = "aat:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+vocab[.]getty[.]edu[\/]ulan[\/]([0-9]+)$/", $name, $m))
     {$out = "ulan:$m[1]|$name";}
+  else if (preg_match("/^http[s]*[:][\/]+viaf[.]org[\/]viaf[\/]([0-9]+)$/", $name, $m))
+    {$out = "viaf:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
     {$out = "ng:$m[1]|$name";}
   else if (preg_match("/^http[s]*[:][\/]+data[.]ng[.]ac[.]uk[\/]([0-9A-Z-]+)$/", $name, $m))
@@ -1414,6 +1931,9 @@ function parseEntities($name)
     {$out = "lae:$m[1]|$name";}
   else
     {$out = $name;}
+    
+  $out = preg_replace('/\r\n|\r/', '\n', $out);
+  $out = preg_replace('/\t/', ' ', $out);
 
   return($out);
   }
@@ -1490,10 +2010,10 @@ function check_string($my_string)
   {
   // Excluded: ";", '#59;' - "#", '#35;' - "@", '#64;' - ":", '#58;' - "/", '#47;'
   $chars = array('!', '*', '"', "'", "(", ")", "&", "=", "+", 
-    "$", ",", "?", "%", "[", "]", "\\");
+    "$", ",", "?", "%", "[", "]", "\\", "<", ">");
   $codes = array('#33;', '#42;', '#34;', '#39;', '#40;', '#41;', '#38;', '#61;',
     '#43;', '#36;', '#44;', '#63;', '#37;', '#91;', '#93;', 
-    '#92;');
+    '#92;', '&#60;', '&#62;');
   
   $my_string = trim ($my_string);
   

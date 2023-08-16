@@ -1,0 +1,14 @@
+{
+	"Linked.Art": [
+		"HumanMadeObject", "Material",
+		"Place",
+		"Actor", "Person", "Group",
+		"Type", "Language", "Currency", "MeasurementUnit", "Material",
+		"InformationObject", "VisualItem", "LinguisticObject", "Set", "Right",
+		"Name", "Identifier",
+		"Event", "Activity", "Acquisition", "Production", "Creation", "AttributeAssignment",
+		"TimeSpan",
+		"Dimension", "MonetaryUnit", "MeasurementUnit",
+		"DigitalObject", "DigitalService"
+	]
+}

@@ -127,6 +127,21 @@ $(document).ready(function()
     });
   //////////////////////////////////////////////////////////////////////
   
+  $(document).ready(function() {
+        $("#mermaidCode").click(function(e) {
+            e.preventDefault(); // Prevent the default link behavior
+            
+            var htmlContent = $("#modelDivTxt").html(); // Get the HTML content to copy
+            var decodedContent = $("<textarea>").html(htmlContent).text(); // Decode HTML entities
+            var tempInput = $("<textarea>"); // Create a temporary textarea element
+            $("body").append(tempInput);
+            tempInput.val(decodedContent).select(); // Set the decoded content and select it
+            document.execCommand("copy"); // Copy the selected content to the clipboard
+            tempInput.remove(); // Remove the temporary textarea
+            //alert("Content copied to clipboard:\n" + decodedContent);
+        });
+    });
+    
   //////////////////////////////////////////////////////////////////////
   // Compressing data and AJAX calls
   //////////////////////////////////////////////////////////////////////
