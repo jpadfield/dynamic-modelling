@@ -8,6 +8,8 @@ actor	linked to	actor_bn	|actor_bn
 
 thing	useful for subgraphs	sg1	|sg1
 thing	useful for subgraphs	sg2	|sg2
+sg2	custom borders	sg2-5-10	|sg2-5-10
+sg2	custom borders	sg2-10-2	|sg2-5-2
 
 object	linked to	idea	|idea
 idea	linked to	idea_bn	|idea_bn
@@ -36,6 +38,7 @@ Linked Art	linked to	event2	crm|event2
 Linked Art	linked to	object2	|object2
 Linked Art	linked to	actor2	|actor2
 Linked Art	linked to	dims2	|dims2
+Linked Art	linked to	digital2	|digital2
 
 actor2	linked to	type2	|type2
 type2	linked to	name2	|name2

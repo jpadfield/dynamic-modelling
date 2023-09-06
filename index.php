@@ -40,7 +40,6 @@ $allClasses = formatClassDef ($config["format"]);
 $bn_number = "0";
 $usedFormats = array();
 $jsonData = array();
-$jsonDataBlank = array(false, false, false, false, false);
 
 $doc_example_links = array(
   "LRNF" => array("TBNF", "LRF", "LR"), 
@@ -776,7 +775,7 @@ END;
 
 
 function getCleanTriples($triplesTxt)
-  {	
+  {
   $lastLine = 0;
   $cleanData = array();
   
@@ -1069,7 +1068,8 @@ function Mermaid_formatData ($selected)
 
   // loop through to format display texts and out put mermaid code
   foreach ($selected["triples"] as $k => $t) 
-    {
+    {    
+    $t[0] = str_replace('"', "#34;", $t[0]);
     $ot = $t;
     $t[1] = check_string($t[1]);
     $t[2] = str_replace('"', "#34;", $t[2]);
@@ -1560,6 +1560,9 @@ function checkTriples ($data)
        }
     else
       {$triplesTxt .= laj2trips ($json);}
+      
+    //prg(0, $triplesTxt);
+    //prg(1, tabSeparatedToLinkedArt($triplesTxt));
     }
   else
     {
@@ -1727,7 +1730,7 @@ function checkForBigTexts ($str)
 // remove the duplicates and then order them, add formats and then output
 function json2trips ($arr, $pSub=false, $pPred=false)
   {
-  global $bn_number, $jsonData, $jsonDataBlank;
+  global $bn_number, $jsonData;
   
   if (!is_array($arr))
     {$arr = array("id" => $arr);}
@@ -1821,6 +1824,68 @@ function json2trips ($arr, $pSub=false, $pPred=false)
        }
     }
   }
+  
+function tabSeparatedToJSONLD($tabSeparatedData) {
+    $lines = explode("\n", $tabSeparatedData);
+    $jsonData = [];
+
+    foreach ($lines as $line) {
+        $columns = explode("\t", $line);
+
+        if (count($columns) >= 3) {
+            $sub = $columns[0];
+            $predicate = $columns[1];
+            $object = $columns[2];
+
+            if (!isset($jsonData[$sub])) {
+                $jsonData[$sub] = [];
+            }
+
+            if (!isset($jsonData[$sub][$predicate])) {
+                $jsonData[$sub][$predicate] = [];
+            }
+
+            $jsonData[$sub][$predicate][] = $object;
+        }
+    }
+
+    // Additional processing based on your original logic may be needed here
+    // ...
+
+    return $jsonData;
+}
+
+function tabSeparatedToLinkedArt($tabSeparatedData) {
+    $lines = explode("\n", $tabSeparatedData);
+    $jsonData = [];
+
+    foreach ($lines as $line) {
+        $columns = explode("\t", $line);
+
+        if (count($columns) >= 3) {
+            $subject = $columns[0];
+            $predicate = $columns[1];
+            $object = $columns[2];
+
+            if (!isset($jsonData[$subject])) {
+                $jsonData[$subject] = [];
+            }
+
+            if ($predicate === "_label") {
+                $jsonData[$subject][$predicate] = $object;
+            } elseif ($predicate === "type") {
+                $jsonData[$subject][$predicate] = $object;
+            } else {
+                if (!isset($jsonData[$subject][$predicate])) {
+                    $jsonData[$subject][$predicate] = [];
+                }
+                $jsonData[$subject][$predicate][] = $object;
+            }
+        }
+    }
+
+    return $jsonData;
+}
 
 function cleanNewlines ($str)  
   {
@@ -1934,6 +1999,7 @@ function parseEntities($name)
     
   $out = preg_replace('/\r\n|\r/', '\n', $out);
   $out = preg_replace('/\t/', ' ', $out);
+  //$out = str_replace('"', "#34;", $out);
 
   return($out);
   }
