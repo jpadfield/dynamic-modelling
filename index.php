@@ -1,5 +1,8 @@
 <?php
 
+// TODO http://localhost/mod2/?url=https://lux.collections.yale.edu/data/place/cfda276e-fddd-4d58-aab5-25894ba991dd highlights a few new linked.art automatic formatting
+// issues that would need to be captured.
+ 
 // Added option to link subgraphs as nodes - needs diagram to be set as "flowchart" and not "graph"
 // Added tests for hover text - it just uses a default example text just now
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
@@ -883,7 +886,7 @@ function getRaw($data)
       $sg = trim ($m[1]);
       
       if (preg_match("/^[-]([A-Z][A-Z])(.+)$/", $sg, $sm))
-        {$sg = trim ($m[2]);
+        {$sg = trim ($sm[2]);
 	 $sgDir = $sm[1];}
       else
 	{$sgDir = false;}
