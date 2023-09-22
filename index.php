@@ -876,11 +876,17 @@ function getRaw($data)
        $diagram = "flowchart";
        if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
        $trip = array($line);}
-    else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh[ ]*(.*)$/", $line, $m))
+    else if(preg_match("/^[\/][\/][ ]*[sS][uU][bB][gG][Rr][Aa][Pp][Hh][ ]*(.*)$/", $line, $m))
       {
       $subGraphCount++;
       $sgdts = array();
       $sg = trim ($m[1]);
+      
+      if (preg_match("/^[-]([A-Z][A-Z])(.+)$/", $sg, $sm))
+        {$sg = trim ($m[2]);
+	 $sgDir = $sm[1];}
+      else
+	{$sgDir = false;}
       
       if (preg_match("/^[\"][\/][\/](.+)[\"]$/", $sg, $sm))
         {$sgdts["id"] = str_replace(' ', "", $sm[1]);
@@ -898,7 +904,7 @@ function getRaw($data)
          
       $subGraphs[$sg] = $sgdts;
       $things[$sg] = $sgdts["id"];
-      $trip = array("subgraph", $sg, "");
+      $trip = array("subgraph", $sg, $sgDir);
       }
     else if(preg_match("/^[\/][\/][ ]*[eE][nN][dD][ ]*(.*)$/", $line, $m))
   {$trip = array("end", $m[1], "");}
@@ -1083,7 +1089,9 @@ function Mermaid_formatData ($selected)
       {
       $sgdts = $subGraphs[trim($t[1], "\"")];
       $sgIDs[] = $sgdts["id"];  
-      $defs .= "\n$t[0] $sgdts[id] $sgdts[lab]\n";      
+      $defs .= "\n$t[0] $sgdts[id] $sgdts[lab]\n";
+      if ($t[2])
+	{$defs .= "direction $t[2]\n";}
       }
     else if (in_array($t[0], array("end")))
       {
