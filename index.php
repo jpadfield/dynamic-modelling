@@ -1129,6 +1129,11 @@ function Mermaid_formatData ($selected)
       // Allow the user to force the formatting classes used for the
       // object and subject
       $fcs = array(false, false);
+      
+      if (preg_match("/^([^|]+)[|](http.+)$/", $t[0], $t0m) or
+        preg_match("/^([^|]+)[|](\?.+)$/", $t[0], $t0m))
+        {$t0extraLink = $t0m[2];
+         $t[0] = $t0m[1];} 
    
       if(isset($t[3]))
         {
