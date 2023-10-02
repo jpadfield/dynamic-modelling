@@ -1107,7 +1107,25 @@ function Mermaid_formatData ($selected)
           {$usedClasses[$t[1]] = $allClasses[$t[1]];}
         else //added the option to used custom dashes on the border line initially for subgraphs but also added for nodes - J Padfield 22/6/23
           {
-					if (preg_match("/^(.+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm))
+          //Also added an option to allow users to change the default font-size for nodes - J Padfield 2/10/23
+					if (preg_match("/^(.+)[-]fs([0-9]+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm)
+            or preg_match("/^(.+)[-]*([a-z]*)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm))
+						{              
+						if(isset($allClasses[$cm[1]]))
+							{
+							$tc = rtrim(trim($allClasses[$cm[1]]), ';');
+              $tc = preg_replace("/classDef $cm[1]/", "classDef $t[1]", $tc);
+              
+              if($cm[2])
+                {$tc = $tc.",font-size:$cm[2]px";}
+                
+							$tc = $tc.",stroke-dasharray:$cm[3] $cm[4];\n";
+							$allClasses[$t[1]] = $tc;
+							$usedClasses[$t[1]] = $allClasses[$t[1]];
+							}								
+						}
+            
+					/*if (preg_match("/^(.+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm))
 						{
 						if(isset($allClasses[$cm[1]]))
 							{
@@ -1117,7 +1135,7 @@ function Mermaid_formatData ($selected)
 							$allClasses[$t[1]] = $tc;
 							$usedClasses[$t[1]] = $allClasses[$t[1]];
 							}								
-						}	
+						}*/	
 					}
         $defs .= "class $sgID $t[1]\n";
         }
