@@ -1108,7 +1108,8 @@ function Mermaid_formatData ($selected)
         else //added the option to used custom dashes on the border line initially for subgraphs but also added for nodes - J Padfield 22/6/23
           {
           //Also added an option to allow users to change the default font-size for nodes - J Padfield 2/10/23
-					if (preg_match("/^(.+)[-]fs([0-9]+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm)
+					if (preg_match("/^(.+)[-]fs([0-9]+)[-]*([0-9]*)[-]*([0-9]*)$/", $t[1], $cm)
+            or preg_match("/^(.+)[-]fs([0-9]+)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm)
             or preg_match("/^(.+)[-]*([a-z]*)[-]([0-9]+)[-]([0-9]+)$/", $t[1], $cm))
 						{              
 						if(isset($allClasses[$cm[1]]))
@@ -1119,7 +1120,10 @@ function Mermaid_formatData ($selected)
               if($cm[2])
                 {$tc = $tc.",font-size:$cm[2]px";}
                 
-							$tc = $tc.",stroke-dasharray:$cm[3] $cm[4];\n";
+              if($cm[3] and $cm[4])
+                {$tc = $tc.",stroke-dasharray:$cm[3] $cm[4]";}
+              
+              $tc = $tc.";\n";
 							$allClasses[$t[1]] = $tc;
 							$usedClasses[$t[1]] = $allClasses[$t[1]];
 							}								
