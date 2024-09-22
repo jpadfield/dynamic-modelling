@@ -1,5 +1,7 @@
 <?php
 
+// Currently debuggin schema processing: http://localhost/mod2/?url=https://raw.githubusercontent.com/E-RIHS/schema/main/organisation-v1.0.schema.json
+
 // TODO http://localhost/mod2/?url=https://lux.collections.yale.edu/data/place/cfda276e-fddd-4d58-aab5-25894ba991dd highlights a few new linked.art automatic formatting
 // issues that would need to be captured.
  
@@ -8,11 +10,11 @@
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
 $versions = array(
   "jquery" => "3.7.0",
-  "bootstrap" => "5.3.1",
-  "mermaid" => "10.3.0", // 9.2.2 available but it breaks the zoom option, so would need to check.
+  "bootstrap" => "5.3.3",
+  "mermaid" => "11.2.0",
   "tether" => "2.0.0",
   "pako" => "2.1.0",
-  "base64" => "3.7.5"
+  "base64" => "3.7.7"
   );
 
 if (isset($_GET["debug"])) {}
@@ -1474,7 +1476,7 @@ function checkFormatReferences ($a, $dupeCheck=false)
   $formatPair = array();
   $lbn = 0;
   
-  foreach ($a as $k => &$r) {
+  foreach ($a as $k => &$r) {    
     list($val0, $val1, $val2, $val3, $val4) = $r;
     
     //prg(0, array($val0, $val1, $val2, $val3, $val4));
@@ -1589,6 +1591,9 @@ function checkTriples ($data)
       {$triplesTxt .= "This Model\thas context\t".$json["@context"]."\n";
        $context = $json["@context"];
        unset($json["@context"]);}
+    else if (isset($json["\$schema"]))
+      {$context = $json["\$schema"];
+       $triplesTxt = "//flowchart LR fix\n";}
     else
       {}
     
@@ -1605,7 +1610,15 @@ function checkTriples ($data)
       "https://linked.art/ns/v1/linked-art.json")))
       {json2trips ($json);
        $triplesTxt .= checkFormatReferences($jsonData, true);
-       }
+       }    
+    else if (in_array ($context, array(
+      "http://json-schema.org/draft-04/schema#")))
+      {      
+      //$json["id"] = $json["title"];
+      //unset($json["title"]);
+      $jsonData = schema2trips ($json);
+      $triplesTxt .= checkFormatReferences($jsonData, true);
+      }
     else
       {$triplesTxt .= laj2trips ($json);}
       
@@ -1872,6 +1885,507 @@ function json2trips ($arr, $pSub=false, $pPred=false)
        }
     }
   }
+  
+// Seem to be getting duplicates, might be good to drop all of the triples into an array
+// remove the duplicates and then order them, add formats and then output
+function schema2trips_OLD ($arr, $pSub=false, $pPred=false, $looplevel=0)
+  {
+  $looplevel++;
+  if (!isset($GLOBALS["usedSubs"])) {$GLOBALS["usedSubs"] = array();}
+  if (!isset($GLOBALS["required"])) {$GLOBALS["required"] = array();}
+  if (!isset($GLOBALS["properties"])) {$GLOBALS["properties"] = 0;}
+  
+  if (!isset($GLOBALS["usedSubs"][$pSub])) {$GLOBALS["usedSubs"][$pSub] = 1;}
+  else {$GLOBALS["usedSubs"][$pSub]++;}
+  
+  //prg(0, array($arr, $pSub, $pPred));
+  //prg(0, $GLOBALS["usedSubs"]);
+  //echo "###################<br/><br/>";
+  
+  global $bn_number, $jsonData, $required, $properties;
+   
+  if ($properties) {        
+    if ($pPred == "\$schema")
+      {return;}       
+    else if ($pPred == "id")
+      {$pPred = "has id";
+       $arr = array("id" => $pSub . " ID");}           
+    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
+      {      
+      $pPred = "has ".prop2label($pPred, 1);
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+      
+      }         
+    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
+      {            
+      $pPred = "has ".prop2label($pPred, 1);
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+       
+      if (isset($oarr["items"]["properties"]))
+        {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
+      else if (isset($oarr["items"]["\$ref"]))
+        {$arr["from list"] = $oarr["items"]["\$ref"];} 
+      }       
+    else if (isset($arr["title"]) and isset($arr["\$ref"])) 
+      {      
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+       
+      $arr["from list"] = $oarr["\$ref"];
+      }
+    // to manage debugging
+    else if (
+      ($pSub == "External PIDs" and $pPred == "pid_type")
+      )
+      {}    
+    else
+      {prg(0, array("CHECK", $arr, $pSub, $pPred));}
+    }
+  
+  $out = "";  
+  $debug = false;
+     
+  if (isset($arr["id"]))
+    {
+    $sub = prop2label($arr["id"]);      
+    unset($arr["id"]);
+    
+    if (isset($arr["\$id"]))
+      {$arr["has url"] = $arr["\$id"];
+       unset($arr["\$id"]);}
+       
+    if (isset($arr["\$code"]))
+      {unset($arr["\$code"]);}       
+    }
+  else
+    {if ($bn_number)
+      {$sub = "_#-".$bn_number;}
+     else
+      {$sub = "_#-0";}
+     $bn_number++;}
+
+  if (isset($arr["type"]))
+      {$arr["has type"] = $arr["type"];
+       unset($arr["type"]);}
+       
+  if (isset($arr["required"]))
+      {$required[$sub] = $arr["required"];
+       unset($arr["required"]);}         
+  
+  // used to reference external controlled lists
+  if (isset($arr["\$ref"]))
+    {
+    if (isset($arr["default"])) {unset($arr["default"]);}
+    
+    $sub = prop2label($pPred);
+    $arr["from list"] = $arr["\$ref"];
+    $pPred = "has ".prop2label($pPred, 1);
+    
+    unset($arr["\$ref"]);}
+       
+  if (isset($arr["properties"]))
+      {
+       if (!$properties)
+        // the array_slice is being used to step through the values to DEBUG the processing.
+        {$arr = array_merge ($arr, array_slice($arr["properties"], 0, 10));}
+        $properties++;
+       unset($arr["properties"]);}
+  
+  if ($pSub and $pPred)
+    {$tt = checkForBigTexts ($sub);
+     $jsonData[] = addAutoFormats (
+      array_map('parseEntities', array($pSub,$pPred,$tt[0])));
+     if ($debug)
+      {echo "Insert One\n";
+       prg(0, array($pSub,$pPred,$tt[0]));}
+              
+     if ($tt[1])
+      {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
+    
+  foreach ($arr as $k => $v)
+    {
+    if (is_array($v))
+      {
+      if(isset($v["id"]))
+        {
+        schema2trips($v, $sub, $k, $looplevel);
+        }
+      elseif (!isArrayAssociative($v))
+        {
+        foreach ($v as $n => $a)
+          {          
+          if (is_array($a)) {
+            schema2trips($a, $sub, $k, $looplevel);
+            }
+          else {
+            $tt = checkForBigTexts ($a);
+            $jsonData[] = addAutoFormats (
+              array_map('parseEntities', array($sub,$k,$tt[0])));
+            if ($debug)
+              {echo "Insert Two\n";
+                prg(0, array($sub,$k,$tt[0]));}
+         
+            if ($tt[1])
+              {$jsonData[] = array($tt[0], "tooltip", $a);}            
+            }          
+          }
+        }      
+      else
+        {
+        // These avoid the additional step of blank nodes. other predicates can be added as required.
+        if (in_array($k, array("prefLabel", "scopeNote", "definition")))
+          {
+          foreach ($v as $l => $val)
+            {
+            if (is_string($val)) {$val = array($val);}
+            foreach ($val as $lk => $valk)
+              {$tt = checkForBigTexts ($valk);
+               $jsonData[] = addAutoFormats (
+                  array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
+               if ($debug)
+                {echo "Insert Three\n";
+                  prg(0, array($sub,$k,$tt[0]));}
+              
+               if ($tt[1])
+                {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
+               }
+            }
+          }
+        else
+          {
+          schema2trips($v, $sub, $k, $looplevel);
+          }
+        }
+      }
+    else
+      {$tt = checkForBigTexts ($v);
+       $jsonData[] = addAutoFormats (
+        array_map('parseEntities', array($sub,$k,$tt[0])));
+       if ($debug)
+        {echo "Insert Four\n";
+         prg(0, array($sub,$k,$tt[0]));}
+       if ($tt[1])
+        {$jsonData[] = array($tt[0], "tooltip", $v);}
+       }
+    }
+  }
+
+function ensureMembers(&$arrayOfArrays, $no=4) {
+    foreach ($arrayOfArrays as &$subArray) {
+        // Check if the sub-array has less than $no members
+        if (count($subArray) < $no) {
+            // Add default values (e.g., null) to make it $no members
+            $subArray = array_pad($subArray, $no, null);
+        }
+    }
+}
+  
+// Seem to be getting duplicates, might be good to drop all of the triples into an array
+// remove the duplicates and then order them, add formats and then output
+function schema2trips ($arr, $pSub=false, $pPred=false, $looplevel=0)
+  {  
+  $looplevel++;
+  //prg(0, array($pSub, $pPred, $looplevel));
+  
+  if (!isset($GLOBALS["required"])) {$GLOBALS["required"] = array();}
+   
+  global $bn_number, $jsonData, $required, $properties;
+  
+  /// set $sub /////////////////////////////////////////////////////////
+  if ($pSub)
+    {$sub = $pSub;
+     if (isset($arr["title"])) {unset($arr["title"]);}}  
+  else if (isset($arr["title"]))
+    {$sub = prop2label($arr["title"])."#-".$looplevel;      
+     unset($arr["title"]);}
+  else
+    {if ($bn_number) {$sub = "_#-".$bn_number;}
+     else {$sub = "_#-0";}
+     $bn_number++;}  
+  //////////////////////////////////////////////////////////////////////
+  
+  //for the top level set catch the $id field and convert
+  $rawTriples = array();  
+   
+  if (isset($arr["type"])) {
+    $type = $arr["type"];
+    unset($arr["type"]);}
+  else  {$type = false;}
+  
+  // Flatten current array slightly
+  if (isset($arr["properties"]))
+    {$arr = array_merge ($arr, $arr["properties"]);
+     unset($arr["properties"]);}
+                 
+  // currently hide all of the following admin metadata
+  if (isset($arr["cordra"])) {unset($arr["cordra"]);}  
+  if (isset($arr["\$schema"])) {unset($arr["\$schema"]);}
+  if (isset($arr["\$code"])) {unset($arr["\$code"]);}
+  
+  // need to revisit to determine predicate suffix
+  if (isset($arr["required"]))
+      {//$required[$sub] = $arr["required"];
+       unset($arr["required"]);}  
+       
+  //for the top level set catch the $id field and convert
+  if (isset($arr["\$id"]))
+      {$rawTriples[] = array($sub, "has url", $arr["\$id"], "url");
+       unset($arr["\$id"]);}
+  
+  
+  foreach ($arr as $k => $a)
+    {   
+    if (!is_array($a))      
+      {$rawTriples[] = array($sub, $k, $a);}
+    else
+      {
+      if (!isset($a["type"])) {$a["type"] = false;}
+      if (isset($a["title"])) {$obj = $a["title"]."#-".$looplevel;}
+      else {$obj = prop2label($k)."#-".$looplevel;}
+      
+      if (!isset($a["format"])) {$a["format"] = false;}
+      $rawTriples[] = array($sub, $k, $obj, $a["format"]);
+      if (isset ($a["description"]) and $a["description"] != $obj)
+        {$rawTriples[] = array($obj, "has description", $a["description"], "note");}        
+        
+      if (isset($a["items"]["properties"]))
+        {      
+        $subrt = schema2trips ($a["items"], $obj, $k, $looplevel);
+        $rawTriples = array_merge ($rawTriples, $subrt);       
+        }
+      else if (isset($a["items"]["\$ref"]))
+        {$rawTriples[] = array($obj, "from list", $a["items"]["\$ref"], "url");}
+      
+      if (isset($a["anyOf"]))
+        { 
+        foreach ($a["anyOf"] as $k2 => $a2)
+          {
+          if (isset($a2["title"])) {
+            $rawTriples[] = array($obj, "has either of", $a2["title"]);
+            $nsub = $a2["title"];
+            unset($a2["title"]);
+            }
+          else {$nsub = $obj;}
+          
+          $subrt = schema2trips ($a2, $nsub, "can have", $looplevel);
+           $rawTriples = array_merge ($rawTriples, $subrt);}
+        }
+        
+      if (isset($a["\$ref"]))
+        {$rawTriples[] = array($obj, "from list", $a["\$ref"], "url");}            
+      }
+    }
+    
+  //prg(0, $rawTriples);
+  
+  //echo "<h2> END schema2trips - $looplevel</h2>";
+  ensureMembers($rawTriples, 5);
+  return ($rawTriples);
+  }
+
+function processSchemaTrips ($arr)
+  {
+  
+  //prg(1, $arr);
+  /* 
+  if ($properties) {        
+    if ($pPred == "\$schema")
+      {return;}       
+    else if ($pPred == "id")
+      {$pPred = "has id";
+       $arr = array("id" => $pSub . " ID");}           
+    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
+      {      
+      $pPred = "has ".prop2label($pPred, 1);
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+      
+      }         
+    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
+      {            
+      $pPred = "has ".prop2label($pPred, 1);
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+       
+      if (isset($oarr["items"]["properties"]))
+        {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
+      else if (isset($oarr["items"]["\$ref"]))
+        {$arr["from list"] = $oarr["items"]["\$ref"];} 
+      }       
+    else if (isset($arr["title"]) and isset($arr["\$ref"])) 
+      {      
+      $oarr = $arr;
+      $arr = array("id" => $arr["title"]);
+      
+      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+        {$arr["definition"] = $oarr["description"];}
+       
+      $arr["from list"] = $oarr["\$ref"];
+      }
+    // to manage debugging
+    else if (
+      ($pSub == "External PIDs" and $pPred == "pid_type")
+      )
+      {}    
+    else
+      {prg(0, array("CHECK", $arr, $pSub, $pPred));}
+    }
+  
+  $out = "";  
+  $debug = false;
+     
+  if (isset($arr["id"]))
+    {
+    $sub = prop2label($arr["id"]);      
+    unset($arr["id"]);
+    
+    if (isset($arr["\$id"]))
+      {$arr["has url"] = $arr["\$id"];
+       unset($arr["\$id"]);}
+       
+    if (isset($arr["\$code"]))
+      {unset($arr["\$code"]);}       
+    }
+  else
+    {if ($bn_number)
+      {$sub = "_#-".$bn_number;}
+     else
+      {$sub = "_#-0";}
+     $bn_number++;}
+
+  if (isset($arr["type"]))
+      {$arr["has type"] = $arr["type"];
+       unset($arr["type"]);}
+       
+  if (isset($arr["required"]))
+      {$required[$sub] = $arr["required"];
+       unset($arr["required"]);}         
+  
+  // used to reference external controlled lists
+  if (isset($arr["\$ref"]))
+    {
+    if (isset($arr["default"])) {unset($arr["default"]);}
+    
+    $sub = prop2label($pPred);
+    $arr["from list"] = $arr["\$ref"];
+    $pPred = "has ".prop2label($pPred, 1);
+    
+    unset($arr["\$ref"]);}
+       
+  
+  
+  if ($pSub and $pPred)
+    {$tt = checkForBigTexts ($sub);
+     $jsonData[] = addAutoFormats (
+      array_map('parseEntities', array($pSub,$pPred,$tt[0])));
+     if ($debug)
+      {echo "Insert One\n";
+       prg(0, array($pSub,$pPred,$tt[0]));}
+              
+     if ($tt[1])
+      {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
+    
+  foreach ($arr as $k => $v)
+    {
+    if (is_array($v))
+      {
+      if(isset($v["id"]))
+        {
+        schema2trips($v, $sub, $k, $looplevel);
+        }
+      elseif (!isArrayAssociative($v))
+        {
+        foreach ($v as $n => $a)
+          {          
+          if (is_array($a)) {
+            schema2trips($a, $sub, $k, $looplevel);
+            }
+          else {
+            $tt = checkForBigTexts ($a);
+            $jsonData[] = addAutoFormats (
+              array_map('parseEntities', array($sub,$k,$tt[0])));
+            if ($debug)
+              {echo "Insert Two\n";
+                prg(0, array($sub,$k,$tt[0]));}
+         
+            if ($tt[1])
+              {$jsonData[] = array($tt[0], "tooltip", $a);}            
+            }          
+          }
+        }      
+      else
+        {
+        // These avoid the additional step of blank nodes. other predicates can be added as required.
+        if (in_array($k, array("prefLabel", "scopeNote", "definition")))
+          {
+          foreach ($v as $l => $val)
+            {
+            if (is_string($val)) {$val = array($val);}
+            foreach ($val as $lk => $valk)
+              {$tt = checkForBigTexts ($valk);
+               $jsonData[] = addAutoFormats (
+                  array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
+               if ($debug)
+                {echo "Insert Three\n";
+                  prg(0, array($sub,$k,$tt[0]));}
+              
+               if ($tt[1])
+                {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
+               }
+            }
+          }
+        else
+          {
+          schema2trips($v, $sub, $k, $looplevel);
+          }
+        }
+      }
+    else
+      {$tt = checkForBigTexts ($v);
+       $jsonData[] = addAutoFormats (
+        array_map('parseEntities', array($sub,$k,$tt[0])));
+       if ($debug)
+        {echo "Insert Four\n";
+         prg(0, array($sub,$k,$tt[0]));}
+       if ($tt[1])
+        {$jsonData[] = array($tt[0], "tooltip", $v);}
+       }
+    }
+  //*/
+  }
+
+function prop2label($input, $predicate=false) {
+    // Replace underscores with spaces
+    $input = str_replace('_', ' ', $input);
+    // Capitalize the first letter of each word
+    if ($predicate)
+      {      
+      $input = strtolower($input);
+      if (preg_match("/^(.+)type$/", $input, $m))
+        {$input = "type";}
+      }
+    else
+      {$input = ucwords($input);}
+    
+    return $input;
+}
   
 function tabSeparatedToJSONLD($tabSeparatedData) {
     $lines = explode("\n", $tabSeparatedData);
