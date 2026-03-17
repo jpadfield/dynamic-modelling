@@ -1143,7 +1143,11 @@ function Mermaid_formatData ($selected)
 							}								
 						}*/	
 					}
-        $defs .= "class $sgID $t[1]\n";
+        //$defs .= "class $sgID $t[1]\n";
+        
+        $resolvedClass = isset($allClasses[$t[1]]) ? rtrim(trim($allClasses[$t[1]]), ';') : '';
+        if ($resolvedClass && preg_match("/^classDef\s+\S+\s+(.+)$/", $resolvedClass, $cssm))
+          {$defs .= "style $sgID $cssm[1]\n";}
         }
       }
     else if ($t[1] == "tooltip")
