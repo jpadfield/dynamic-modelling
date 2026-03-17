@@ -233,8 +233,8 @@ function buildLinksDD ()
     </a>
   <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuLinks">
     <a class="dropdown-item" id="downloadLink" title="Mermaid Get PNG" href="" download="model_$date.png">Download Image</a>    
-    <!-- <a class="dropdown-item" title="Bookmark Link" href="$bookmark" target="_blank">Bookmark Link</a> -->
-		<a class="dropdown-item" id="bookmark" title="Bookmark Link" href="" target="_blank">Bookmark Link</a>
+		<!-- <a class="dropdown-item" id="bookmarkOLD" title="Bookmark Link" href="" target="_blank">Bookmark Link</a> -->
+    <a class="dropdown-item" id="bookmark" title="Copy shareable link to clipboard" href="">Copy Link</a>
     <a class="dropdown-item" id="mermaidLink" title="Edit further in the Mermaid Live Editor" href="" target="_blank">Mermaid Editor</a>
     <a class="dropdown-item" id="mermaidCode" title="Copy Mermaid Code to Clipboard" href="">Mermaid Code</a>
 END;

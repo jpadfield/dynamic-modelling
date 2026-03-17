@@ -140,6 +140,17 @@ $(document).ready(function()
             tempInput.remove(); // Remove the temporary textarea
             //alert("Content copied to clipboard:\n" + decodedContent);
         });
+        
+        $("#bookmark").click(function(e) {  
+          e.preventDefault();
+          var relativeUrl = $(this).attr("href");
+          var fullUrl = new URL(relativeUrl, window.location.href).href;
+          var tempInput = $("<textarea>");
+          $("body").append(tempInput);
+          tempInput.val(fullUrl).select();
+          document.execCommand("copy");
+          tempInput.remove();
+          });
     });
     
   //////////////////////////////////////////////////////////////////////
