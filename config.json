@@ -106,17 +106,17 @@
   "prefix" : {
     "ngo": {
       "match": {
-	"short": "[Nn][Gg][Oo][:]([0-9A-Z]{3}[-].+)",
+	"short": "[Nn][Gg][Oo]*[:]([0-9A-Z]{3}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]resource[\/]([0-9A-Z]{3}[-].+)"},
       "format": "object",
-      "url": "https://data.ng-london.org.uk/resource/"
+      "url": "https://data.ng-london.org.uk/"
       }, 
     "ng": {
       "match": {
 	"short": "[Nn][Gg][:]([0-9A-Z]{4}[-].+)",
 	"long": "http[s]*[:][\/]+data[.]ng[-]london[.]org[.]uk[\/]([0-9A-Z]{4}[-].+)"},
-      "format": "object",
-      "url": "https://data.ng-london.org.uk/"
+      "format": "object",      
+      "url": "https://data.ng.ac.uk/"
       }, 
     "aat": {
       "match": {
