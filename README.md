@@ -1,4 +1,7 @@
 [![DOI](https://zenodo.org/badge/281618147.svg)](https://zenodo.org/badge/latestdoi/281618147)
+
+> **Note:** This is the primary development repository. A dissemination copy is maintained under the [National Gallery GitHub organisation](https://github.com/national-gallery/dynamic-modelling).
+> 
 # dynamic-modelling
 This is an interactive live modelling system which can automatically convert simple tab separated triples into graphical models using the [mermaid library](https://mermaid-js.github.io/mermaid). 
 

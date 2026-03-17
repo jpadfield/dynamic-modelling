@@ -9,12 +9,12 @@
 // Added tests for hover text - it just uses a default example text just now
 // Added the option of fixing the properties tags to the lines or letting them float - add "fix" after //Flowchart LR fix
 $versions = array(
-  "jquery" => "3.7.0",
-  "bootstrap" => "5.3.3",
-  "mermaid" => "11.2.0",
-  "tether" => "2.0.0",
+  "jquery" => "3.7.1",
+  "bootstrap" => "5.3.8",
+  "mermaid" => "11", // Sub versions organised as needed
+  "tether" => "3.0.2",
   "pako" => "2.1.0",
-  "base64" => "3.7.7"
+  "base64" => "3.7.8"
   );
 
 if (isset($_GET["debug"])) {}
@@ -53,6 +53,11 @@ $doc_example_links = array(
   "TBF" => array("LRF", "TBNF", "TB fix"), 
   );
 
+if (!isset($_GET["getmermaid"]))
+  {$getmermaid= false;}  
+else
+  {$getmermaid = true;}  
+
 // Expects pako compressed data and pulls image directly from https://mermaid.ink
 if (isset($_GET["image"]))
   {getModelImage($_GET["image"]);
@@ -85,7 +90,8 @@ else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]])
   
 // TODO works with an external data source 
 else if (isset($_GET["url"]))
-  {$fc = getRemoteURL ($_GET["url"]);
+  {
+   $fc = getRemoteURLV2 ($_GET["url"]);
    $triplesTxt = checkTriples ($fc);}
   
 // TODO Need to update to allow data to be sent as pako compressed - three options 
@@ -136,8 +142,11 @@ $triples = getCleanTriples($triplesTxt);
 $cleanTriplesTxt = implode("\n", $triples);
 $raw = getRaw($triples);
 $mermaid = Mermaid_formatData ($raw["test"]);
-  
-if ($simple)
+
+
+if ($getmermaid)
+  {$html = $mermaid;}
+else if ($simple)
   {$html = buildPageSimple ($cleanTriplesTxt, $mermaid);}
 else
   {$html = buildPage ($cleanTriplesTxt, $mermaid);}
@@ -227,7 +236,7 @@ function buildLinksDD ()
     <!-- <a class="dropdown-item" title="Bookmark Link" href="$bookmark" target="_blank">Bookmark Link</a> -->
 		<a class="dropdown-item" id="bookmark" title="Bookmark Link" href="" target="_blank">Bookmark Link</a>
     <a class="dropdown-item" id="mermaidLink" title="Edit further in the Mermaid Live Editor" href="" target="_blank">Mermaid Editor</a>
-    <a class="dropdown-item" id="mermaidCode" title="Copy Mermaid Code to Clipboard" onclick="copyMermaid()" href="">Mermaid Code</a>
+    <a class="dropdown-item" id="mermaidCode" title="Copy Mermaid Code to Clipboard" href="">Mermaid Code</a>
 END;
   $html = ob_get_contents();
   ob_end_clean(); // Don't send output to client
@@ -419,15 +428,18 @@ $modal
   <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
   <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
   <script src="$jslib/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script> -->
   <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';    
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@$vs[3]/dist/mermaid.esm.min.mjs';    
     let config = {
-    maxTextSize: 900000,
+  'theme': 'default',
+  'themeVariables': {
+    'padding': 6
+  },
+    maxTextSize: 9000000,    
     startOnLoad:true, 
     securityLevel: "loose",
     logLevel: 4,
-    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true },
+    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true, wrappingWidth: 600 },
     mermaid: {
       callback:function(id) {modelZoom ()}
       }}
@@ -532,15 +544,18 @@ div.mermaidTooltip {
   <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
   <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
   <script src="$jslib/bootstrap@$vs[2]/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- <script src="$jslib/mermaid@$vs[3]/dist/mermaid.min.js"></script> -->
   <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';    
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@$vs[3]/dist/mermaid.esm.min.mjs';    
     let config = {
+  'theme': 'default',
+  'themeVariables': {
+    'padding': 6
+  },
     maxTextSize: 900000,
     startOnLoad:true, 
     securityLevel: "loose",
     logLevel: 4,
-    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true },
+    flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true, wrappingWidth: 600 },
     mermaid: {
       callback:function(id) {modelZoom ()}
       }}
@@ -875,7 +890,7 @@ function getRaw($data)
        $diagram = "graph";
        if (strtolower(trim($m[2])) == "fix") {$fixlinks = true;}
        $trip = array($line);}
-    else if((preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LT][BR])(.*)$/", $line, $m)) or
+    else if((preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LTBR]{2})(.*)$/", $line, $m)) or
       (preg_match("/^[\/][\/][ ]*[fF]lowchart[ ]*([LT][BR])(.*)$/", $trip[0], $m)))
       {$orientation = $m[1];
        $diagram = "flowchart";
@@ -1083,10 +1098,19 @@ function Mermaid_formatData ($selected)
     $t[0] = str_replace('"', "#34;", $t[0]);
     $ot = $t;
     $t[1] = check_string($t[1]);
+    
+    // Protect <br>, <br/>, <br />, case-insensitive
+    $t[2] = preg_replace('~<\s*br\s*/?\s*>~i', '##BR##', $t[2]);
+    
     $t[2] = str_replace('"', "#34;", $t[2]);
     $t[2] = str_replace('?', "#63;", $t[2]);
+    
+    // Escape < and >
     $t[2] = str_replace('<', "#60;", $t[2]);
     $t[2] = str_replace('>', "#62;", $t[2]);
+
+    // Restore <br>
+    $t[2] = str_replace('##BR##', '<br>', $t[2]);
     
     // Updated to allow formats classes to be added to subgraphs - 05/07/22 JPadfield
     // Commenting out a subgraph name with "//" will hide the subgraph label. - 17/08/22 JPadfield
@@ -1343,7 +1367,7 @@ function Mermaid_formatData ($selected)
   
     }//exit;
 
-  $defs = "$diagram $orientation\n".
+  $defs = "%%{init: {'flowchart': {'wrappingWidth': 600}}}%%\n$diagram $orientation\n".
     implode("", $usedClasses).
     "\n$defs;";
   
@@ -2625,6 +2649,51 @@ function getRemoteURL ($url)
   
   return ($fc);
   }
+  
+function getRemoteURLV2($url) {
+    // If the whole URL arrives percent-encoded, decode it once
+    if (preg_match('~^https?%3A%2F%2F~i', $url)) {
+        $url = rawurldecode($url);
+    }
+
+    $p = parse_url($url);
+    if ($p === false || empty($p['scheme']) || empty($p['host'])) {
+        return false; // or throw/return an error string
+    }
+
+    // Rebuild and safely encode path segments only
+    $path = '';
+    if (!empty($p['path'])) {
+        $segments = explode('/', ltrim($p['path'], '/'));
+        foreach ($segments as &$seg) {
+            // avoid double-encoding: decode first, then encode segment
+            $seg = rawurlencode(rawurldecode($seg));
+        }
+        unset($seg);
+        $path = '/' . implode('/', $segments);
+    }
+
+    $rebuilt = $p['scheme'] . '://' . $p['host']
+             . (isset($p['port']) ? ':' . $p['port'] : '')
+             . $path
+             . (isset($p['query']) ? '?' . $p['query'] : '')
+             . (isset($p['fragment']) ? '#' . $p['fragment'] : '');
+
+    // Optional: set a UA and timeout to avoid 403s/timeouts on some servers
+    $ctx = stream_context_create([
+        'http' => [
+            'timeout' => 15,
+            'header'  => "User-Agent: NG-fetch/1.0\r\n",
+        ],
+        'https' => [
+            'timeout' => 15,
+            'header'  => "User-Agent: NG-fetch/1.0\r\n",
+        ],
+    ]);
+
+    return @file_get_contents($rebuilt, false, $ctx);
+}
+
   
 function getRemoteJsonDetails ($uri, $format=false, $decode=false)
   {
