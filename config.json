@@ -93,9 +93,9 @@
       "stroke": "blue","fill":"#96e0f6","rx":"20px","ry":"20px"},
     "digital2_bn":{
       "stroke": "#999","fill":"#eee","rx":"5px","ry":"5px"},
-      
+     
     "missing":{
-      "stroke": "#A32D2D","fill":"#A32D2D", "color": "#501313", "rx":"5px","ry":"5px"},
+      "stroke": "#A32D2D","fill":"#FCEBEB", "color": "#501313", "rx":"5px","ry":"5px"},
       
     "classstyle": {
       "stroke": "black","fill":"white"},
