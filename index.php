@@ -11,7 +11,7 @@
 $versions = array(
   "jquery" => "3.7.1",
   "bootstrap" => "5.3.8",
-  "mermaid" => "11", // Sub versions organised as needed
+  "mermaid" => "12", // Sub versions organised as needed
   "tether" => "3.0.2",
   "pako" => "2.1.0",
   "base64" => "3.7.8"
