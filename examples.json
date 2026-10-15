@@ -48,5 +48,10 @@
     "title": "SSHOC - Image and IIIF CIDOC CRM",
     "format": "triples",
     "uri": "examples/sshoc-image.csv"
+  },
+  "tour-sample":{
+    "title": "HSDS - An example walk-through tour of a complex model (Heritage Samples)",
+    "format": "triples",
+    "uri": "examples/tour-sample.csv"
   }
 }

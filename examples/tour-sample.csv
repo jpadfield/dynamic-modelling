@@ -1,0 +1,293 @@
+//flowchart BT fix
+// Heritage sample model v0.9 DRAFT (14 October 2026): a sample lineage (E89) grouping a sequence of material records (S13)
+// Companion to the note "Heritage Sample Model v0.9". Grouped by activity; links between groups and the order of
+// events are listed at the bottom, outside any group.
+//
+// Conventions in brief:
+// - The sample is represented by a sample lineage (E89 Propositional Object, typed "Sample lineage"). There is no E19
+//   for the sample. The lineage is about (P129) every material record (S13) in the sample's life	past and current	
+//   and carries the IGSN (P48	assigned by E15)	the kind of sample (P2) and the sample's status (E17).
+// - The lineage is created (E65, P94) by the event that creates its first S13: the sample taking or a sub-sampling.
+//   An E15 can create it instead when a sample is registered retrospectively.
+// - An S13 is the sample in one material state, one format and one container. Only one S13 of a lineage exists at
+//   any time. A modification that changes the material or format	or a change of container	ends the current S13
+//   (P93) and starts the next (P92). Events that do this are also typed E63 and E64.
+// - Every S13 is in exactly one container for its whole life (container O25 contains S13), chosen when it starts:
+//   a new container or the current one. Containers are E22 with minted IRIs and keep normal CRM location (P55) and
+//   moves (E9), so moving a container does not affect the S13s inside it.
+// - Format sits on each S13 (P2) and is fixed for its life; a format change is set by E17 inside the modification.
+//   Supports are part of the S13 by default; a support that can be separated (a stub, a slide) can be a container.
+// - An assessment that finds no change leaves the current S13 in place. An assessment that finds an
+//   earlier change ends the S13 and starts the next; the change happened no later than the assessment.
+// - Sub-sampling repeats the sample-taking pattern	with the parent's current S13 as the source	and creates a
+//   child lineage with its own identifier. Lineages are linked only through their S13s and events.
+// - Observations attach to the S13 of the time. Every event has a date (P4, not shown); consecutive events are
+//   linked with P182, or P183 where strict.
+// - Technique types carry effect types (P2 on the concept): Ends current material record	Changes format	
+//   Consumes the sample.
+// - Statuses (Available	Missing	Consumed	Destroyed) are set on the lineage by E17. Statuses on S13s are allowed
+//   set when the S13 starts; which terms go where is still to be agreed.
+// - Using up or destroying a sample is an E64 that ends its last S13 (P93); no E6. The lineage remains.
+// - Missing: if the container is present but the sample is not, a new S13 starts in an unknown container; if the
+//   container is lost with the sample, the S13 continues and only the status changes.
+// - Format is shown only where it is first set or changes; every other S13 keeps the format of the one before.
+//
+// To be re-checked against CIDOC CRM 7.1.3 and CRMsci 3.2. Open: a change of container ending an S13; S13 for
+// derived states; O1 and P93 on the same S13 in sub-sampling; E89 content growing over the life cycle; results and
+// interpretation pattern (Q12).
+
+//subgraph Planning and taking the sample
+Sampling Activity	P9 consists of	Sampling	event|event
+Sampling Activity	tooltip	E7 Activity. The sampling campaign for a painting. Groups its sample takings.
+Painting	tooltip	E22 Human-Made Object. The source object. Diminished by sampling but remains the same painting.
+Painting	P59 has section	Sampling Site	object|place
+Sampling Site	P3 has note	Site description	|literal
+Sampling Site	tooltip	E53 Place. The area of the source object the sample was taken from. Needs at least a human-readable description (P3), noting how the site was identified; an image annotation or measured position can be added (not shown).
+Sampling	O3 sampled from	Painting
+Sampling	O4 sampled at	Sampling Site
+Sampling	O1 diminished	Painting
+Sampling	P9 consists of	Lineage creation 1	|event
+Sampling	tooltip	S2 Sample Taking. Removes the first material record (O5) and, through the nested creation event, creates the sample lineage.
+Lineage creation 1	tooltip	E65 Creation, part of the sample taking (P9). Creates the sample lineage (P94). An E15 can do this instead when a sample is registered retrospectively.
+//end sg1
+
+//subgraph The sample lineage and its registration
+Registration 1	P140 assigned attribute to	E89 - Sample 1	event|document
+Registration 1	P37 assigned	IGSN 1	|url
+Registration 1	P9 consists of	Status set 1	|event
+Registration 1	tooltip	E15 Identifier Assignment. Gives the sample lineage its IGSN. The IGSN identifies the physical sample; it is recorded on the lineage because that is the only part of the model that lasts for the sample's whole life.
+Status set 1	P41 classified	E89 - Sample 1
+Status set 1	P42 assigned	Available	|type
+Status set 1	tooltip	E17 Type Assignment, part of the registration. Sets the first status of the sample.
+E89 - Sample 1	P48 has preferred identifier	IGSN 1
+E89 - Sample 1	P2 has type	Sample lineage	|type
+E89 - Sample 1	P2 has type	Paint sample	|type
+E89 - Sample 1	tooltip	E89 Propositional Object. The sample lineage: stands for the sample over its full life cycle. Carries the IGSN, the kind of sample and its status, and is about (P129) every material record, past and current. Adding a material record does not change the proposition, which always covered the full life cycle.
+Sample lineage	tooltip	E55 Type. Marks an E89 as a sample lineage.
+Paint sample	tooltip	E55 Type. The kind of sample. Does not change over the sample's life.
+//end sg1
+
+//subgraph Material records of Sample 1
+E89 - Sample 1	P129 is about	S13 - Sample 1.1	|thing
+E89 - Sample 1	P129 is about	S13 - Sample 1.2	|thing
+E89 - Sample 1	P129 is about	S13 - Sample 1.3	|thing
+S13 - Sample 1.1	P2 has type	Loose fragments	|type
+S13 - Sample 1.1	tooltip	S13 Sample. Material record: the material as taken from the painting, in Pot 1. Ended by sub-sampling 1a.
+S13 - Sample 1.2	tooltip	S13 Sample. Material record: the material remaining after sub-sampling 1a, still in Pot 1. Ended by sub-sampling 1b.
+S13 - Sample 1.3	tooltip	S13 Sample. Material record: the material remaining after sub-sampling 1b, still in Pot 1.
+Loose fragments	tooltip	E55 Type. A format. Fixed for the life of each material record.
+//end sg1
+
+//subgraph Containers
+Pot 1	P2 has type	Sample pot	object|type
+Pot 1	P55 has current location	Sample store	|place
+Pot 1	O25 contains	S13 - Sample 1.1
+Pot 1	O25 contains	S13 - Sample 1.2
+Pot 1	O25 contains	S13 - Sample 1.3
+Pot 1	tooltip	E22 Human-Made Object. A container, with its own minted IRI even if it has no label or public identifier. Contains each material record for that record's whole life (O25).
+Pot 2	P2 has type	Sample pot	object|
+Pot 2	P55 has current location	Sample store
+Pot 2	tooltip	E22 Human-Made Object. A new pot chosen for the material removed in sub-sampling 1a.
+Pot 3	P2 has type	Sample pot	object|
+Pot 3	P55 has current location	Sample store
+Pot 3	tooltip	E22 Human-Made Object. A new pot chosen for the material removed in sub-sampling 1b.
+Box 1	P2 has type	Slide box	object|type
+Box 1	P55 has current location	Sample store
+Box 1	tooltip	E22 Human-Made Object. A storage container, for example a slide box. Moving the box (E9, not shown) moves every material record in it without changing them.
+Sample store	tooltip	E53 Place. Where the containers are kept.
+//end sg1
+
+//subgraph Sub-sampling
+Sub-sampling 1a	O5 removed	S13 - Sample 1a.1	event|thing
+Sub-sampling 1a	O4 sampled at	Position in Sample 1	|place
+Sub-sampling 1a	P9 consists of	Lineage creation 1a	|event
+Sub-sampling 1a	tooltip	S2 Sample Taking also typed E63 and E64. Same pattern as the first sample taking, with the parent's current material record as the source. Ends S13 1.1, starts the remainder S13 1.2 in the same pot, removes S13 1a.1 into a new pot and creates the child lineage.
+Position in Sample 1	tooltip	E53 Place. Where in the parent material the fragment came from; a description is enough. Required by O4 sampled at.
+Lineage creation 1a	P94 has created	E89 - Sample 1a	event|document
+Lineage creation 1a	tooltip	E65 Creation, part of the sub-sampling. Creates the child lineage.
+Registration 1a	P140 assigned attribute to	E89 - Sample 1a	event|
+Registration 1a	P37 assigned	Sample 1a identifier	|url
+Sub-sampling 1b	O5 removed	S13 - Sample 1b.1	event|thing
+Sub-sampling 1b	P9 consists of	Lineage creation 1b	|event
+Sub-sampling 1b	tooltip	A second sub-sampling using the same pattern (O4 not shown). Ends S13 1.2, starts S13 1.3 in the same pot, removes S13 1b.1 into a new pot and creates the child lineage.
+Lineage creation 1b	P94 has created	E89 - Sample 1b	event|document
+Registration 1b	P140 assigned attribute to	E89 - Sample 1b	event|
+Registration 1b	P37 assigned	Sample 1b identifier	|url
+E89 - Sample 1a	P129 is about	S13 - Sample 1a.1
+E89 - Sample 1b	P129 is about	S13 - Sample 1b.1
+E89 - Sample 1a	tooltip	E89 Propositional Object. The child sample lineage created by sub-sampling 1a, with its own identifier. Linked to its parent only through the material records and the sub-sampling event.
+E89 - Sample 1b	tooltip	E89 Propositional Object. The child sample lineage created by sub-sampling 1b. Later used up in analysis; the lineage keeps its identifier and results.
+S13 - Sample 1a.1	tooltip	S13 Sample. Material record: the material of Sample 1a as removed, in Pot 2. Ended by the change of container.
+S13 - Sample 1b.1	tooltip	S13 Sample. The only material record of Sample 1b, in Pot 3. Ended when it is used up.
+//end sg1
+
+//subgraph Changing container
+Change of container 1a	P2 has type	Change of container	event|type
+Change of container 1a	P92 brought into existence	S13 - Sample 1a.2	|thing
+Change of container 1a	tooltip	E7 Activity also typed E63 and E64. Moves Sample 1a from Pot 2 to Box 1 by ending S13 1a.1 (P93) and starting S13 1a.2, which Box 1 contains. Each containment therefore lasts exactly as long as its material record. No E9 for samples.
+S13 - Sample 1a.2	tooltip	S13 Sample. Material record: Sample 1a in Box 1, material and format unchanged. Ended by embedding.
+//end sg1
+
+//subgraph Preparing Sample 1a
+Embedding	P2 has type	Embedding in resin	event|type
+Embedding	P125 used object of type	Resin	|type
+Embedding	P9 consists of	Format change 1a	|event
+Embedding	P92 brought into existence	S13 - Sample 1a.3	|thing
+Embedding	tooltip	E7 Activity also typed E63 and E64. Ends S13 1a.2 and starts S13 1a.3 with a new format, in the same box. By default the resin is part of the material record and the block is not recorded separately. P125 is used because P126 employed needs an E11 Modification.
+Format change 1a	P41 classified	S13 - Sample 1a.3
+Format change 1a	P42 assigned	Resin-mounted cross-section	|type
+Format change 1a	tooltip	E17 Type Assignment, part of the embedding. Sets the format of the new material record.
+S13 - Sample 1a.3	P2 has type	Resin-mounted cross-section
+Resin	tooltip	E57 Material. Used in embedding (P125); part of the material record from then on.
+Polishing 1a	P2 has type	Polishing	event|type
+Polishing 1a	P92 brought into existence	S13 - Sample 1a.4	|thing
+Polishing 1a	tooltip	S1 Matter Removal also typed E63 and E64. Diminishes S13 1a.3 (O1), ends it and starts S13 1a.4 in the same box. The format is unchanged.
+S13 - Sample 1a.3	tooltip	S13 Sample. Material record: Sample 1a once embedded, in Box 1. Ended by polishing.
+S13 - Sample 1a.4	tooltip	S13 Sample. Material record: Sample 1a after polishing, in Box 1. Ended when an assessment finds the resin has yellowed.
+//end sg1
+
+//subgraph Effect types
+Embedding in resin	P2 has type	Ends current material record	type|type
+Embedding in resin	P2 has type	Changes format	|type
+Polishing	P2 has type	Ends current material record
+Change of container	P2 has type	Ends current material record
+Mounting on stub	P2 has type	Ends current material record	type|
+Mounting on stub	P2 has type	Changes format
+Destructive analysis	P2 has type	Consumes the sample	type|type
+Ends current material record	tooltip	E55 Type. Effect type: the event ends the current material record and starts a new one in the same lineage, in a container chosen for it (new or current).
+Changes format	tooltip	E55 Type. Effect type: the new material record gets a new format, set by an E17 inside the event.
+Consumes the sample	tooltip	E55 Type. Effect type: the event ends the last material record (E64, P93) and sets the lineage status to Consumed.
+//end sg1
+
+//subgraph Observing the material
+Examination	P2 has type	Observation type	event|type
+Examination	P70i is documented in	Results	|document
+Examination	P9 consists of	Material identification	|event
+Examination	tooltip	S27 Observation. Any examination or analysis, attached to the material record that existed at the time. It finds no change, so S13 1a.4 continues.
+Material identification	O9 observed property type	material present	event|type
+Material identification	O16 observed value	Lead white	|type
+Material identification	tooltip	S4 Single Observation. One per material identified, on the material record that existed at the time.
+material present	tooltip	S9 Property Type. The presence of a material.
+Lead white	tooltip	E57 Material. An identified material, from a controlled vocabulary.
+Results	tooltip	Images, spectra, data files and reports. Link provisional; full results pattern still open (Q12).
+Interpretation	P16 used specific object	Results	event|document
+Interpretation	tooltip	S5 Inference Making. Interpretation of results, at the time or later. Full pattern, for example via CRMinf, still open (Q12).
+//end sg1
+
+//subgraph An assessment that finds a change
+Condition assessment 1a	P2 has type	Change identified	event|type
+Condition assessment 1a	P9 consists of	Condition observation 1a	|event
+Condition assessment 1a	P92 brought into existence	S13 - Sample 1a.5	|thing
+Condition assessment 1a	tooltip	S27 Observation also typed E63 and E64. Finds that the resin has yellowed since the last record, so it ends S13 1a.4 and starts S13 1a.5 in the same box. The change happened no later than the assessment. An assessment that finds no change leaves the current material record in place.
+Condition observation 1a	O9 observed property type	condition	event|type
+Condition observation 1a	O16 observed value	Yellowed resin	|type
+Condition observation 1a	tooltip	S4 Single Observation. Records the condition found, on the new material record it describes.
+condition	tooltip	S9 Property Type. The condition of the material, including any resin that is part of it.
+S13 - Sample 1a.5	tooltip	S13 Sample. Material record: Sample 1a with yellowed resin, in Box 1. The current material of Sample 1a.
+//end sg1
+
+//subgraph Using up a sample
+Analysis 1b	P2 has type	Destructive analysis	event|type
+Analysis 1b	P9 consists of	Status change 1b	|event
+Analysis 1b	tooltip	S27 Observation also typed E64 End of Existence. Observes S13 1b.1 and ends it (P93). No E6: the lineage remains, with status Consumed. Accidental destruction: E64 alone, with status Destroyed.
+Status change 1b	P42 assigned	Consumed	event|type
+Status change 1b	tooltip	E17 Type Assignment, part of the analysis. Lineage statuses: Available, Missing, Consumed (used up as planned), Destroyed (accident or damage).
+//end sg1
+
+//subgraph Optional: a separable support as a container
+Mounting 1	P2 has type	Mounting on stub	event|type
+Mounting 1	P9 consists of	Format change 1	|event
+Mounting 1	P92 brought into existence	S13 - Sample 1.4	|thing
+Mounting 1	tooltip	E7 Activity also typed E63 and E64. OPTIONAL pattern. Ends S13 1.3 and starts S13 1.4 on a stub, which is recorded as its container. Used where the support can be separated from the sample.
+Format change 1	P41 classified	S13 - Sample 1.4
+Format change 1	P42 assigned	Stub-mounted fragments	|type
+S13 - Sample 1.4	P2 has type	Stub-mounted fragments
+Stub 1	P2 has type	SEM stub	object|type
+Stub 1	P55 has current location	Sample store
+Stub 1	O25 contains	S13 - Sample 1.4
+Stub 1	tooltip	E22 Human-Made Object. OPTIONAL. A support that can be separated, recorded as a container. As a physical object it can also have its own condition assessed (E14, not shown).
+E89 - Sample 1	P129 is about	S13 - Sample 1.4
+S13 - Sample 1.4	tooltip	S13 Sample. Material record: Sample 1 mounted on Stub 1. Ended when the sample is found to be missing from the stub.
+//end sg1
+
+//subgraph Optional: a missing sample
+Inventory check 1	P2 has type	Not found in container	event|type
+Inventory check 1	P9 consists of	Status change 1	|event
+Inventory check 1	P92 brought into existence	S13 - Sample 1.5	|thing
+Inventory check 1	tooltip	E7 Activity also typed E63 and E64. The stub is present but the sample is not on it: ends S13 1.4 and starts S13 1.5 in an unknown container, with status Missing. If the container had been lost with the sample, no new record would start; only the status would change. When found, a new record starts in the real container and the status returns to Available.
+Status change 1	P41 classified	E89 - Sample 1
+Status change 1	P42 assigned	Missing	|type
+Unknown container 1	P2 has type	Unknown container	object|type
+Unknown container 1	O25 contains	S13 - Sample 1.5
+Unknown container 1	tooltip	E22 Human-Made Object. A placeholder for a container that is not known, so that every material record still has a container.
+E89 - Sample 1	P129 is about	S13 - Sample 1.5
+S13 - Sample 1.5	tooltip	S13 Sample. Material record: Sample 1 while missing; material and format assumed unchanged.
+//end sg1
+
+// Links between groups
+Sampling	O5 removed	S13 - Sample 1.1
+Lineage creation 1	P94 has created	E89 - Sample 1
+Sub-sampling 1a	O3 sampled from	S13 - Sample 1.1
+Sub-sampling 1a	O1 diminished	S13 - Sample 1.1
+Sub-sampling 1a	P93 took out of existence	S13 - Sample 1.1
+Sub-sampling 1a	P92 brought into existence	S13 - Sample 1.2
+Sub-sampling 1a	P92 brought into existence	S13 - Sample 1a.1
+Sub-sampling 1b	O3 sampled from	S13 - Sample 1.2
+Sub-sampling 1b	O1 diminished	S13 - Sample 1.2
+Sub-sampling 1b	P93 took out of existence	S13 - Sample 1.2
+Sub-sampling 1b	P92 brought into existence	S13 - Sample 1.3
+Sub-sampling 1b	P92 brought into existence	S13 - Sample 1b.1
+Pot 2	O25 contains	S13 - Sample 1a.1
+Pot 3	O25 contains	S13 - Sample 1b.1
+Change of container 1a	P93 took out of existence	S13 - Sample 1a.1
+Box 1	O25 contains	S13 - Sample 1a.2
+E89 - Sample 1a	P129 is about	S13 - Sample 1a.2
+Embedding	P93 took out of existence	S13 - Sample 1a.2
+Box 1	O25 contains	S13 - Sample 1a.3
+E89 - Sample 1a	P129 is about	S13 - Sample 1a.3
+Polishing 1a	O1 diminished	S13 - Sample 1a.3
+Polishing 1a	P93 took out of existence	S13 - Sample 1a.3
+Box 1	O25 contains	S13 - Sample 1a.4
+E89 - Sample 1a	P129 is about	S13 - Sample 1a.4
+Examination	O35 observed entity	S13 - Sample 1a.4
+Material identification	O8 observed	S13 - Sample 1a.4
+Condition assessment 1a	P93 took out of existence	S13 - Sample 1a.4
+Condition observation 1a	O8 observed	S13 - Sample 1a.5
+Box 1	O25 contains	S13 - Sample 1a.5
+E89 - Sample 1a	P129 is about	S13 - Sample 1a.5
+Analysis 1b	O35 observed entity	S13 - Sample 1b.1
+Analysis 1b	P93 took out of existence	S13 - Sample 1b.1
+Status change 1b	P41 classified	E89 - Sample 1b
+Mounting 1	P93 took out of existence	S13 - Sample 1.3
+Inventory check 1	P93 took out of existence	S13 - Sample 1.4
+
+// Order of events (every event also has P4 has time-span, not shown)
+Sampling	P182 ends before or with the start of	Registration 1
+Registration 1	P182 ends before or with the start of	Sub-sampling 1a
+Sub-sampling 1a	P182 ends before or with the start of	Registration 1a
+Registration 1a	P182 ends before or with the start of	Sub-sampling 1b
+Sub-sampling 1b	P182 ends before or with the start of	Registration 1b
+Registration 1b	P182 ends before or with the start of	Change of container 1a
+Change of container 1a	P182 ends before or with the start of	Embedding
+Embedding	P183 ends before the start of	Polishing 1a
+Polishing 1a	P182 ends before or with the start of	Examination
+Examination	P182 ends before or with the start of	Condition assessment 1a
+Condition assessment 1a	P182 ends before or with the start of	Analysis 1b
+Analysis 1b	P182 ends before or with the start of	Mounting 1
+Mounting 1	P182 ends before or with the start of	Inventory check 1
+
+// Guided tour (read by tour.js; ignored when drawing the model)
+//tour Heritage sample model v0.9
+//step 1. Taking the sample | Sampling Activity ; Sampling ; Painting ; Sampling Site ; S13 - Sample 1.1 | A sample is taken from a painting as part of a sampling campaign. The material removed is recorded as the first material record, an S13 Sample.
+//step 2. The sample lineage | Sampling ; Lineage creation 1 ; E89 - Sample 1 ; Registration 1 ; IGSN 1 ; Status set 1 ; Available | The sample taking also creates the sample lineage, an E89 Propositional Object. Registration gives the lineage its IGSN and its first status. The IGSN identifies the physical sample; it sits on the lineage because that is the only part that lasts for the sample's whole life.
+//step 3. What the lineage holds | E89 - Sample 1 ; Sample lineage ; Paint sample ; S13 - Sample 1.1 ; S13 - Sample 1.2 ; S13 - Sample 1.3 | The lineage is about every material record in the sample's life	past and current. It also records the kind of sample	which does not change.
+//step 4. Containers | Pot 1 ; Sample pot ; Sample store ; S13 - Sample 1.1 ; S13 - Sample 1.2 ; S13 - Sample 1.3 | Each material record sits in one container for its whole life. Containers are ordinary physical objects, so they keep their own location in the store.
+//step 5. Sub-sampling | S13 - Sample 1.1 ; Sub-sampling 1a ; S13 - Sample 1.2 ; S13 - Sample 1a.1 ; Position in Sample 1 ; Lineage creation 1a ; E89 - Sample 1a | Sub-sampling repeats the same pattern. It ends the parent's current record	starts a record for what remains	and removes new material that begins a lineage of its own.
+//step 6. Changing container | S13 - Sample 1a.1 ; Pot 2 ; Change of container 1a ; S13 - Sample 1a.2 ; Box 1 | Moving Sample 1a from Pot 2 to Box 1 ends one material record and starts the next	in the new container. So where a sample was	and when	follows from its material records.
+//step 7. Preparing the sample | S13 - Sample 1a.2 ; Embedding ; Resin ; Format change 1a ; Resin-mounted cross-section ; S13 - Sample 1a.3 ; Polishing 1a ; S13 - Sample 1a.4 | Embedding in resin and polishing each end the current material record and start a new one. Embedding also sets a new format, which stays fixed for the life of that record.
+//step 8. Observing the material | Examination ; Material identification ; material present ; Lead white ; Results ; Interpretation ; S13 - Sample 1a.4 | Examinations and analyses attach to the material record that existed at the time. An examination that finds no change leaves that record in place.
+//step 9. Finding a change | S13 - Sample 1a.4 ; Condition assessment 1a ; Condition observation 1a ; Yellowed resin ; S13 - Sample 1a.5 | An assessment that finds a change has already happened	here yellowed resin	ends the current record and starts a new one.
+//step 10. Using up a sample | E89 - Sample 1b ; S13 - Sample 1b.1 ; Analysis 1b ; Status change 1b ; Consumed | A destructive analysis ends the last material record. The lineage remains	with the status Consumed	so its identifier and results stay available.
+//step 11. A support as a container (optional) | S13 - Sample 1.3 ; Mounting 1 ; S13 - Sample 1.4 ; Stub 1 ; SEM stub ; Format change 1 ; Stub-mounted fragments | Where a support can be separated from the sample	such as a stub	it can be recorded as the container.
+//step 12. A missing sample (optional) | S13 - Sample 1.4 ; Inventory check 1 ; Status change 1 ; Missing ; E89 - Sample 1 ; Unknown container 1 ; S13 - Sample 1.5 | If the sample is not where it should be, a new material record starts in an unknown container and the lineage is marked Missing.
+//step 13. Overview | | Together	these give one stable identifier for each sample	and a dated history of its material	its format and where it was kept.

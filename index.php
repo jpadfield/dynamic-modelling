@@ -451,6 +451,7 @@ $modal
   <script src="$jslib/js-base64@$vs[6]/base64.min.js"></script>
   <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
   <script src="./js/local.js"></script>
+  <script src="js/tour.js"></script>
   <script>
  
   let code = JSON.stringify($json_code);
@@ -567,6 +568,7 @@ div.mermaidTooltip {
   <script src="$jslib/js-base64@$vs[6]/base64.min.js"></script>
   <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
   <script src="./js/local.js"></script>
+  <script src="js/tour.js"></script>
   <script>
  
   let code = JSON.stringify($json_code);
