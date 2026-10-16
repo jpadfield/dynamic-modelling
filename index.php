@@ -3,6 +3,7 @@
 // Currently debuggin schema processing: http://localhost/mod2/?url=https://raw.githubusercontent.com/E-RIHS/schema/main/organisation-v1.0.schema.json
 
 // TODO http://localhost/mod2/?url=https://lux.collections.yale.edu/data/place/cfda276e-fddd-4d58-aab5-25894ba991dd highlights a few new linked.art automatic formatting
+// The "simple" format does not work with models passed as links using PAKO
 // issues that would need to be captured.
  
 // Added option to link subgraphs as nodes - needs diagram to be set as "flowchart" and not "graph"
@@ -436,15 +437,20 @@ $modal
     'padding': 6
   },
     maxTextSize: 9000000,    
-    startOnLoad:true, 
+    startOnLoad:false, 
     securityLevel: "loose",
     logLevel: 4,
     flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true, wrappingWidth: 600 },
-    mermaid: {
-      callback:function(id) {modelZoom ()}
-      }}
+    }
       
   mermaid.initialize(config);
+
+  // Draw the model, then start pan and zoom once the drawing is finished. Starting pan and zoom
+  // before Mermaid has finished (as the old one-second timer could) leaves it measuring a
+  // half-drawn model, with its buttons too small to see.
+  try { await mermaid.run({ querySelector: '#modelDiv' }); }
+  catch (e) { console.error(e); }
+  if (window.startZoom) { window.startZoom(); }
 
 </script>
   <script src="$jslib/pako@$vs[5]/dist/pako.min.js"></script>
@@ -541,6 +547,7 @@ div.mermaidTooltip {
 </div>
 <div id="modelDiv" style="height:100%" class="mermaid">$mermaid</div>
 <div id="modelDivTxt" style="display:none">$mermaid</div>
+<textarea id="triplesTxt" style="display:none" aria-hidden="true">$triplesTxt</textarea>
       
   <script src="$jslib/jquery@$vs[1]/dist/jquery.min.js"></script>  
   <script src="$jslib/tether@$vs[4]/dist/js/tether.min.js"></script>
@@ -553,15 +560,20 @@ div.mermaidTooltip {
     'padding': 6
   },
     maxTextSize: 900000,
-    startOnLoad:true, 
+    startOnLoad:false, 
     securityLevel: "loose",
     logLevel: 4,
     flowchart: { curve: 'basis', useMaxWidth: false, htmlLabels: true, wrappingWidth: 600 },
-    mermaid: {
-      callback:function(id) {modelZoom ()}
-      }}
+    }
       
   mermaid.initialize(config);
+
+  // Draw the model, then start pan and zoom once the drawing is finished. Starting pan and zoom
+  // before Mermaid has finished (as the old one-second timer could) leaves it measuring a
+  // half-drawn model, with its buttons too small to see.
+  try { await mermaid.run({ querySelector: '#modelDiv' }); }
+  catch (e) { console.error(e); }
+  if (window.startZoom) { window.startZoom(); }
 
 </script>
   <script src="$jslib/pako@$vs[5]/dist/pako.min.js"></script>

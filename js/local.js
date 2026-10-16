@@ -163,9 +163,7 @@ $(document).ready(function()
     console.log("Pako String");
     processTriples (d2);    
     }
-   else {
-    f1(); 
-    }
+   // Otherwise pan and zoom is started by the page once Mermaid has finished drawing (startZoom).
 	const bmCompressed = pako.deflate($("#triplesTxt").text().trim(), { level: 9 });
 	const bmData = Base64.fromUint8Array(bmCompressed, true);
 	const bmURL = "./?data=pako:"+bmData;
@@ -190,8 +188,21 @@ function resolveAfterTime(x) {
 
 async function f1() {
   const x = await resolveAfterTime(1000);
-  modelZoom();
+  restartZoom();
 }
+
+// Start pan and zoom if it is not already running (called once Mermaid has finished drawing).
+function startZoom ()
+  {
+  if (typeof panZoom === 'undefined') {modelZoom ();}
+  }
+
+// Start pan and zoom afresh, for a model that has been redrawn.
+function restartZoom ()
+  {
+  if (typeof panZoom !== 'undefined') {modelZoom ();}
+  modelZoom ();
+  }
 
 async function f2(period) {
   const x = await resolveAfterTime(period);
