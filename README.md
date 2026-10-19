@@ -6,7 +6,7 @@
 This is an interactive live modelling system which can automatically convert simple tab separated triples into graphical models using the [mermaid library](https://mermaid.ai/). 
 
 ## Instructions
-The documentation is built into the tool itself, as models that you can explore and edit. Open the **Documentation** menu on the [Dynamic Modelling web site](https://research.ng-london.org.uk/modelling/), starting with **Getting started**. Each documentation page has a guided tour and links to the pages before and after it. The **Examples** menu shows models made with the tool. All of the related code is presented here in [GitHub](https://github.com/jpadfield/dynamic-modelling).
+The documentation is built into the tool itself, as models that you can explore and edit. Open the **Documentation** menu on the [Dynamic Modelling web site](https://research.nationalgallery.org.uk/lab/modelling/), starting with **Getting started**. Each documentation page has a guided tour and links to the pages before and after it. The **Examples** menu shows models made with the tool. All of the related code is presented here in [GitHub](https://github.com/jpadfield/dynamic-modelling).
 
 ## Quick reference
 Each topic below has its own page, with a guided tour, in the tool's **Documentation** menu.
@@ -82,7 +82,7 @@ Keys while a tour is open: arrow keys move back and forward, Shift with an arrow
 
 To show a model inside another web page:
 ```html
-<iframe src="https://research.ng-london.org.uk/modelling/?example=doc_layout&simple"
+<iframe src="https://research.nationalgallery.org.uk/lab/modelling/?simple"
         width="100%" height="600" style="border:0" title="Dynamic Modeller model"></iframe>
 ```
 
