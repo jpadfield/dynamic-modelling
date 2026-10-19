@@ -1,0 +1,59 @@
+//flowchart LR
+// Blank nodes and repeated labels
+// Normally the same text always means the same node. This page shows the ways round that.
+
+The same text	normally means	One node	thing|note
+The same text	can be kept apart with	Blank nodes
+The same text	can refer back with	Earlier blank nodes
+The same text	can be shown twice with	Repeated labels
+The same text	is kept apart automatically for	Class names
+
+//subgraph Blank nodes
+A blank node	is a node with	No name of its own	object|note
+A blank node	is written as	The subject _BN	|note
+A blank node	starts each time	A line about _BN gives its type	|note
+A blank node	collects	The _BN lines that follow it	|note
+A blank node	is shown with	An automatic number	|note
+_BN	has type	Production	event_bn|type
+_BN	produced	Painting	|object
+_BN	took place in	London	|place
+//end
+
+//subgraph Earlier blank nodes
+Writing _BN-1	points to	The blank node before the current one	object|note
+Writing _BN-2	points to	The one before that	object|note
+Writing _BN as an object	points to	The current blank node	object|note
+_BN	has type	Sampling	event_bn|type
+_BN	took a sample from	Painting
+_BN	happened after	_BN-1
+//end
+
+//subgraph Repeated labels
+Adding #-1 or #-2 to the end	keeps apart	Nodes that show the same text	object|note
+Painting A	has the title	Portrait of a Man#-1	object|literal
+Painting B	has the title	Portrait of a Man#-2	object|literal
+//end
+
+//subgraph Class names
+Names that start crm: sci: or dig:	get	A separate copy for each subject	object|note
+The word Type	also gets	A separate copy for each subject	object|note
+A separate copy for each subject	stops	Many links meeting at one node	|note
+Sample A	is classified as	crm:E22_Human-Made_Object	object|
+Sample B	is classified as	crm:E22_Human-Made_Object	object|
+//end
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Subgraphs|?example=doc_subgraphs	next page	This page: Blank nodes	url|note
+This page: Blank nodes	next page	Next: Links and icons|?example=doc_links	|url
+//end group
+
+//tour Blank nodes and repeated labels
+//step The same text | The same text ; One node | Normally the same text always means the same node. This page shows three ways round that.
+//step Blank nodes | Blank nodes | A blank node has no name of its own. Write _BN as the subject and give it a type. The lines about _BN that follow all belong to it until another _BN is given a type.
+//sub What a blank node is | A blank node ; No name of its own ; The subject _BN ; A line about _BN gives its type ; The _BN lines that follow it ; An automatic number |
+//sub An example | _BN-N1 ; Production ; Painting ; London | Here a production is written as a blank node. It has a type and two more lines.
+//step Earlier blank nodes | Earlier blank nodes | _BN-1 points to the blank node before the current one and _BN-2 to the one before that. Here the sampling happened after the production.
+//step Repeated labels | Repeated labels | Adding #-1 or #-2 to the end of some text makes separate nodes that show the same text. The number is not shown.
+//step Class names | Class names | Class names such as crm: names and the word Type get a separate copy for each subject. This stops many links meeting at one node.
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.

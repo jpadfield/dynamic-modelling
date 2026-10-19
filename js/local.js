@@ -29,6 +29,10 @@ $(function () {
 
 var panZoom;
 
+// Hover texts (tooltips) are drawn by Mermaid as "click <node> function <text>", so clicking such a
+// node asks for a JavaScript function called "function". This empty one stops that causing an error.
+window['function'] = function () {};
+
 function modelZoom ()
     {
     console.log("modelZoom"); 
@@ -171,7 +175,7 @@ $(document).ready(function()
 	
   const compressed = pako.deflate(code, { level: 9 });
   const send = Base64.fromUint8Array(compressed, true) 
-  const mleURL = "https://mermaid-js.github.io/mermaid-live-editor/edit#pako:"+send;
+  const mleURL = "https://mermaid.live/edit#pako:"+send;
   const imURL = "./?image="+send;
   $("#mermaidLink").attr("href", mleURL);
   $("#downloadLink").attr("href", imURL);

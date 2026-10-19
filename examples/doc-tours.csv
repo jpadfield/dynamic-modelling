@@ -1,0 +1,66 @@
+//flowchart LR
+// Guided tours
+// A tour is written as extra comment lines in the model, so it travels with the model.
+// The tour lines for this page are at the bottom of this box.
+
+Guided tours	are written with	Tour lines	thing|
+Guided tours	move through	Steps
+Guided tours	can zoom in with	Parts of a step
+Guided tours	are played with	The tour controls
+Guided tours	are easier to follow with	Tips for writing tours
+
+//subgraph Tour lines
+The title line	reads	//tour followed by a title	object|note
+The title line	is	Optional	|note
+A step line	reads	//step then a title and names and a caption	object|note
+A step line	separates its three parts with	Vertical bars	|note
+A part line	reads	//sub then a title and names and a caption	object|note
+//end
+
+//subgraph Steps
+The names in a step	are	Node texts separated by semicolons	object|note
+The names in a step	can include	Subgraph titles	|object
+Subgraph titles	light up	The whole box and everything in it	|note
+The names in a step	ignore	Spaces and capitals	|note
+A step with no names	shows	The whole model	object|note
+//end
+
+//subgraph Parts of a step
+A part	belongs to	The step line above it	object|note
+A part	zooms in on	Some of the step's nodes	|note
+A part	keeps	The step's highlighting	|note
+A part with no title or caption	keeps showing	The step's title and caption	object|note
+//end
+
+//subgraph The tour controls
+The tour button	sits at	The bottom left of the model	object|note
+The tour panel	has	Back and Play and Forward buttons	object|note
+The tour panel	has icons for	Re-centre and Restart and Hide and Close	|note
+The tour panel	can	Read captions aloud	|note
+Moving the model while playing	pauses the tour until you press	Resume	object|note
+Shift with Back or Forward	jumps	A whole step	object|note
+//end
+
+//subgraph Tips for writing tours
+A caption	should have no more than	Three commas	object|note
+Three commas	is the limit because	The text after a fourth comma is lost	|note
+A caption	reads out a double slash if you write	The words double slash before it	|note
+The browser console	notes	Steps whose text is too small to read	object|note
+//end
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Links and icons|?example=doc_links	next page	This page: Tours	url|note
+This page: Tours	next page	Next: Sharing|?example=doc_sharing	|url
+//end group
+
+//tour Guided tours
+//step Guided tours | | A guided tour moves through a model one step at a time. This page explains how to write one. Its own tour lines are at the bottom of the text box.
+//step Tour lines | Tour lines | A tour is written as extra comment lines in the model. A "double slash" //tour line gives the title. Each "double slash" //step line gives a title and some names and a caption separated by vertical bars.
+//step Steps | Steps | The names in a step are node texts separated by semicolons. A subgraph title lights the whole box. A step with no names shows the whole model.
+//step Parts of a step | Parts of a step | A "double slash" //sub line adds a part to the step above it. A part zooms in on some of the step's nodes and keeps the same highlighting.
+//sub An example | A part ; The step line above it ; Some of the step's nodes ; The step's highlighting | This is a part. It zooms in on four nodes of this box.
+//step The tour controls | The tour controls | Use Back and Play and Forward to move through the tour. Moving the model while it plays pauses it until you press Resume.
+//sub Keys | The tour panel ; Shift with Back or Forward ; A whole step | The arrow keys move back and forward. Space plays or pauses. C re-centres and H hides the controls.
+//step Tips for writing tours | Tips for writing tours | Keep each caption to three commas or fewer. Write the words "double slash" before // so that it is read aloud. The browser console notes steps whose text is too small.
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.

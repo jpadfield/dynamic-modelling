@@ -1,58 +1,60 @@
-//The first line is an optional special comment that requests TB (Top Bottom) or a LR (Left Right) flow diagram, the default is LR - the style of the nodes linking the displayed concepts can also be adjusted with the addition or omission of the extra term "fix"
-// Extra formats can be selected using a | separated pair of terms - the format only needs to be defined the first time an entities is referenced
-Dynamic Modeller	was created by	Joseph Padfield|https://orcid.org/0000-0002-2572-6428	object|actor
-Dynamic Modeller	is based on	https://mermaid-js.github.io/mermaid
-Dynamic Modeller	can toggle	Zooming (toggle control in upper right of the model window)	|name2
-Dynamic Modeller	designed to	"Allow users to create modelling flow-diagrams from simple lists of triples"
-Dynamic Modeller	works with	Triples
-Dynamic Modeller	can use	Subgraphs
-Dynamic Modeller	allows the use of	Tooltips	|document
-Tooltips	tooltip	Also known as hover text or labels
-Tooltips	for example	Example Concept with a Tooltip	|thing
-Example Concept with a Tooltip	tooltip	This approach can be used to hide comments on larger flow diagrams to simplify their appearance but without loosing the extra descriptions and information.
-Tooltips	has comment	"Tooltips are added to link based nodes, with alternative texts, automatically, but they can also be added manually through an additional triple using the 'tooltip' property to link the item to the required text:<br/>Label  tooltip Required hover text "
-Dynamic Modeller	can format	Links with alternative labels
-Links with alternative labels	for example	Example Formats	|url
-Links with alternative labels	has comment	"This can be achieved by adding the alternative label as a <b>'|'</b> separated suffix, such as:<br/>'ALT TEXT|https://full.url/or/link' "
-Dynamic Modeller	uses	https://github.com/ariutta/svg-pan-zoom
-https://github.com/ariutta/svg-pan-zoom	has comment	"svg-pan-zoom is used to allow users to use their mouse to navigate around and zoom in and out of larger models"
-// Comments can be added simply by starting a line with // or ##
-//subgraph Example Subgraph Title
-Subgraphs	are	Grouped sections of a graph
-Subgraphs	has comment	"Subgraph are started by adding a special comment  before the relevant triples - //Subgraph GROUP TITLE"<br/><br/>"The GROUP TITLE or subgraph label is optional and can be hidden using the following syntax - //Subgraph //GROUP TITLE"<br/><br/>"Alternatively the GROUP TITLE can be omitted completely - //Subgraph"
-Subgraphs	has comment	"Subgraph are ended by adding a special comment  after the relevant triples - //end"
-Subgraphs	can be nested as	Sub-Subgraphs
-//subgraph Example Sub-Subgraph Title
-Sub-Subgraphs	has comment	"Care needs to be taken to make sure which Subgraph nodes appear in, but it is possible to created nested sub-subgraphs simply by starting a new subgraph inside another one."
+//flowchart LR
+// Getting started with the Dynamic Modeller
+// Every line in this box is part of the model. Change any of them and press the refresh button to see the result.
+// Lines that start with // or ## are comments: they are not drawn, but some (like the first line) give instructions.
+
+Dynamic Modeller	works from	Writing a model	thing|
+Dynamic Modeller	lets you explore	Exploring the model
+Dynamic Modeller	keeps your work by	Saving and sharing
+Dynamic Modeller	is explained further in	Finding out more
+
+//subgraph Writing a model
+Triples	are written	One per line	object|note
+Triples	have three parts	Subject then predicate then object	|note
+Triples	separate their parts with	Tabs	|object
+Tabs	come with the text when you	Copy three columns from a spreadsheet	|note
+Triples	can have	A fourth column	|object
+A fourth column	sets the	Formats	|object
+Formats	are written as	Two format names joined by a vertical bar	|note
+Formats	only need to be given	The first time something appears	|note
 //end
+
+//subgraph Exploring the model
+The diagram	is drawn with	Mermaid|https://mermaid.ai/	object|url
+The diagram	can be explored with	Pan and zoom	|object
+Pan and zoom	is turned on and off with	The switch at the top right	|note
+The diagram	can be explained by	Guided tours	|object
+Guided tours	start from	The tour button at the bottom left	|note
 //end
-//subgraph Formatted Subgraph
-Subgraphs	can be styled	Styled Subgraphs
-Styled Subgraphs	has comment	"Any of the existing standard formats can automatically be applied to a subgraph by simply adding the name of the format after the //end line. For example this subgraph has been styled with the line //end base"
-//end base
-Triples	are	Tab separated	|type
-Triples	have some	"Basic automatic formatting, but it is possible to force some further options using additional instructions after the third value in a given triple"
-Triples	format examples	Example Formats|https://research.ng-london.org.uk/modelling/?example=example_formats
-Dynamic Modeller	can also	"Start with data formatted as JSON, which is then automatically converted to Triples, please check the triples and report any errors in the conversion"
-// Blank node can be added as shown
-_BN	has type	Production	event_bn|
-_BN	are allocated	"An automatic number each time the 'has type' property is used, so multiple _BN can be added to the list of triples and they will processed. All other properties will be allocated to the current _BN until a new 'has type' property is called."
-Dynamic Modeller	carries out	_BN
-_BN	produces	Flow-diagrams	|thing
-Flow-diagrams	can be saved by	"Copying the triples and saving them as a text file."
-Flow-diagrams	can be saved by	"Bookmarking or copying the URL under the Bookmark Link options, under the Links menu, after an update."
 
-Flow-diagrams	can be saved by	Downloading an image	|event
-Downloading an image	has comment	"Following the link under the Download Image link, under the Links menu, and using the options provided."
-Downloading an image	is achieved using	https://mermaid.ink/
+//subgraph Saving and sharing
+Your work	can be saved as	A link	object|object
+A link	is made with	Links menu then Copy Link	|note
+Your work	can be saved as	An image	|object
+An image	is made with	Links menu then Download Image	|note
+Your work	can be saved as	Text	|object
+Text	is saved by	Copying these lines into a text file	|note
+//end
 
-Flow-diagrams	can also be edited in	The Mermaid Live Editor	|event
-The Mermaid Live Editor	has comment	"Following the link under the Mermaid Editor link, under the Links menu, and using the options provided."
-The Mermaid Live Editor	has url	https://mermaid-js.github.io/mermaid-live-editor
-_BN	has type	Author	actor_bn|
-_BN	has comment	"New Blank Nodes, or any other entities can refer back to a previous Blank Node by adding a suffix to indicate how many Blank Nodes back one wants to refer to, i.e. the previous blank node would be referenced as '_BN-1' and the one before that would be '_BN-2' and so on."
-_BN	assigned	_BN-1
+//subgraph Finding out more
+Help	is in	The Documentation menu	object|object
+The Documentation menu	has	One page for each topic	|note
+Help	is in	The Examples menu	|object
+The Examples menu	shows	Models made with the tool	|note
+Help	is in	GitHub|https://github.com/jpadfield/dynamic-modelling	|url
+The tool	was created by	Joseph Padfield|https://orcid.org/0000-0002-2572-6428	object|actor
+//end
 
-Dynamic Modeller	can display	Free Font Awesome 5 Icons|https://fontawesome.com/v5/icons/
-Free Font Awesome 5 Icons	for example	far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code
-far:fa-user-circle far:fa-heart fab:fa-creative-commons fas:fa-code	has note	The Font Awesome icons can be added by formatting the icon details, provided on the Font Awesome website, like:<br/>far : fa-user-circle<br/>(without the spaces around the colon).
+//subgraph -LR Documentation pages
+This page: Getting started	next page	Next: Layout|?example=doc_layout	note|url
+//end group
+
+//tour Getting started with the Dynamic Modeller
+//step Welcome | | This model explains the Dynamic Modeller. It is drawn from the lines of text in the box above the model and you can change them.
+//step The Dynamic Modeller | Dynamic Modeller | The tool turns lines of text into diagrams. This page covers four things: writing a model and exploring it and saving it and finding out more.
+//step Writing a model | Writing a model | Each line is a triple: a subject and an object joined by a predicate. The three parts are separated by tabs.
+//sub Formats | A fourth column ; Formats ; Two format names joined by a vertical bar ; The first time something appears | An optional fourth column sets how the subject and the object are drawn.
+//step Exploring the model | Exploring the model | The diagram is drawn by Mermaid. You can pan and zoom around it and play guided tours like this one.
+//step Saving and sharing | Saving and sharing | Save your work as a link that rebuilds the model or as an image or as plain text.
+//step Finding out more | Finding out more | Each topic has its own page in the Documentation menu. The Examples menu shows the tool in use and GitHub holds the code.
+//step Next page | Documentation pages | Every documentation page has links to the pages before and after it. Click a link to follow it.

@@ -12,8 +12,11 @@
  *   //sub  Part title | Node A ; Node B | Caption for a closer look at part of the step.
  *   //step Overview | | A step with no nodes shows the whole model.
  *
- * - Node names must match the node labels exactly (as written in the TSV).
- * - Separate node names with semicolons. Captions may contain commas, but when the page is
+ * - Node names must match the node labels (as written in the TSV). Spaces and capitals are
+ *   ignored when matching, so labels that Mermaid wraps onto several lines still match.
+ * - A subgraph title can be used as a name too: it lights the whole box, everything drawn
+ *   inside it and any links to or from the box. (Boxes with hidden titles cannot be named.)
+ * - Separate names with semicolons. Captions may contain commas, but when the page is
  *   refreshed the server keeps only the text up to the third comma in a line.
  * - Links are highlighted automatically when both of their nodes are listed.
  *
@@ -92,6 +95,7 @@
     };
   }
   function norm(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
+  function key(s) { return (s || '').replace(/\s+/g, '').toLowerCase(); }
   function sourceText() {
     var el = document.querySelector(SELECTORS.source);
     return el ? (el.value || el.textContent || '') : '';
@@ -136,12 +140,29 @@
     var clusters = [].slice.call(svg.querySelectorAll(SELECTORS.cluster));
     var everything = nodeEls.concat(links, linkLabels, clusters);
 
-    var byLabel = {}, byKey = {};
+    // Names are matched ignoring spaces and capitals (Mermaid drops the space where it wraps a label).
+    var byLabel = {}, byKey = {}, boxByLabel = {};
     nodeEls.forEach(function (n) {
-      byLabel[norm(n.textContent)] = n;
+      byLabel[key(n.textContent)] = n;
       var k = (n.id.match(/flowchart-(.+)-\d+$/) || [])[1];
       if (k) { byKey[k] = n; }
     });
+    // Subgraph boxes: named by their title, and linked to by their id (Mermaid adds a "mermaid-<number>-" prefix).
+    clusters.forEach(function (c) {
+      var lab = c.querySelector('.cluster-label'), title = key(lab ? lab.textContent : '');
+      if (title && !byLabel[title]) { boxByLabel[title] = c; }
+      byKey[c.id.replace(/^mermaid-\d+-/, '')] = c;
+    });
+    // Everything drawn inside a box (nodes and smaller boxes), worked out from where they sit.
+    function contents(box) {
+      var b = box.getBoundingClientRect(), out = [box];
+      nodeEls.concat(clusters).forEach(function (e) {
+        if (e === box) { return; }
+        var r = e.getBoundingClientRect(), cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
+        if (cx > b.left && cx < b.right && cy > b.top && cy < b.bottom) { out.push(e); }
+      });
+      return out;
+    }
     // Each link id ends L_<from>_<to>_<n>; link labels are in the same order as links.
     var linkInfo = links.map(function (p, i) {
       var m = p.id.match(/L_(.+?)_(.+?)_\d+$/);
@@ -151,10 +172,12 @@
     // Match the node names in the tour to the drawn nodes once, warning about any that are missing.
     function resolve(names) {
       var out = [];
+      function add(e) { if (out.indexOf(e) < 0) { out.push(e); } }
       names.forEach(function (name) {
-        var n = byLabel[name];
-        if (n) { if (out.indexOf(n) < 0) { out.push(n); } }
-        else if (window.console) { console.warn('tour.js: no node labelled "' + name + '"'); }
+        var n = byLabel[key(name)], box = boxByLabel[key(name)];
+        if (n) { add(n); }
+        else if (box) { contents(box).forEach(add); }
+        else if (window.console) { console.warn('tour.js: no node or subgraph labelled "' + name + '"'); }
       });
       return out;
     }
@@ -367,10 +390,10 @@
         var on = lit.has(e);
         e.style.transition = 'opacity .6s';
         e.style.opacity = !any ? '' : (on ? '1' : DIM);
-        e.classList.toggle('dmt-node-hi', any && on && e.classList.contains('node'));
+        e.classList.toggle('dmt-node-hi', any && on && (e.classList.contains('node') || e.classList.contains('cluster')));
         e.classList.toggle('dmt-link-hi', any && on && e.tagName.toLowerCase() === 'path');
       });
-      if (any) { clusters.forEach(function (c) { c.style.opacity = CLUSTER_DIM; }); }
+      if (any) { clusters.forEach(function (c) { if (!lit.has(c)) { c.style.opacity = CLUSTER_DIM; } }); }
     }
     function clearHighlight() {
       everything.forEach(function (e) { e.style.opacity = ''; e.classList.remove('dmt-node-hi', 'dmt-link-hi'); });

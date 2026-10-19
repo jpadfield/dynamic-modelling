@@ -47,12 +47,13 @@ $bn_number = "0";
 $usedFormats = array();
 $jsonData = array();
 
-$doc_example_links = array(
-  "LRNF" => array("TBNF", "LRF", "LR"), 
-  "TBNF" => array("LRNF", "TBF", "TB"), 
-  "LRF" => array("TBF", "LRNF", "LR fix"), 
-  "TBF" => array("LRF", "TBNF", "TB fix"), 
-  );
+// UNUSED: commented out on 17 October 2026 for future removal: the old generated documentation layout variants (the addresses now open the Layout page via examples.json)
+// $doc_example_links = array(
+//   "LRNF" => array("TBNF", "LRF", "LR"), 
+//   "TBNF" => array("LRNF", "TBF", "TB"), 
+//   "LRF" => array("TBF", "LRNF", "LR fix"), 
+//   "TBF" => array("LRF", "TBNF", "TB fix"), 
+//   );
 
 if (!isset($_GET["getmermaid"]))
   {$getmermaid= false;}  
@@ -81,13 +82,12 @@ else if (isset($_GET["example"]) and isset($examples[$_GET["example"]]))
   
   if ($_GET["example"] == "object2")
     {$triplesTxt = replaceFCDefIfExists ($triplesTxt, "//Flowchart LR fix");}
-  else if ($_GET["example"] == "documentation")
-    {$triplesTxt = docExampleTriples ($doc_example_links["LRNF"], $triplesTxt);}
   }
   
-// Used to ad additional format options to the default "instructions diagram
-else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]]))
-  {$triplesTxt = docExampleTriples ($doc_example_links[$_GET["example"]]);}
+// UNUSED: commented out on 17 October 2026 for future removal: branch for the old generated layout variants
+// // Used to ad additional format options to the default "instructions diagram
+// else if (isset($_GET["example"]) and isset($doc_example_links[$_GET["example"]]))
+//   {$triplesTxt = docExampleTriples ($doc_example_links[$_GET["example"]]);}
   
 // TODO works with an external data source 
 else if (isset($_GET["url"]))
@@ -123,7 +123,7 @@ else if (isset($_GET["data"]))
   
 // Default instructions diagram
 else
-  {$triplesTxt = docExampleTriples ($doc_example_links["LRNF"]);}
+  {$triplesTxt = checkTriples ($default);}
 
 // TODO Thumbnail display in diagram nodes might be possible with - but needs to be re-examined as it was not sorted
 //    
@@ -169,51 +169,63 @@ function replaceFCDefIfExists ($string, $newline=false)
     {return ($newline . "\n" . $string);} 
   }
 
-function docExampleTriples ($ex, $use=false)
-  {
-  global $default;
-  
-  if(!$use) {$use = $default;}
-  
-  $layout_comments = array(
-    "TB" => array ("Flowchart TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
-    "LR" => array ("Flowchart LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
-    "F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
-    "NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
-    );
-  
-  $triplesTxt = "//Flowchart $ex[2] \n".checkTriples ($use);  
-
-  $do = str_split($ex[0], 2);  
-  $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
-  $triplesTxt .= "\n".$layout_comments[$do[0]][0]."\thas comment\t".json_encode($layout_comments[$do[0]][1]);
-  
-  $do = str_split($ex[1], 2);
-  $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[1]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[1]";
-  $triplesTxt .= "\n".$layout_comments[$do[1]][0]."\thas comment\t".json_encode($layout_comments[$do[1]][1]);
-
-  return ($triplesTxt);
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: docExampleTriples()
+// function docExampleTriples ($ex, $use=false)
+//   {
+//   global $default;
+//
+//   if(!$use) {$use = $default;}
+//
+//   $layout_comments = array(
+//     "TB" => array ("Flowchart TB", "In addition to the default left-right (LR) orientation diagrams can also be arranged from the top-bottom (TB)"),
+//     "LR" => array ("Flowchart LR", "In addition to the optional top-bottom (TB) orientation diagrams can also be arranged with the default Left-Right (LR) orientation"),
+//     "F" => array ("Fixed Properties", "This format extends and straightens  the lines linking the various concepts together to ensure there is a flat section of the line for the link property to be specifically fixed to. This can result in a larger overall diagram, but can be required when there are higher numbers of property links being displayed together"),
+//     "NF" => array ("Relaxed Properties", "This format curves  the lines linking the various concepts together to minimise the size of the generated diagram.")
+//     );
+//
+//   $triplesTxt = "//Flowchart $ex[2] \n".checkTriples ($use);  
+//
+//   $do = str_split($ex[0], 2);  
+//   $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[0]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[0]";
+//   $triplesTxt .= "\n".$layout_comments[$do[0]][0]."\thas comment\t".json_encode($layout_comments[$do[0]][1]);
+//
+//   $do = str_split($ex[1], 2);
+//   $triplesTxt .= "\nDynamic Modeller\tcan be formatted with\t".$layout_comments[$do[1]][0]."|https://research.ng-london.org.uk/modelling/?example=$ex[1]";
+//   $triplesTxt .= "\n".$layout_comments[$do[1]][0]."\thas comment\t".json_encode($layout_comments[$do[1]][1]);
+//
+//   return ($triplesTxt);
+//   }
   
 function buildExamplesDD ()
   {
   global $examples;
 
-  ob_start();
-  echo <<<END
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuExamples" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Examples
-    </a>
-  <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuExamples">
-END;
-  $html = ob_get_contents();
-  ob_end_clean(); // Don't send output to client
+  // Two menus are built from examples.json: entries with "group": "documentation" go in the
+  // Documentation menu (in the order they are listed), everything else in the Examples menu.
+  $menus = array(
+    "documentation" => array("title" => "Documentation", "id" => "dropdownMenuDocs", "items" => ""),
+    "examples" => array("title" => "Examples", "id" => "dropdownMenuExamples", "items" => "")
+    );
 
   foreach ($examples as $k => $a)
-    {$html .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";}
+    {
+    // "menu": false keeps an entry working for old links without listing it
+    if (isset($a["menu"]) and $a["menu"] === false) {continue;}
+    $g = (isset($a["group"]) and $a["group"] == "documentation") ? "documentation" : "examples";
+    $menus[$g]["items"] .= "<a class=\"dropdown-item\" href=\"./?example=$k\">$a[title]</a>\n";
+    }
 
-  $html .= "</div></li>";
+  $html = "";
+  foreach ($menus as $g => $m)
+    {
+    if (!$m["items"]) {continue;}
+    $html .= "  <li class=\"nav-item dropdown\">
+    <a class=\"nav-link dropdown-toggle\" href=\"#\" id=\"$m[id]\" role=\"button\" data-bs-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">
+      $m[title]
+    </a>
+  <div class=\"dropdown-menu  dropdown-menu-end\" aria-labelledby=\"$m[id]\">
+$m[items]</div></li>\n";
+    }
 
   return ($html);
   }
@@ -248,53 +260,54 @@ END;
   }
 
 
-function debugJsonConversaion ($json, $php, $triples)
-  {
-  global $examples;
-  $php = print_r($php, true);
-  
-  ob_start();
-  echo <<<END
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-</head>
-<body>
-
-<div class="container-fluid" style="padding:0px;">
-  
-  <div class="container-fluid" style="padding:0px;">
- 
-    <div class="row" style="padding:0px;margin:0px;">
-      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
-  <pre style="height:100%;overflow:scroll;">$json</pre></div>
-      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:#efefef;">
-  <pre style="height:100%;overflow:scroll;">$php</pre></div>
-      <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
-  <pre style="height:100%;overflow:scroll;">$triples</pre></div>
-    </div>
-    <br>
-    
-  </div>
-</div>
-
-</body>
-</html>
-
-END;
-  $html = ob_get_contents();
-  ob_end_clean(); // Don't send output to client
-
-  echo $html;
-  exit;
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: debugJsonConversaion()
+// function debugJsonConversaion ($json, $php, $triples)
+//   {
+//   global $examples;
+//   $php = print_r($php, true);
+//
+//   ob_start();
+//   echo <<<END
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <title>Bootstrap Example</title>
+//   <meta charset="utf-8">
+//   <meta name="viewport" content="width=device-width, initial-scale=1">
+//   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+//   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+//   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+//   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+// </head>
+// <body>
+//
+// <div class="container-fluid" style="padding:0px;">
+//
+//   <div class="container-fluid" style="padding:0px;">
+//
+//     <div class="row" style="padding:0px;margin:0px;">
+//       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
+//   <pre style="height:100%;overflow:scroll;">$json</pre></div>
+//       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:#efefef;">
+//   <pre style="height:100%;overflow:scroll;">$php</pre></div>
+//       <div class="col-sm-4" style="padding:0px;height:98vh;background-color:white;">
+//   <pre style="height:100%;overflow:scroll;">$triples</pre></div>
+//     </div>
+//     <br>
+//
+//   </div>
+// </div>
+//
+// </body>
+// </html>
+//
+// END;
+//   $html = ob_get_contents();
+//   ob_end_clean(); // Don't send output to client
+//
+//   echo $html;
+//   exit;
+//   }
 
   
 function buildPage ($triplesTxt, $mermaid)
@@ -602,21 +615,56 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Information" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD (experimental) into graphical models and flow diagrams using the <a href="https://mermaid-js.github.io/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tool makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents an example set or data, and the generated model demonstrates the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Bookmark Link</b>. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid-js.github.io/mermaid-live-editor">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
+    "Information" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD (experimental) into graphical models and flow diagrams using the <a href="https://mermaid.ai/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tool makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents an example set or data, and the generated model demonstrates the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Copy Link</b> option. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid.ai/live">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
+    <br/><br/>
+    To learn how to use the tool, open the <b>Documentation</b> menu and start with <a href="./?example=documentation">Getting started</a>. Each documentation page has a guided tour.
     <br/><br/>
     <h5>Acknowledgements:</h5>
-This tool was originally developed within the National Gallery, but its continue development and public presentation has also been supported by:
+This tool was originally developed at the National Gallery, London. Its current development is supported by:
 <br/><br/>
-    <h6></a>The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project</h6>
-<p dir="auto"><a href="https://www.iperionhs.eu/" rel="nofollow"><img height="42px" src="./graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%;"></a>&nbsp;&nbsp;
-<a href="https://www.iperionhs.eu/" rel="nofollow"><img height="32px" src="./graphics/iperionhs-eu-tag2.png" alt="IPERION-HS" style="max-width: 100%;"></a></p>
-<br/>
-<h6>The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project</h6>
-<p><a href="https://sshopencloud.eu/" rel="nofollow"><img height="48px" src="./graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%;"></a>&nbsp;&nbsp;
-<a href="https://sshopencloud.eu/" rel="nofollow"><img height="32px" src="./graphics/sshoc-eu-tag2.png" alt="SSHOC" style="max-width: 100%;"></a></p>
-<br/>
-<h6>The AHRC Funded <a href="https://linked.art/" rel="nofollow">Linked.Art</a> project</h6>
-<p><a href="https://ahrc.ukri.org/" rel="nofollow"><img height="48px" src="./graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="Linked.Art" style="max-width: 100%;"></a></p>',
+<h6>The <a href="https://www.riches.ukri.org/" rel="nofollow">UKRI RICHeS</a> <a href="https://hsds.ac.uk/" rel="nofollow">HSDS</a> project</h6>
+<p><a href="https://hsds.ac.uk/" rel="nofollow"><img height="48px" src="./graphics/HSDS-logo.png" alt="HSDS" style="max-width: 100%;"></a><br/>
+<small>HSDS is a project funded by UK Research and Innovation (UKRI) as part of the <a href="https://www.riches.ukri.org/" rel="nofollow">RICHeS Programme</a>.</small></p>
+<h6>The Horizon Europe <a href="https://www.echoes-eccch.eu/" rel="nofollow">ECHOES</a> project</h6>
+<p><a href="https://www.echoes-eccch.eu/" rel="nofollow"><img height="48px" src="./graphics/ECHOES_Logo.png" alt="ECHOES" style="max-width: 100%;"></a><br/>
+<small>ECHOES is a project funded by the European Commission under <a href="https://cordis.europa.eu/project/id/101157364" rel="nofollow">Grant Agreement n.101157364 – ECHOES</a>, and by UK Research and Innovation (UKRI) under the UK government’s Horizon Europe funding guarantee n.10110142 &amp; n.10110466.</small></p>
+<h6 class="text-muted mt-4">Previously supported by</h6>
+<p class="text-muted"><small>
+<a href="https://www.iperionhs.eu/" rel="nofollow"><img height="20px" src="./graphics/IPERION-HS%20Logo.png" alt="IPERION-HS" style="max-width: 100%; vertical-align: middle;"></a>&nbsp;The H2020 <a href="https://www.iperionhs.eu/" rel="nofollow">IPERION-HS</a> project<br/>
+<a href="https://sshopencloud.eu/" rel="nofollow"><img height="20px" src="./graphics/sshoc-logo.png" alt="SSHOC" style="max-width: 100%; vertical-align: middle;"></a>&nbsp;The H2020 <a href="https://sshopencloud.eu/" rel="nofollow">SSHOC</a> project<br/>
+<a href="https://www.ukri.org/councils/ahrc/" rel="nofollow"><img height="20px" src="./graphics/UKRI_AHR_Council-Logo_Horiz-RGB.png" alt="AHRC" style="max-width: 100%; vertical-align: middle;"></a>&nbsp;The AHRC funded <a href="https://linked.art/" rel="nofollow">Linked.Art</a> project
+</small></p>',
+
+    "Quick reference" => '<p>Each topic has its own page, with a guided tour, in the <b>Documentation</b> menu.</p>
+<table class="table table-sm small">
+<tr><th colspan="2" class="pt-3"><a href="./?example=documentation">Writing a model</a></th></tr>
+<tr><td>Subject <i>tab</i> predicate <i>tab</i> object</td><td>One statement per line</td></tr>
+<tr><td>A fourth column: <code>subjectformat|objectformat</code></td><td>Formats, first appearance only</td></tr>
+<tr><td><code>// text</code> or <code>## text</code></td><td>A comment</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_layout">Layout and orientation</a></th></tr>
+<tr><td><code>//flowchart LR</code> (or TB, BT, RL)</td><td>Direction of the whole diagram</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_formatting">Formatting</a></th></tr>
+<tr><td><code>object</code>, <code>event</code>, <code>note</code> ...</td><td>Named formats</td></tr>
+<tr><td><code>note-fs24</code>, <code>object-6-4</code>, <code>object-fs20-6-4</code></td><td>Font size, dashed border, both</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_subgraphs">Subgraphs</a></th></tr>
+<tr><td><code>//subgraph Title</code> ... <code>//end</code></td><td>A box; <code>//end base</code> styles it</td></tr>
+<tr><td><code>//subgraph -TB Title</code></td><td>The box&#39;s own direction</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_blank_nodes">Blank nodes and repeated labels</a></th></tr>
+<tr><td><code>_BN</code> with a type, then <code>_BN-1</code></td><td>Blank nodes and earlier ones</td></tr>
+<tr><td><code>Painting#-1</code>, <code>Painting#-2</code></td><td>Two nodes with the same text</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_links">Links, hover text, prefixes and icons</a></th></tr>
+<tr><td><code>Text|https://...</code> or <code>Text|?example=name</code></td><td>A link</td></tr>
+<tr><td>Node <i>tab</i> <code>tooltip</code> <i>tab</i> text</td><td>Hover text</td></tr>
+<tr><td><code>aat:...</code>, <code>fa:fa-paint-brush</code>, <code>&lt;br/&gt;</code></td><td>Prefix link, icon, line break</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_tours">Guided tours</a></th></tr>
+<tr><td><code>//tour Title</code></td><td>Tour title</td></tr>
+<tr><td><code>//step Title | names ; ... | caption</code></td><td>A step</td></tr>
+<tr><td><code>//sub Title | names | caption</code></td><td>A part of the step above</td></tr>
+<tr><th colspan="2" class="pt-3"><a href="./?example=doc_sharing">Sharing and embedding</a></th></tr>
+<tr><td><code>?example=name</code>, <code>?url=...</code></td><td>Open a model by address</td></tr>
+<tr><td><code>&amp;simple</code></td><td>Only the model, for iframes</td></tr>
+</table>
+<p class="small text-muted">Take care: a line without tabs that has two or more commas is split at the commas, and comments that start with the words subgraph or end start or end a box.</p>',
     //"Blank Nodes" => 'Details to be added',
     //"Formatting" => 'Details to be added',
     //"Aliases" => 'Details to be added'
@@ -677,135 +725,136 @@ END;
 
 
   
-function buildModalDefault()
-  {
-  // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
-  $tabs = array(
-    "My Apps" => ' <h5 class="text-center mb-4 mt-0 pt-4">My Apps</h5>
-                                <h6 class="px-3">Most Used Apps</h6>
-                                <ol class="pb-4">
-                                    <li>Watsapp</li>
-                                    <li>Instagram</li>
-                                    <li>Chrome</li>
-                                    <li>Linkedin</li>
-                                </ol>
-                            </div>
-                            <div class="px-3">
-                                <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-android"></span> Suggested Apps</h6>
-                                <h6 class="text-primary pb-2"><a href="#">Opera Browser</a> <span class="text-secondary">- One of the best browsers</span></h6>
-                                <h6 class="text-primary pb-2"><a href="#">Camscanner</a> <span class="text-secondary">- Easily scan your documents</span></h6>
-                                <h6 class="text-primary pb-4"><a href="#">Coursera</a> <span class="text-secondary">- Learn online, lecturers from top universities</span></h6>',
-    "Knowledge Center" => '<h5 class="text-center mb-4 mt-0 pt-4">Knowledge Center</h5>
-                                <form>
-                                    <div class="form-group pb-5 px-3"> <select name="account" class="form-control">
-                                            <option selected disabled>Select Product</option>
-                                            <option>Product 1</option>
-                                            <option>Product 2</option>
-                                            <option>Product 3</option>
-                                            <option>Product 4</option>
-                                        </select> </div>
-                                </form>
-                            </div>
-                            <div class="px-3">
-                                <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-star"></span> Popular Topics</h6>
-                                <h6 class="text-primary pb-2"><a href="#">Getting started with Blazemeter</a></h6>
-                                <h6 class="text-primary pb-2"><a href="#">Creating tests</a></h6>
-                                <h6 class="text-primary pb-4"><a href="#">Running tests</a></h6>',
-    "Communities" => ' <h5 class="text-center mb-4 mt-0 pt-4">Communities</h5>
-                                <form>
-                                    <div class="form-group pb-5 px-3 row justify-content-center"> <button type="button" class="btn btn-primary">New Community +</button> </div>
-                                </form>
-                            </div>
-                            <div class="px-3">
-                                <div class="border border-1 box">
-                                    <h5>Community 1</h5>
-                                    <p class="text-muted mb-1">Members : <strong>27</strong></p>
-                                </div>
-                                <div class="border border-1 box">
-                                    <h5>Community 2</h5>
-                                    <p class="text-muted mb-1">Members : <strong>16</strong></p>
-                                </div>',
-    "Education" => ' <h5 class="text-center mb-4 mt-0 pt-4">Education</h5>
-                                <form>
-                                    <div class="form-group pb-2 px-3"> <input type="text" placeholder="Enter College Name" class="form-control"> </div>
-                                    <div class="form-group row pb-2 px-3">
-                                        <div class="col-6"> <input type="text" placeholder="Percentage" class="form-control"> </div>
-                                        <div class="col-6"> <input type="text" placeholder="Grade" class="form-control"> </div>
-                                    </div>
-                                    <div class="form-group px-3 pb-2"> <label class="form-control-label">
-                                            <h6>What are you good at ?</h6>
-                                        </label>
-                                        <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option1" type="checkbox" value=""> <label class="custom-control-label" for="option1">Web Development</label> </div>
-                                        <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option2" type="checkbox" value=""> <label class="custom-control-label" for="option2">Data Structures & Algorithms</label> </div>
-                                        <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option3" type="checkbox" value=""> <label class="custom-control-label" for="option3">Android Development</label> </div>
-                                        <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option4" type="checkbox" value=""> <label class="custom-control-label" for="option4">Blockchain</label> </div>
-                                        <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option5" type="checkbox" value=""> <label class="custom-control-label" for="option5">Machine Learning Algorithms</label> </div>
-                                    </div>
-                                    <div class="form-group pb-5 row justify-content-center"> <button type="button" class="btn btn-primary px-3">Submit</button> </div>
-                                </form>
-                            </div>
-                            <div class="px-3">
-                                <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-rocket"></span> Trending Technologies</h6>
-                                <h6 class="text-primary pb-2"><a href="#">Augmented Reality and Virtual Reality</a></h6>
-                                <h6 class="text-primary pb-2"><a href="#">Angular and React</a></h6>
-                                <h6 class="text-primary pb-2"><a href="#">Big Data and Hadoop</a></h6>
-                                <h6 class="text-primary pb-4"><a href="#">Internet of Things (IoT)</a></h6>',
-    );
-
-  $tHeaders = false;
-  $tFields = false;
-
-  $at = " active";
-  $sh = "show";
-  $tc = "font-weight-bold";
-
-  $no = 1;
-  foreach ($tabs as $k => $ht)
-    {
-    $dno = sprintf('%02d', $no);
-    $tHeaders .= "
-<div class=\"tabs$at\" id=\"tab$dno\">".
-      "<h6 class=\"$tc\">$k</h6></div>";
-
-    $tFields .= "
-<fieldset id=\"tab${dno}1\"  class=\"$sh\"><div class=\"bg-light\">
-  $ht
-</div></fieldset>";
-
-    $at = "";
-    $sh = "";
-    $tc = "text-muted";
-    $no++;
-    }
-  
-  ob_start();
-  echo <<<END
-  <!-- Modal-->
-  <div id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-  <!-- Tab headers, numbered from tab01 -> tab0n, etc -->
-  <div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
-        $tHeaders
-  </div>
-  <div class="line"></div>
-  <!-- Tab Contents, numbered from tab011 -> tab0n1, etc -->
-  <div class="modal-body p-0">
-    $tFields
-        </div>
-        <div class="line"></div>
-        <div class="modal-footer d-flex flex-column justify-content-center border-0">
-    <p class="text-muted">Can't find what you're looking for?</p> <button type="button" class="btn btn-primary">Contact Support Team</button>
-  </div>
-      </div>
-    </div>
-  </div>
-END;
-  $html = ob_get_contents();
-  ob_end_clean(); // Don't send output to client
-
-  return ($html);
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: buildModalDefault() (placeholder template text)
+// function buildModalDefault()
+//   {
+//   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
+//   $tabs = array(
+//     "My Apps" => ' <h5 class="text-center mb-4 mt-0 pt-4">My Apps</h5>
+//                                 <h6 class="px-3">Most Used Apps</h6>
+//                                 <ol class="pb-4">
+//                                     <li>Watsapp</li>
+//                                     <li>Instagram</li>
+//                                     <li>Chrome</li>
+//                                     <li>Linkedin</li>
+//                                 </ol>
+//                             </div>
+//                             <div class="px-3">
+//                                 <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-android"></span> Suggested Apps</h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Opera Browser</a> <span class="text-secondary">- One of the best browsers</span></h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Camscanner</a> <span class="text-secondary">- Easily scan your documents</span></h6>
+//                                 <h6 class="text-primary pb-4"><a href="#">Coursera</a> <span class="text-secondary">- Learn online, lecturers from top universities</span></h6>',
+//     "Knowledge Center" => '<h5 class="text-center mb-4 mt-0 pt-4">Knowledge Center</h5>
+//                                 <form>
+//                                     <div class="form-group pb-5 px-3"> <select name="account" class="form-control">
+//                                             <option selected disabled>Select Product</option>
+//                                             <option>Product 1</option>
+//                                             <option>Product 2</option>
+//                                             <option>Product 3</option>
+//                                             <option>Product 4</option>
+//                                         </select> </div>
+//                                 </form>
+//                             </div>
+//                             <div class="px-3">
+//                                 <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-star"></span> Popular Topics</h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Getting started with Blazemeter</a></h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Creating tests</a></h6>
+//                                 <h6 class="text-primary pb-4"><a href="#">Running tests</a></h6>',
+//     "Communities" => ' <h5 class="text-center mb-4 mt-0 pt-4">Communities</h5>
+//                                 <form>
+//                                     <div class="form-group pb-5 px-3 row justify-content-center"> <button type="button" class="btn btn-primary">New Community +</button> </div>
+//                                 </form>
+//                             </div>
+//                             <div class="px-3">
+//                                 <div class="border border-1 box">
+//                                     <h5>Community 1</h5>
+//                                     <p class="text-muted mb-1">Members : <strong>27</strong></p>
+//                                 </div>
+//                                 <div class="border border-1 box">
+//                                     <h5>Community 2</h5>
+//                                     <p class="text-muted mb-1">Members : <strong>16</strong></p>
+//                                 </div>',
+//     "Education" => ' <h5 class="text-center mb-4 mt-0 pt-4">Education</h5>
+//                                 <form>
+//                                     <div class="form-group pb-2 px-3"> <input type="text" placeholder="Enter College Name" class="form-control"> </div>
+//                                     <div class="form-group row pb-2 px-3">
+//                                         <div class="col-6"> <input type="text" placeholder="Percentage" class="form-control"> </div>
+//                                         <div class="col-6"> <input type="text" placeholder="Grade" class="form-control"> </div>
+//                                     </div>
+//                                     <div class="form-group px-3 pb-2"> <label class="form-control-label">
+//                                             <h6>What are you good at ?</h6>
+//                                         </label>
+//                                         <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option1" type="checkbox" value=""> <label class="custom-control-label" for="option1">Web Development</label> </div>
+//                                         <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option2" type="checkbox" value=""> <label class="custom-control-label" for="option2">Data Structures & Algorithms</label> </div>
+//                                         <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option3" type="checkbox" value=""> <label class="custom-control-label" for="option3">Android Development</label> </div>
+//                                         <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option4" type="checkbox" value=""> <label class="custom-control-label" for="option4">Blockchain</label> </div>
+//                                         <div class="custom-control custom-checkbox"> <input class="custom-control-input" id="option5" type="checkbox" value=""> <label class="custom-control-label" for="option5">Machine Learning Algorithms</label> </div>
+//                                     </div>
+//                                     <div class="form-group pb-5 row justify-content-center"> <button type="button" class="btn btn-primary px-3">Submit</button> </div>
+//                                 </form>
+//                             </div>
+//                             <div class="px-3">
+//                                 <h6 class="pt-3 pb-3 mb-4 border-bottom"><span class="fa fa-rocket"></span> Trending Technologies</h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Augmented Reality and Virtual Reality</a></h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Angular and React</a></h6>
+//                                 <h6 class="text-primary pb-2"><a href="#">Big Data and Hadoop</a></h6>
+//                                 <h6 class="text-primary pb-4"><a href="#">Internet of Things (IoT)</a></h6>',
+//     );
+//
+//   $tHeaders = false;
+//   $tFields = false;
+//
+//   $at = " active";
+//   $sh = "show";
+//   $tc = "font-weight-bold";
+//
+//   $no = 1;
+//   foreach ($tabs as $k => $ht)
+//     {
+//     $dno = sprintf('%02d', $no);
+//     $tHeaders .= "
+// <div class=\"tabs$at\" id=\"tab$dno\">".
+//       "<h6 class=\"$tc\">$k</h6></div>";
+//
+//     $tFields .= "
+// <fieldset id=\"tab${dno}1\"  class=\"$sh\"><div class=\"bg-light\">
+//   $ht
+// </div></fieldset>";
+//
+//     $at = "";
+//     $sh = "";
+//     $tc = "text-muted";
+//     $no++;
+//     }
+//
+//   ob_start();
+//   echo <<<END
+//   <!-- Modal-->
+//   <div id="helpModalCenter" tabindex="-1" role="dialog" aria-labelledby="helpModalCenterTitle" aria-hidden="true" class="modal fade text-left">
+//     <div role="document" class="modal-dialog modal-lg modal-dialog-centered">
+//       <div class="modal-content">
+//   <!-- Tab headers, numbered from tab01 -> tab0n, etc -->
+//   <div class="modal-header row d-flex justify-content-between mx-1 mx-sm-3 mb-0 pb-0 border-0">
+//         $tHeaders
+//   </div>
+//   <div class="line"></div>
+//   <!-- Tab Contents, numbered from tab011 -> tab0n1, etc -->
+//   <div class="modal-body p-0">
+//     $tFields
+//         </div>
+//         <div class="line"></div>
+//         <div class="modal-footer d-flex flex-column justify-content-center border-0">
+//     <p class="text-muted">Can't find what you're looking for?</p> <button type="button" class="btn btn-primary">Contact Support Team</button>
+//   </div>
+//       </div>
+//     </div>
+//   </div>
+// END;
+//   $html = ob_get_contents();
+//   ob_end_clean(); // Don't send output to client
+//
+//   return ($html);
+//   }
 
 
 function getCleanTriples($triplesTxt)
@@ -1050,15 +1099,16 @@ function formatClassDef ($formats)
   return ($allClasses);//$classDef);
   }
  
-function checkForSubgraphId ($id)
-  {
-  global $subGraphs;
-  
-  if (isset($subGraphs[$id]))
-    {return ($subGraphs[$id]["id"]);}
-  else
-    {return ($id);}
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: checkForSubgraphId()
+// function checkForSubgraphId ($id)
+//   {
+//   global $subGraphs;
+//
+//   if (isset($subGraphs[$id]))
+//     {return ($subGraphs[$id]["id"]);}
+//   else
+//     {return ($id);}
+//   }
  
 function Mermaid_displayLabel ($str)
   {
@@ -1195,7 +1245,7 @@ function Mermaid_formatData ($selected)
       // Allow the user to force the formatting classes used for the
       // object and subject
       $fcs = array(false, false);
-      
+      $t0extraLink = false;
       if (preg_match("/^([^|]+)[|](http.+)$/", $t[0], $t0m) or
         preg_match("/^([^|]+)[|](\?.+)$/", $t[0], $t0m))
         {$t0extraLink = $t0m[2];
@@ -1233,7 +1283,11 @@ function Mermaid_formatData ($selected)
       // Adding a display label after the click does not work so it is
       // added to a single node before hand      
       $defs .=  $things[$t[0]].$use_0."\n";
-      $defs .= "click ".$things[$t[0]]." function \"$t[2]\"; \n";
+      // A node with a link ("Label|link  tooltip  text") becomes a link with the tooltip as its hover text
+      if ($t0extraLink)
+        {$defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$t[2]\"".linkTarget($t0extraLink)."; \n";}
+      else
+        {$defs .= "click ".$things[$t[0]]." function \"$t[2]\"; \n";}
       }
     else
       {
@@ -1246,9 +1300,11 @@ function Mermaid_formatData ($selected)
         {$t0extraLink = $t0m[2];
          $t[0] = $t0m[1];}        
     
+      // The object has already had "?" turned into "#63;" (see above), so look for that form too
+      // and turn it back, so relative links ("Label|?example=name") and links with query strings work.
       if (preg_match("/^([^|]+)[|](http.+)$/", $t[2], $t2m) or
-        preg_match("/^([^|]+)[|](\?.+)$/", $t[2], $t2m))
-        {$t2extraLink = $t2m[2];
+        preg_match("/^([^|]+)[|]((?:\?|#63;).+)$/", $t[2], $t2m))
+        {$t2extraLink = str_replace("#63;", "?", $t2m[2]);
          $t[2] = $t2m[1];}
       
       $use_0 = Mermaid_displayLabel ($t[0]);
@@ -1353,12 +1409,12 @@ function Mermaid_formatData ($selected)
       // If an ALT suffix was supplied for a link, add ref to the link back in with a tool tip.
       if ($t0extraLink)
         {$pp = pathinfo($t0extraLink);
-         $tt = "Link to: $pp[dirname] ...";
-         $defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$tt\"; \n";}
+         $tt = (substr($t0extraLink, 0, 1) == "?") ? "Open: ".$t[0] : "Link to: $pp[dirname] ...";
+         $defs .= "click ".$things[$t[0]]." \"$t0extraLink\" \"$tt\"".linkTarget($t0extraLink)."; \n";}
       if ($t2extraLink)
         {$pp = pathinfo($t2extraLink);
-         $tt = "Link to: $pp[dirname] ...";
-         $defs .= "click ".$things[$t[2]]." \"$t2extraLink\" \"$tt\"; \n";}
+         $tt = (substr($t2extraLink, 0, 1) == "?") ? "Open: ".$t[2] : "Link to: $pp[dirname] ...";
+         $defs .= "click ".$things[$t[2]]." \"$t2extraLink\" \"$tt\"".linkTarget($t2extraLink)."; \n";}
  
  // need to check for an image and if so update $use
  // O6[&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src='https://research.ng-london.org.uk/iiif/pics/tmp/raphael_pyr/N-1171/08_Images_of_Frames/raphael%20capitals%20right%20and%20left-PYR.tif/full/,125/0/default.jpg'/>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp]  
@@ -1388,6 +1444,13 @@ function Mermaid_formatData ($selected)
   return ($defs);
   }  
 
+// Links to other web sites open in a new tab; links within the tool (starting "?" or "./") open in the same tab.
+function linkTarget ($url)
+  {
+  if (preg_match("/^http[s]*[:]/", $url)) {return (" _blank");}
+  else {return ("");}
+  }
+
 function Mermaid_defThing ($var, $no, $fc=false)
   {
   global $config, $usedClasses, $allClasses;    
@@ -1405,9 +1468,9 @@ function Mermaid_defThing ($var, $no, $fc=false)
       if (isset($a["url"]))
         {$pp = pathinfo($a["url"]);
          $tt = "Link to: $pp[dirname] ...";
-         $click = "click ".$code." \"".$a["url"]."$m[1]\" \"$tt\"; \n";}        
+         $click = "click ".$code." \"".$a["url"]."$m[1]\" \"$tt\"".linkTarget($a["url"])."; \n";}        
       else if(preg_match("/^http.+$/", $var, $m))
-        {$click = "click ".$code." \"".$var."\"\n";}
+        {$click = "click ".$code." \"".$var."\"".linkTarget($var)."\n";}
       break;
       }    
     }
@@ -1930,198 +1993,199 @@ function json2trips ($arr, $pSub=false, $pPred=false)
   
 // Seem to be getting duplicates, might be good to drop all of the triples into an array
 // remove the duplicates and then order them, add formats and then output
-function schema2trips_OLD ($arr, $pSub=false, $pPred=false, $looplevel=0)
-  {
-  $looplevel++;
-  if (!isset($GLOBALS["usedSubs"])) {$GLOBALS["usedSubs"] = array();}
-  if (!isset($GLOBALS["required"])) {$GLOBALS["required"] = array();}
-  if (!isset($GLOBALS["properties"])) {$GLOBALS["properties"] = 0;}
-  
-  if (!isset($GLOBALS["usedSubs"][$pSub])) {$GLOBALS["usedSubs"][$pSub] = 1;}
-  else {$GLOBALS["usedSubs"][$pSub]++;}
-  
-  //prg(0, array($arr, $pSub, $pPred));
-  //prg(0, $GLOBALS["usedSubs"]);
-  //echo "###################<br/><br/>";
-  
-  global $bn_number, $jsonData, $required, $properties;
-   
-  if ($properties) {        
-    if ($pPred == "\$schema")
-      {return;}       
-    else if ($pPred == "id")
-      {$pPred = "has id";
-       $arr = array("id" => $pSub . " ID");}           
-    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
-      {      
-      $pPred = "has ".prop2label($pPred, 1);
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-      
-      }         
-    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
-      {            
-      $pPred = "has ".prop2label($pPred, 1);
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-       
-      if (isset($oarr["items"]["properties"]))
-        {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
-      else if (isset($oarr["items"]["\$ref"]))
-        {$arr["from list"] = $oarr["items"]["\$ref"];} 
-      }       
-    else if (isset($arr["title"]) and isset($arr["\$ref"])) 
-      {      
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-       
-      $arr["from list"] = $oarr["\$ref"];
-      }
-    // to manage debugging
-    else if (
-      ($pSub == "External PIDs" and $pPred == "pid_type")
-      )
-      {}    
-    else
-      {prg(0, array("CHECK", $arr, $pSub, $pPred));}
-    }
-  
-  $out = "";  
-  $debug = false;
-     
-  if (isset($arr["id"]))
-    {
-    $sub = prop2label($arr["id"]);      
-    unset($arr["id"]);
-    
-    if (isset($arr["\$id"]))
-      {$arr["has url"] = $arr["\$id"];
-       unset($arr["\$id"]);}
-       
-    if (isset($arr["\$code"]))
-      {unset($arr["\$code"]);}       
-    }
-  else
-    {if ($bn_number)
-      {$sub = "_#-".$bn_number;}
-     else
-      {$sub = "_#-0";}
-     $bn_number++;}
-
-  if (isset($arr["type"]))
-      {$arr["has type"] = $arr["type"];
-       unset($arr["type"]);}
-       
-  if (isset($arr["required"]))
-      {$required[$sub] = $arr["required"];
-       unset($arr["required"]);}         
-  
-  // used to reference external controlled lists
-  if (isset($arr["\$ref"]))
-    {
-    if (isset($arr["default"])) {unset($arr["default"]);}
-    
-    $sub = prop2label($pPred);
-    $arr["from list"] = $arr["\$ref"];
-    $pPred = "has ".prop2label($pPred, 1);
-    
-    unset($arr["\$ref"]);}
-       
-  if (isset($arr["properties"]))
-      {
-       if (!$properties)
-        // the array_slice is being used to step through the values to DEBUG the processing.
-        {$arr = array_merge ($arr, array_slice($arr["properties"], 0, 10));}
-        $properties++;
-       unset($arr["properties"]);}
-  
-  if ($pSub and $pPred)
-    {$tt = checkForBigTexts ($sub);
-     $jsonData[] = addAutoFormats (
-      array_map('parseEntities', array($pSub,$pPred,$tt[0])));
-     if ($debug)
-      {echo "Insert One\n";
-       prg(0, array($pSub,$pPred,$tt[0]));}
-              
-     if ($tt[1])
-      {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
-    
-  foreach ($arr as $k => $v)
-    {
-    if (is_array($v))
-      {
-      if(isset($v["id"]))
-        {
-        schema2trips($v, $sub, $k, $looplevel);
-        }
-      elseif (!isArrayAssociative($v))
-        {
-        foreach ($v as $n => $a)
-          {          
-          if (is_array($a)) {
-            schema2trips($a, $sub, $k, $looplevel);
-            }
-          else {
-            $tt = checkForBigTexts ($a);
-            $jsonData[] = addAutoFormats (
-              array_map('parseEntities', array($sub,$k,$tt[0])));
-            if ($debug)
-              {echo "Insert Two\n";
-                prg(0, array($sub,$k,$tt[0]));}
-         
-            if ($tt[1])
-              {$jsonData[] = array($tt[0], "tooltip", $a);}            
-            }          
-          }
-        }      
-      else
-        {
-        // These avoid the additional step of blank nodes. other predicates can be added as required.
-        if (in_array($k, array("prefLabel", "scopeNote", "definition")))
-          {
-          foreach ($v as $l => $val)
-            {
-            if (is_string($val)) {$val = array($val);}
-            foreach ($val as $lk => $valk)
-              {$tt = checkForBigTexts ($valk);
-               $jsonData[] = addAutoFormats (
-                  array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
-               if ($debug)
-                {echo "Insert Three\n";
-                  prg(0, array($sub,$k,$tt[0]));}
-              
-               if ($tt[1])
-                {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
-               }
-            }
-          }
-        else
-          {
-          schema2trips($v, $sub, $k, $looplevel);
-          }
-        }
-      }
-    else
-      {$tt = checkForBigTexts ($v);
-       $jsonData[] = addAutoFormats (
-        array_map('parseEntities', array($sub,$k,$tt[0])));
-       if ($debug)
-        {echo "Insert Four\n";
-         prg(0, array($sub,$k,$tt[0]));}
-       if ($tt[1])
-        {$jsonData[] = array($tt[0], "tooltip", $v);}
-       }
-    }
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: schema2trips_OLD()
+// function schema2trips_OLD ($arr, $pSub=false, $pPred=false, $looplevel=0)
+//   {
+//   $looplevel++;
+//   if (!isset($GLOBALS["usedSubs"])) {$GLOBALS["usedSubs"] = array();}
+//   if (!isset($GLOBALS["required"])) {$GLOBALS["required"] = array();}
+//   if (!isset($GLOBALS["properties"])) {$GLOBALS["properties"] = 0;}
+//
+//   if (!isset($GLOBALS["usedSubs"][$pSub])) {$GLOBALS["usedSubs"][$pSub] = 1;}
+//   else {$GLOBALS["usedSubs"][$pSub]++;}
+//
+//   //prg(0, array($arr, $pSub, $pPred));
+//   //prg(0, $GLOBALS["usedSubs"]);
+//   //echo "###################<br/><br/>";
+//
+//   global $bn_number, $jsonData, $required, $properties;
+//
+//   if ($properties) {        
+//     if ($pPred == "\$schema")
+//       {return;}       
+//     else if ($pPred == "id")
+//       {$pPred = "has id";
+//        $arr = array("id" => $pSub . " ID");}           
+//     else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
+//       {      
+//       $pPred = "has ".prop2label($pPred, 1);
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       }         
+//     else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
+//       {            
+//       $pPred = "has ".prop2label($pPred, 1);
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       if (isset($oarr["items"]["properties"]))
+//         {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
+//       else if (isset($oarr["items"]["\$ref"]))
+//         {$arr["from list"] = $oarr["items"]["\$ref"];} 
+//       }       
+//     else if (isset($arr["title"]) and isset($arr["\$ref"])) 
+//       {      
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       $arr["from list"] = $oarr["\$ref"];
+//       }
+//     // to manage debugging
+//     else if (
+//       ($pSub == "External PIDs" and $pPred == "pid_type")
+//       )
+//       {}    
+//     else
+//       {prg(0, array("CHECK", $arr, $pSub, $pPred));}
+//     }
+//
+//   $out = "";  
+//   $debug = false;
+//
+//   if (isset($arr["id"]))
+//     {
+//     $sub = prop2label($arr["id"]);      
+//     unset($arr["id"]);
+//
+//     if (isset($arr["\$id"]))
+//       {$arr["has url"] = $arr["\$id"];
+//        unset($arr["\$id"]);}
+//
+//     if (isset($arr["\$code"]))
+//       {unset($arr["\$code"]);}       
+//     }
+//   else
+//     {if ($bn_number)
+//       {$sub = "_#-".$bn_number;}
+//      else
+//       {$sub = "_#-0";}
+//      $bn_number++;}
+//
+//   if (isset($arr["type"]))
+//       {$arr["has type"] = $arr["type"];
+//        unset($arr["type"]);}
+//
+//   if (isset($arr["required"]))
+//       {$required[$sub] = $arr["required"];
+//        unset($arr["required"]);}         
+//
+//   // used to reference external controlled lists
+//   if (isset($arr["\$ref"]))
+//     {
+//     if (isset($arr["default"])) {unset($arr["default"]);}
+//
+//     $sub = prop2label($pPred);
+//     $arr["from list"] = $arr["\$ref"];
+//     $pPred = "has ".prop2label($pPred, 1);
+//
+//     unset($arr["\$ref"]);}
+//
+//   if (isset($arr["properties"]))
+//       {
+//        if (!$properties)
+//         // the array_slice is being used to step through the values to DEBUG the processing.
+//         {$arr = array_merge ($arr, array_slice($arr["properties"], 0, 10));}
+//         $properties++;
+//        unset($arr["properties"]);}
+//
+//   if ($pSub and $pPred)
+//     {$tt = checkForBigTexts ($sub);
+//      $jsonData[] = addAutoFormats (
+//       array_map('parseEntities', array($pSub,$pPred,$tt[0])));
+//      if ($debug)
+//       {echo "Insert One\n";
+//        prg(0, array($pSub,$pPred,$tt[0]));}
+//
+//      if ($tt[1])
+//       {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
+//
+//   foreach ($arr as $k => $v)
+//     {
+//     if (is_array($v))
+//       {
+//       if(isset($v["id"]))
+//         {
+//         schema2trips($v, $sub, $k, $looplevel);
+//         }
+//       elseif (!isArrayAssociative($v))
+//         {
+//         foreach ($v as $n => $a)
+//           {          
+//           if (is_array($a)) {
+//             schema2trips($a, $sub, $k, $looplevel);
+//             }
+//           else {
+//             $tt = checkForBigTexts ($a);
+//             $jsonData[] = addAutoFormats (
+//               array_map('parseEntities', array($sub,$k,$tt[0])));
+//             if ($debug)
+//               {echo "Insert Two\n";
+//                 prg(0, array($sub,$k,$tt[0]));}
+//
+//             if ($tt[1])
+//               {$jsonData[] = array($tt[0], "tooltip", $a);}            
+//             }          
+//           }
+//         }      
+//       else
+//         {
+//         // These avoid the additional step of blank nodes. other predicates can be added as required.
+//         if (in_array($k, array("prefLabel", "scopeNote", "definition")))
+//           {
+//           foreach ($v as $l => $val)
+//             {
+//             if (is_string($val)) {$val = array($val);}
+//             foreach ($val as $lk => $valk)
+//               {$tt = checkForBigTexts ($valk);
+//                $jsonData[] = addAutoFormats (
+//                   array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
+//                if ($debug)
+//                 {echo "Insert Three\n";
+//                   prg(0, array($sub,$k,$tt[0]));}
+//
+//                if ($tt[1])
+//                 {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
+//                }
+//             }
+//           }
+//         else
+//           {
+//           schema2trips($v, $sub, $k, $looplevel);
+//           }
+//         }
+//       }
+//     else
+//       {$tt = checkForBigTexts ($v);
+//        $jsonData[] = addAutoFormats (
+//         array_map('parseEntities', array($sub,$k,$tt[0])));
+//        if ($debug)
+//         {echo "Insert Four\n";
+//          prg(0, array($sub,$k,$tt[0]));}
+//        if ($tt[1])
+//         {$jsonData[] = array($tt[0], "tooltip", $v);}
+//        }
+//     }
+//   }
 
 function ensureMembers(&$arrayOfArrays, $no=4) {
     foreach ($arrayOfArrays as &$subArray) {
@@ -2236,182 +2300,183 @@ function schema2trips ($arr, $pSub=false, $pPred=false, $looplevel=0)
   return ($rawTriples);
   }
 
-function processSchemaTrips ($arr)
-  {
-  
-  //prg(1, $arr);
-  /* 
-  if ($properties) {        
-    if ($pPred == "\$schema")
-      {return;}       
-    else if ($pPred == "id")
-      {$pPred = "has id";
-       $arr = array("id" => $pSub . " ID");}           
-    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
-      {      
-      $pPred = "has ".prop2label($pPred, 1);
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-      
-      }         
-    else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
-      {            
-      $pPred = "has ".prop2label($pPred, 1);
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-       
-      if (isset($oarr["items"]["properties"]))
-        {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
-      else if (isset($oarr["items"]["\$ref"]))
-        {$arr["from list"] = $oarr["items"]["\$ref"];} 
-      }       
-    else if (isset($arr["title"]) and isset($arr["\$ref"])) 
-      {      
-      $oarr = $arr;
-      $arr = array("id" => $arr["title"]);
-      
-      if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
-        {$arr["definition"] = $oarr["description"];}
-       
-      $arr["from list"] = $oarr["\$ref"];
-      }
-    // to manage debugging
-    else if (
-      ($pSub == "External PIDs" and $pPred == "pid_type")
-      )
-      {}    
-    else
-      {prg(0, array("CHECK", $arr, $pSub, $pPred));}
-    }
-  
-  $out = "";  
-  $debug = false;
-     
-  if (isset($arr["id"]))
-    {
-    $sub = prop2label($arr["id"]);      
-    unset($arr["id"]);
-    
-    if (isset($arr["\$id"]))
-      {$arr["has url"] = $arr["\$id"];
-       unset($arr["\$id"]);}
-       
-    if (isset($arr["\$code"]))
-      {unset($arr["\$code"]);}       
-    }
-  else
-    {if ($bn_number)
-      {$sub = "_#-".$bn_number;}
-     else
-      {$sub = "_#-0";}
-     $bn_number++;}
-
-  if (isset($arr["type"]))
-      {$arr["has type"] = $arr["type"];
-       unset($arr["type"]);}
-       
-  if (isset($arr["required"]))
-      {$required[$sub] = $arr["required"];
-       unset($arr["required"]);}         
-  
-  // used to reference external controlled lists
-  if (isset($arr["\$ref"]))
-    {
-    if (isset($arr["default"])) {unset($arr["default"]);}
-    
-    $sub = prop2label($pPred);
-    $arr["from list"] = $arr["\$ref"];
-    $pPred = "has ".prop2label($pPred, 1);
-    
-    unset($arr["\$ref"]);}
-       
-  
-  
-  if ($pSub and $pPred)
-    {$tt = checkForBigTexts ($sub);
-     $jsonData[] = addAutoFormats (
-      array_map('parseEntities', array($pSub,$pPred,$tt[0])));
-     if ($debug)
-      {echo "Insert One\n";
-       prg(0, array($pSub,$pPred,$tt[0]));}
-              
-     if ($tt[1])
-      {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
-    
-  foreach ($arr as $k => $v)
-    {
-    if (is_array($v))
-      {
-      if(isset($v["id"]))
-        {
-        schema2trips($v, $sub, $k, $looplevel);
-        }
-      elseif (!isArrayAssociative($v))
-        {
-        foreach ($v as $n => $a)
-          {          
-          if (is_array($a)) {
-            schema2trips($a, $sub, $k, $looplevel);
-            }
-          else {
-            $tt = checkForBigTexts ($a);
-            $jsonData[] = addAutoFormats (
-              array_map('parseEntities', array($sub,$k,$tt[0])));
-            if ($debug)
-              {echo "Insert Two\n";
-                prg(0, array($sub,$k,$tt[0]));}
-         
-            if ($tt[1])
-              {$jsonData[] = array($tt[0], "tooltip", $a);}            
-            }          
-          }
-        }      
-      else
-        {
-        // These avoid the additional step of blank nodes. other predicates can be added as required.
-        if (in_array($k, array("prefLabel", "scopeNote", "definition")))
-          {
-          foreach ($v as $l => $val)
-            {
-            if (is_string($val)) {$val = array($val);}
-            foreach ($val as $lk => $valk)
-              {$tt = checkForBigTexts ($valk);
-               $jsonData[] = addAutoFormats (
-                  array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
-               if ($debug)
-                {echo "Insert Three\n";
-                  prg(0, array($sub,$k,$tt[0]));}
-              
-               if ($tt[1])
-                {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
-               }
-            }
-          }
-        else
-          {
-          schema2trips($v, $sub, $k, $looplevel);
-          }
-        }
-      }
-    else
-      {$tt = checkForBigTexts ($v);
-       $jsonData[] = addAutoFormats (
-        array_map('parseEntities', array($sub,$k,$tt[0])));
-       if ($debug)
-        {echo "Insert Four\n";
-         prg(0, array($sub,$k,$tt[0]));}
-       if ($tt[1])
-        {$jsonData[] = array($tt[0], "tooltip", $v);}
-       }
-    }
-  //*/
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: processSchemaTrips()
+// function processSchemaTrips ($arr)
+//   {
+//
+//   //prg(1, $arr);
+//   /* 
+//   if ($properties) {        
+//     if ($pPred == "\$schema")
+//       {return;}       
+//     else if ($pPred == "id")
+//       {$pPred = "has id";
+//        $arr = array("id" => $pSub . " ID");}           
+//     else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "string") 
+//       {      
+//       $pPred = "has ".prop2label($pPred, 1);
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       }         
+//     else if (isset($arr["type"]) and isset($arr["title"]) and $arr["type"] === "array") 
+//       {            
+//       $pPred = "has ".prop2label($pPred, 1);
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       if (isset($oarr["items"]["properties"]))
+//         {$arr = array_merge($arr, $oarr["items"]["properties"]);} 
+//       else if (isset($oarr["items"]["\$ref"]))
+//         {$arr["from list"] = $oarr["items"]["\$ref"];} 
+//       }       
+//     else if (isset($arr["title"]) and isset($arr["\$ref"])) 
+//       {      
+//       $oarr = $arr;
+//       $arr = array("id" => $arr["title"]);
+//
+//       if (isset ($oarr["description"]) and $oarr["description"] != $oarr["title"])
+//         {$arr["definition"] = $oarr["description"];}
+//
+//       $arr["from list"] = $oarr["\$ref"];
+//       }
+//     // to manage debugging
+//     else if (
+//       ($pSub == "External PIDs" and $pPred == "pid_type")
+//       )
+//       {}    
+//     else
+//       {prg(0, array("CHECK", $arr, $pSub, $pPred));}
+//     }
+//
+//   $out = "";  
+//   $debug = false;
+//
+//   if (isset($arr["id"]))
+//     {
+//     $sub = prop2label($arr["id"]);      
+//     unset($arr["id"]);
+//
+//     if (isset($arr["\$id"]))
+//       {$arr["has url"] = $arr["\$id"];
+//        unset($arr["\$id"]);}
+//
+//     if (isset($arr["\$code"]))
+//       {unset($arr["\$code"]);}       
+//     }
+//   else
+//     {if ($bn_number)
+//       {$sub = "_#-".$bn_number;}
+//      else
+//       {$sub = "_#-0";}
+//      $bn_number++;}
+//
+//   if (isset($arr["type"]))
+//       {$arr["has type"] = $arr["type"];
+//        unset($arr["type"]);}
+//
+//   if (isset($arr["required"]))
+//       {$required[$sub] = $arr["required"];
+//        unset($arr["required"]);}         
+//
+//   // used to reference external controlled lists
+//   if (isset($arr["\$ref"]))
+//     {
+//     if (isset($arr["default"])) {unset($arr["default"]);}
+//
+//     $sub = prop2label($pPred);
+//     $arr["from list"] = $arr["\$ref"];
+//     $pPred = "has ".prop2label($pPred, 1);
+//
+//     unset($arr["\$ref"]);}
+//
+//
+//
+//   if ($pSub and $pPred)
+//     {$tt = checkForBigTexts ($sub);
+//      $jsonData[] = addAutoFormats (
+//       array_map('parseEntities', array($pSub,$pPred,$tt[0])));
+//      if ($debug)
+//       {echo "Insert One\n";
+//        prg(0, array($pSub,$pPred,$tt[0]));}
+//
+//      if ($tt[1])
+//       {$jsonData[] = array($tt[0], "tooltip", $sub);}  }  
+//
+//   foreach ($arr as $k => $v)
+//     {
+//     if (is_array($v))
+//       {
+//       if(isset($v["id"]))
+//         {
+//         schema2trips($v, $sub, $k, $looplevel);
+//         }
+//       elseif (!isArrayAssociative($v))
+//         {
+//         foreach ($v as $n => $a)
+//           {          
+//           if (is_array($a)) {
+//             schema2trips($a, $sub, $k, $looplevel);
+//             }
+//           else {
+//             $tt = checkForBigTexts ($a);
+//             $jsonData[] = addAutoFormats (
+//               array_map('parseEntities', array($sub,$k,$tt[0])));
+//             if ($debug)
+//               {echo "Insert Two\n";
+//                 prg(0, array($sub,$k,$tt[0]));}
+//
+//             if ($tt[1])
+//               {$jsonData[] = array($tt[0], "tooltip", $a);}            
+//             }          
+//           }
+//         }      
+//       else
+//         {
+//         // These avoid the additional step of blank nodes. other predicates can be added as required.
+//         if (in_array($k, array("prefLabel", "scopeNote", "definition")))
+//           {
+//           foreach ($v as $l => $val)
+//             {
+//             if (is_string($val)) {$val = array($val);}
+//             foreach ($val as $lk => $valk)
+//               {$tt = checkForBigTexts ($valk);
+//                $jsonData[] = addAutoFormats (
+//                   array_map('parseEntities', array($sub,$k,$tt[0]."@".$l)));
+//                if ($debug)
+//                 {echo "Insert Three\n";
+//                   prg(0, array($sub,$k,$tt[0]));}
+//
+//                if ($tt[1])
+//                 {$jsonData[] = array($tt[0]."@".$l, "tooltip", $valk."@".$l);}                 
+//                }
+//             }
+//           }
+//         else
+//           {
+//           schema2trips($v, $sub, $k, $looplevel);
+//           }
+//         }
+//       }
+//     else
+//       {$tt = checkForBigTexts ($v);
+//        $jsonData[] = addAutoFormats (
+//         array_map('parseEntities', array($sub,$k,$tt[0])));
+//        if ($debug)
+//         {echo "Insert Four\n";
+//          prg(0, array($sub,$k,$tt[0]));}
+//        if ($tt[1])
+//         {$jsonData[] = array($tt[0], "tooltip", $v);}
+//        }
+//     }
+//   //*/
+//   }
 
 function prop2label($input, $predicate=false) {
     // Replace underscores with spaces
@@ -2429,35 +2494,36 @@ function prop2label($input, $predicate=false) {
     return $input;
 }
   
-function tabSeparatedToJSONLD($tabSeparatedData) {
-    $lines = explode("\n", $tabSeparatedData);
-    $jsonData = [];
-
-    foreach ($lines as $line) {
-        $columns = explode("\t", $line);
-
-        if (count($columns) >= 3) {
-            $sub = $columns[0];
-            $predicate = $columns[1];
-            $object = $columns[2];
-
-            if (!isset($jsonData[$sub])) {
-                $jsonData[$sub] = [];
-            }
-
-            if (!isset($jsonData[$sub][$predicate])) {
-                $jsonData[$sub][$predicate] = [];
-            }
-
-            $jsonData[$sub][$predicate][] = $object;
-        }
-    }
-
-    // Additional processing based on your original logic may be needed here
-    // ...
-
-    return $jsonData;
-}
+// UNUSED: commented out on 17 October 2026 for future removal: tabSeparatedToJSONLD()
+// function tabSeparatedToJSONLD($tabSeparatedData) {
+//     $lines = explode("\n", $tabSeparatedData);
+//     $jsonData = [];
+//
+//     foreach ($lines as $line) {
+//         $columns = explode("\t", $line);
+//
+//         if (count($columns) >= 3) {
+//             $sub = $columns[0];
+//             $predicate = $columns[1];
+//             $object = $columns[2];
+//
+//             if (!isset($jsonData[$sub])) {
+//                 $jsonData[$sub] = [];
+//             }
+//
+//             if (!isset($jsonData[$sub][$predicate])) {
+//                 $jsonData[$sub][$predicate] = [];
+//             }
+//
+//             $jsonData[$sub][$predicate][] = $object;
+//         }
+//     }
+//
+//     // Additional processing based on your original logic may be needed here
+//     // ...
+//
+//     return $jsonData;
+// }
 
 function tabSeparatedToLinkedArt($tabSeparatedData) {
     $lines = explode("\n", $tabSeparatedData);
@@ -2491,13 +2557,14 @@ function tabSeparatedToLinkedArt($tabSeparatedData) {
     return $jsonData;
 }
 
-function cleanNewlines ($str)  
-  {
-  $str = preg_replace('/\r\n|\r/', '\n', $str);
-  $str = preg_replace('/\t/', ' ', $str);
-
-  return ($str);
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: cleanNewlines()
+// function cleanNewlines ($str)  
+//   {
+//   $str = preg_replace('/\r\n|\r/', '\n', $str);
+//   $str = preg_replace('/\t/', ' ', $str);
+//
+//   return ($str);
+//   }
   
 // Seem to be getting duplicates, might be good to drop all of the triples into an array
 // remove the duplicates and then order them, add formats and then output
@@ -2608,20 +2675,21 @@ function parseEntities($name)
   return($out);
   }
   
-function getsslfile ($uri, $decode=true)
-	{
-	$arrContextOptions=array(
-    "ssl"=>array(
-        "verify_peer"=>false,
-        "verify_peer_name"=>false,),);  
-
-	$response = @file_get_contents($uri, false, stream_context_create($arrContextOptions));
-	
-	if ($decode)
-		{return (json_decode($response, true));}
-	else
-		{return ($response);}
-	}
+// UNUSED: commented out on 17 October 2026 for future removal: getsslfile()
+// function getsslfile ($uri, $decode=true)
+// 	{
+// 	$arrContextOptions=array(
+//     "ssl"=>array(
+//         "verify_peer"=>false,
+//         "verify_peer_name"=>false,),);  
+//
+// 	$response = @file_get_contents($uri, false, stream_context_create($arrContextOptions));
+//
+// 	if ($decode)
+// 		{return (json_decode($response, true));}
+// 	else
+// 		{return ($response);}
+// 	}
   
 function getRemotePage ($uri)
 	{
@@ -2649,20 +2717,21 @@ curl_close($ch);
   return ($response);
   }
   
-function getRemoteURL ($url)
-  {
-  $bits = explode("/", $url);
-  $b1 = array_shift($bits);
-  
-  foreach ($bits as $k => $v)
-    {$bits[$k] = rawurlencode($v);}
-    
-  $url = $b1."/".implode("/", $bits);
-  
-  $fc = file_get_contents($url);  
-  
-  return ($fc);
-  }
+// UNUSED: commented out on 17 October 2026 for future removal: getRemoteURL() (getRemoteURLV2() is the one in use)
+// function getRemoteURL ($url)
+//   {
+//   $bits = explode("/", $url);
+//   $b1 = array_shift($bits);
+//
+//   foreach ($bits as $k => $v)
+//     {$bits[$k] = rawurlencode($v);}
+//
+//   $url = $b1."/".implode("/", $bits);
+//
+//   $fc = file_get_contents($url);  
+//
+//   return ($fc);
+//   }
   
 function getRemoteURLV2($url) {
     // If the whole URL arrives percent-encoded, decode it once
@@ -2752,44 +2821,45 @@ function getModelImage ($code)
   exit;  
   }
 
-function getTriplesDetails ($id, $decode=false)
-	{
-  global $thisPage;
-  
-  $uri = $thisPage."infl.php?data=".$id;
-  $fc = getRemotePage ($uri);
-  //exit;
-  //prg(0, $uri);
-  //$fc = file_get_contents($uri);
-  //echo "######################################################<pre>";
-  // prg(0, $fc); 
-  //echo "</pre>######################################################";
-	//$fc = file_get_contents($id."/export/json");
-	//$fc = explode("\n", $fc);
-//  prg(1, $fc);
-	$out = "";
-	$echo = false;
-	 
-	foreach ($fc as $k => $line)
-		{
-    prg(0, $line);
-		if ($line == "<pre class=\"triples\">")
-			{$line = "{";
-			 $echo = true;}
-		else if ($line == "</pre>")
-			{$echo = false;}
-		
-		if ($echo)
-			{$out .= $line."\n";}
-		}
-		
-	$out = htmlspecialchars_decode($out);
-	 
-	if ($decode)
-		{$output = json_decode($out, true);}
-	else
-		{$output = $out;}
-		
-	return ($output);
-	}
+// UNUSED: commented out on 17 October 2026 for future removal: getTriplesDetails()
+// function getTriplesDetails ($id, $decode=false)
+// 	{
+//   global $thisPage;
+//
+//   $uri = $thisPage."infl.php?data=".$id;
+//   $fc = getRemotePage ($uri);
+//   //exit;
+//   //prg(0, $uri);
+//   //$fc = file_get_contents($uri);
+//   //echo "######################################################<pre>";
+//   // prg(0, $fc); 
+//   //echo "</pre>######################################################";
+// 	//$fc = file_get_contents($id."/export/json");
+// 	//$fc = explode("\n", $fc);
+// //  prg(1, $fc);
+// 	$out = "";
+// 	$echo = false;
+//
+// 	foreach ($fc as $k => $line)
+// 		{
+//     prg(0, $line);
+// 		if ($line == "<pre class=\"triples\">")
+// 			{$line = "{";
+// 			 $echo = true;}
+// 		else if ($line == "</pre>")
+// 			{$echo = false;}
+//
+// 		if ($echo)
+// 			{$out .= $line."\n";}
+// 		}
+//
+// 	$out = htmlspecialchars_decode($out);
+//
+// 	if ($decode)
+// 		{$output = json_decode($out, true);}
+// 	else
+// 		{$output = $out;}
+//
+// 	return ($output);
+// 	}
 ?>

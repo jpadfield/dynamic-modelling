@@ -1,0 +1,58 @@
+//flowchart LR
+// Sharing and embedding models
+// A model can be kept as a link or an image or plain text, and shown on its own inside other web pages.
+
+Your model	can be shared from	The Links menu	thing|
+Your model	can be shown on its own in	Simple mode
+Your model	can be placed in	Other web pages
+Your model	can be opened from	Web address options
+Your model	can be kept as	Plain text
+
+//subgraph The Links menu
+Copy Link	copies	A web address that rebuilds the model	object|note
+Download Image	saves	A picture of the model made by Mermaid Ink|https://mermaid.ink/	object|url
+Mermaid Editor	opens the model in	The Mermaid Live Editor|https://mermaid.live/	object|url
+Mermaid Code	copies	The Mermaid code behind the diagram	object|note
+//end
+
+//subgraph Simple mode
+Adding &simple to a web address	shows	Only the model and its tour	object|note
+Adding &simple to a web address	for example gives	This page in simple mode|?example=doc_sharing&simple	|url
+Adding &simple to a web address	does not yet work with	Copy Link addresses	|note
+Adding &simple to a web address	does work with	Example names and file addresses	|note
+//end
+
+//subgraph Other web pages
+An iframe	shows	A model inside another web page	object|note
+An iframe	uses as its address	A model address ending with &simple	|note
+An iframe	needs	A height such as 600 pixels	|note
+A model in an iframe	keeps	Its tour and pan and zoom	object|note
+//end
+
+//subgraph Web address options
+?example= then a name	opens	A model from the Documentation or Examples menu	note|note
+?url= then a web address	opens	A file of triples or JSON from another site	note|note
+?data= then a code	is what	Copy Link makes	note|note
+&simple	shows	The model on its own	note|note
+&getmermaid	returns	Only the Mermaid code	note|note
+//end
+
+//subgraph Plain text
+The lines in the text box	can be saved as	A text file	object|note
+The lines in the text box	can be pasted back in to	Rebuild the model	|note
+The lines in the text box	can be kept in	Three or four columns of a spreadsheet	|note
+//end
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Tours|?example=doc_tours	next page	This page: Sharing	url|note
+//end group
+
+//tour Sharing and embedding models
+//step Your model | | A model can be shared as a link or an image or plain text. It can also be shown on its own inside other web pages.
+//step The Links menu | The Links menu | Copy Link copies a web address that rebuilds the model. Download Image saves a picture. Mermaid Editor and Mermaid Code pass the diagram on to Mermaid's own tools.
+//step Simple mode | Simple mode | Adding &simple to a model's web address shows only the model and its tour. It works with example names and file addresses but not yet with Copy Link addresses.
+//step Other web pages | Other web pages | To show a model inside another web page use an iframe whose address ends with &simple. The model keeps its tour and pan and zoom.
+//step Web address options | Web address options | The web address can open an example by name or a file from another site. It can also return just the Mermaid code.
+//step Plain text | Plain text | The lines in the text box are the model. Save them as a text file or keep them in a spreadsheet and paste them back in later.
+//step Other pages | Documentation pages | This is the last documentation page. Use these links to go back.

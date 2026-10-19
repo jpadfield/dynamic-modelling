@@ -1,0 +1,61 @@
+//flowchart LR
+// Links and hover text and prefixes and icons
+// Extra details that can be added to the text of a node.
+
+Extra details	can be	Links	thing|
+Extra details	can be	Notes and hover text
+Extra details	can come from	Prefixes
+Extra details	can be	Icons and line breaks
+
+//subgraph Links
+A link	is added by writing	The text then a vertical bar then the web address	object|note
+A link	for example	Mermaid|https://mermaid.ai/	|url
+A link	can also be	https://www.nationalgallery.org.uk/	|url
+A link	can open another page of this tool as in	Layout|?example=doc_layout	|url
+A link	opens	Other web sites in a new tab	|note
+//end
+
+//subgraph Notes and hover text
+Hover me|https://mermaid.ai/	tooltip	This hover text belongs to a link: the link is given on the tooltip line	url|
+Hover text	is added with a line reading	The node then tooltip then the text	object|note
+Hover text	for example	Hover over me	|object
+Hover over me	tooltip	This text appears when the mouse is over the node
+Hover text	can sit on a link if	The link is given on the tooltip line	|note
+Hover text	for example with a link	Hover me
+Notes	are made by the predicate	has note	object|note
+Notes	are also made by putting	Text in double quotes	|note
+//end
+
+//subgraph Prefixes
+A prefix	turns a short name into a link as in	aat:300033618	object|
+A prefix	can be one of	Getty AAT and ULAN and TGN and Wikidata	|note
+A prefix	is also used to shorten	Full Getty and VIAF web addresses	|note
+A prefix	is listed in	The config.json file	|note
+//end
+
+//subgraph Icons and line breaks
+Icons	are written as	fa: then the name of a Font Awesome icon	object|note
+Icons	for example	fa:fa-paint-brush A brush	|literal
+Icons	for example	far:fa-heart fab:fa-github	|literal
+Icons	come from	Font Awesome 5|https://fontawesome.com/v5/search?m=free	|url
+Line breaks	are added with	A br tag inside the text	object|note
+Line breaks	for example	First line<br/>Second line	|literal
+//end
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Blank nodes|?example=doc_blank_nodes	next page	This page: Links and icons	url|note
+This page: Links and icons	next page	Next: Tours|?example=doc_tours	|url
+//end group
+
+//tour Links and hover text and prefixes and icons
+//step Extra details | Extra details | Nodes can carry links and hover text. Short prefixes become links and icons and line breaks can be added to the text.
+//step Links | Links | Add a link by writing the text then a vertical bar then the web address. A plain web address works too. Links to other web sites open in a new tab.
+//step Notes and hover text | Notes and hover text | A tooltip line adds hover text to a node. To give a link its own hover text put the link on the tooltip line. Notes come from has note or from text in double quotes.
+//sub Hover text | Hover text ; Hover over me ; Hover me ; The node then tooltip then the text ; The link is given on the tooltip line |
+//sub Notes | Notes ; has note ; Text in double quotes |
+//step Prefixes | Prefixes | Short names such as aat: followed by a number become links to the Getty vocabularies. The full list is in the config.json file.
+//step Icons and line breaks | Icons and line breaks | Font Awesome icons are written as fa: then the icon name. A br tag inside the text starts a new line.
+//sub Icons | Icons ; fa: then the name of a Font Awesome icon ; Font Awesome 5 |
+//sub Line breaks | Line breaks ; A br tag inside the text |
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.

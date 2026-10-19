@@ -1,0 +1,81 @@
+//flowchart LR
+// Grouping parts of a model into boxes, known as subgraphs
+// This page is built from subgraphs, so each box shows the feature it describes.
+// Each box is linked to the central Subgraphs node by using its title in a triple.
+
+Subgraphs	are made by	Making a subgraph	thing|
+Subgraphs	can have	Titles
+Subgraphs	can be put inside each other by	Nesting
+Subgraphs	can be given a style by	Styling
+Subgraphs	can have their own direction by	Choosing a direction
+Subgraphs	can be joined up by	Linking subgraphs
+Subgraphs	can show the same text twice by	Repeating a label
+
+//subgraph Making a subgraph
+A subgraph	starts with a line reading	//subgraph followed by a title	object|note
+A subgraph	ends with a line reading	//end	|note
+A subgraph	holds	Everything first used between the two lines	|note
+A subgraph	can be started or ended by mistake by	Comments that start with the words subgraph or end	|note
+//end
+
+//subgraph Titles
+A title	is written after	//subgraph	object|note
+A title	can be hidden by writing	//subgraph //Title	|note
+A title	can be left out by writing	//subgraph on its own	|note
+//subgraph //Hidden title example
+The first inner box	has	A hidden title	object|note
+//end
+//subgraph
+The second inner box	has	No title at all	object|note
+//end
+//end
+
+//subgraph Nesting
+A box inside another	is started with	A new //subgraph line before the outer //end	object|note
+//subgraph The inner box
+Each box	is closed with	Its own //end	object|note
+//end
+//end
+
+//subgraph Styling
+A box	can be styled by	Adding a format name after //end	object|note
+Adding a format name after //end	for example	This box ends with //end base	|note
+//end base
+
+//subgraph -TB Choosing a direction
+Direction	is set by writing	//subgraph -TB Title	object|note
+Direction	can be	LR or TB or BT or RL	|note
+Direction	is only used by Mermaid if	No node in the box links to anything outside it	|note
+//end
+
+//subgraph Linking subgraphs
+A subgraph title	can be used as	The subject or object of a triple	object|note
+A subgraph title	draws	A link to or from the whole box	|note
+A subgraph title	should not be the same as	The text of any node	|note
+A subgraph title	used inside another box	Draws its box inside that box	|note
+A subgraph title	needs a first line reading	//flowchart LR or //flowchart TB	|note
+//end
+
+//subgraph Repeating a label
+The same text	can appear in separate nodes by adding	#-1 or #-2 to the end	object|note
+The same text	for example	Painting#-1	|object
+The same text	for example	Painting#-2	|object
+//end
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Formatting|?example=doc_formatting	next page	This page: Subgraphs	url|note
+This page: Subgraphs	next page	Next: Blank nodes|?example=doc_blank_nodes	|url
+//end group
+
+//tour Subgraphs
+//step Subgraphs | | Subgraphs group parts of a model into boxes. This page is built from subgraphs so each box shows the feature it describes.
+//step Making a subgraph | Making a subgraph | A subgraph starts with a "double slash" //subgraph line and ends with a "double slash" //end line. Everything first used between the two lines is drawn inside the box. Take care with comments that begin with the words subgraph or end.
+//step Titles | Titles | The title follows "double slash" //subgraph. Starting the title with a "double slash" // hides it and leaving it out gives a box with no title.
+//step Nesting | Nesting | A box can sit inside another. Start it before the outer box ends and close each box with its own "double slash" //end line.
+//step Styling | Styling | Adding a format name after the "double slash" //end line styles the box. Any of the standard formats can be used.
+//step Choosing a direction | Choosing a direction | A box can have its own direction. Mermaid only uses it when no node inside the box links to anything outside it.
+//step Linking subgraphs | Subgraphs ; Linking subgraphs | A subgraph title can be used in a triple like any other node. Every box on this page is linked to the central Subgraphs node in this way.
+//sub The rules | Linking subgraphs | Linking needs the first line to start with "double slash" //flowchart. Give each box a title that no node uses. Mention a box title only outside other boxes or it will be drawn inside them.
+//step Repeating a label | Repeating a label | The same text normally means the same node. Adding #-1 or #-2 to the end makes separate nodes that show the same text.
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.

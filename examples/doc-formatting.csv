@@ -1,0 +1,76 @@
+//flowchart LR
+// Formatting the nodes of a model
+// An optional fourth column sets the formats: the subject format and the object format joined by a vertical bar.
+// Without it the tool chooses a format for each node itself.
+
+Formats	are set in	The format column	thing|
+Formats	are chosen for you by	Automatic formats
+Formats	come from	Named formats
+Formats	can change the text size with	Font size
+Formats	can draw a dashed border with	Dashed borders
+Formats	can also style	Subgraph boxes
+
+//subgraph The format column
+The fourth column	holds	Two format names joined by a vertical bar	object|note
+Two format names joined by a vertical bar	set in turn	The subject format then the object format	|note
+The fourth column	can leave out either side as in	thing| or |note	|note
+The fourth column	only counts	The first time a node appears	|note
+//end
+
+//subgraph Automatic formats
+The tool	gives subjects	object	object|object
+The tool	gives plain values	literal	|literal
+The tool	gives the object of has note	note	|note
+The tool	gives the object of has type	type	|type
+The tool	gives web links	url	|url
+//end
+
+//subgraph -TB Named formats
+Format names	include	thing	object|thing
+Format names	include	event	|event
+Format names	include	actor	|actor
+Format names	include	place	|place
+Format names	include	period	|period
+Format names	include	document	|document
+Format names	include	idea	|idea
+Format names	include	dims	|dims
+Format names	include	name	|name
+Format names	include	missing	|missing
+Format names	include	base	|base
+Format names	are all shown in	Every format|?example=example_formats	|url
+//end
+
+//subgraph Font size
+A font size	is set by adding	-fs and a number to a format name	object|note
+A font size	for example	Small text from note-fs10	|note-fs10
+A font size	for example	Large text from note-fs28	|note-fs28
+//end
+
+//subgraph Dashed borders
+A dashed border	is set by adding	Two numbers for the dash and the gap	object|note
+A dashed border	for example	Short dashes from object-4-4	|object-4-4
+A dashed border	for example	Long dashes from object-12-6	|object-12-6
+A dashed border	can be combined with a font size as in	Both together from object-fs20-6-4	|object-fs20-6-4
+//end
+
+//subgraph Subgraph boxes
+A subgraph box	is styled by	A format name after //end	object|note
+A subgraph box	can also take	The same font size and dash endings	|note
+//end sg1-6-4
+
+//subgraph -LR Documentation pages
+Home: Getting started|?example=documentation	tooltip	Back to the first documentation page	url|
+Previous: Layout|?example=doc_layout	next page	This page: Formatting	url|note
+This page: Formatting	next page	Next: Subgraphs|?example=doc_subgraphs	|url
+//end group
+
+//tour Formatting the nodes of a model
+//step Formats | | Each node is drawn in a format: a set of colours and shapes. The tool chooses one for you but you can also choose your own.
+//step The format column | The format column | An optional fourth column holds two format names joined by a vertical bar. The first sets the subject and the second the object. Either side can be left empty.
+//sub Only the first time | The first time a node appears | A format only counts the first time a node appears. Later lines can leave the column empty.
+//step Automatic formats | Automatic formats | Without a format column the tool chooses for you. Subjects are drawn as objects and plain values as literals. Notes and types and web links get their own formats.
+//step Named formats | Named formats | These are some of the named formats. Follow the Every format link to see them all.
+//step Font size | Font size | Adding "minus" -fs and a number to a format name sets the text size in pixels.
+//step Dashed borders | Dashed borders | Adding two numbers sets a dashed border: the length of each dash and then the gap. A font size can come first.
+//step Subgraph boxes | Subgraph boxes | A format name after the "double slash" //end line styles a subgraph box. The same endings work there too: this box ends with sg1-6-4.
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.

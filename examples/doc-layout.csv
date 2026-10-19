@@ -1,0 +1,64 @@
+//flowchart LR
+// The layout of a model
+// The first line of a model chooses the direction the whole diagram is drawn in.
+// This page uses //flowchart LR. The small boxes below show what the other directions look like.
+
+Layout	is chosen by	The first line	thing|
+Layout	can run	Left to right
+Layout	can run	Top to bottom
+Layout	can run	Bottom to top
+Layout	can run	Right to left
+Layout	used to offer	The fix option
+
+//subgraph The first line
+The first line	reads	//flowchart followed by a direction	object|note
+The first line	can be left out to get	A left to right layout	|note
+The first line	can also use	The older //graph form	|object
+The older //graph form	draws the same diagrams but cannot	Link whole subgraphs	|note
+//end
+
+//subgraph -LR Left to right
+First#-1	then	Second#-1	object|object
+Second#-1	then	Third#-1	|object
+Third#-1	is drawn by writing	//flowchart LR	|note
+//end
+
+//subgraph -TB Top to bottom
+First#-2	then	Second#-2	object|object
+Second#-2	then	Third#-2	|object
+Third#-2	is drawn by writing	//flowchart TB	|note
+//end
+
+//subgraph -BT Bottom to top
+First#-3	then	Second#-3	object|object
+Second#-3	then	Third#-3	|object
+Third#-3	is drawn by writing	//flowchart BT	|note
+//end
+
+//subgraph -RL Right to left
+First#-4	then	Second#-4	object|object
+Second#-4	then	Third#-4	|object
+Third#-4	is drawn by writing	//flowchart RL	|note
+//end
+
+//subgraph The fix option
+The word fix	is added to the end of the first line as in	//flowchart LR fix	object|note
+The word fix	was needed with	Older versions of Mermaid	|note
+Older versions of Mermaid	used it to	Straighten links so their labels stayed in place	|note
+The word fix	makes no difference with	The current version of Mermaid	|note
+//end
+
+//subgraph -LR Documentation pages
+Previous: Getting started|?example=documentation	next page	This page: Layout	url|note
+This page: Layout	next page	Next: Formatting|?example=doc_formatting	|url
+//end group
+
+//tour The layout of a model
+//step Layout | | The first line of a model chooses the direction the whole diagram is drawn in. This page is drawn from left to right.
+//step The first line | The first line | The first line reads "double slash" //flowchart followed by a direction. Without it a model is drawn from left to right. The older "double slash" //graph form draws the same diagrams but cannot link whole subgraphs.
+//step Left to right | Left to right | LR draws from left to right. It suits long chains of links and wide screens.
+//step Top to bottom | Top to bottom | TB draws from top to bottom. It suits tall pages and models that branch out.
+//step Bottom to top | Bottom to top | BT draws from bottom to top.
+//step Right to left | Right to left | RL draws from right to left.
+//step The fix option | The fix option | Adding the word fix to the end of the first line was needed with older versions of Mermaid. It makes no difference now and can be left out.
+//step Other pages | Documentation pages | Use these links to move between the documentation pages.
