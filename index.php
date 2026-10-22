@@ -61,6 +61,8 @@ else
   {$getmermaid = true;}  
 
 // Expects pako compressed data and pulls image directly from https://mermaid.ink
+// No longer used by the Links menu (pictures are now made in the page by js/export.js, 19 October 2026).
+// Kept so that older ?image= links still work; can be removed in future.
 if (isset($_GET["image"]))
   {getModelImage($_GET["image"]);
 	 exit;}  
@@ -245,7 +247,9 @@ function buildLinksDD ()
       Links
     </a>
   <div class="dropdown-menu  dropdown-menu-end" aria-labelledby="dropdownMenuLinks">
-    <a class="dropdown-item" id="downloadLink" title="Mermaid Get PNG" href="" download="model_$date.png">Download Image</a>    
+    <a class="dropdown-item" id="downloadPNG" href="#" title="Save the whole model as a PNG picture, with text 16 pixels high">Download PNG</a>
+    <a class="dropdown-item" id="downloadPNGLarge" href="#" title="Save the whole model as a PNG picture, with text 32 pixels high, for printing or slides">Download PNG (large text)</a>
+    <a class="dropdown-item" id="downloadSVG" href="#" title="Save the whole model as an SVG file, which stays sharp at any size">Download SVG</a>
 		<!-- <a class="dropdown-item" id="bookmarkOLD" title="Bookmark Link" href="" target="_blank">Bookmark Link</a> -->
     <a class="dropdown-item" id="bookmark" title="Copy shareable link to clipboard" href="">Copy Link</a>
     <a class="dropdown-item" id="mermaidLink" title="Edit further in the Mermaid Live Editor" href="" target="_blank">Mermaid Editor</a>
@@ -471,6 +475,7 @@ $modal
   <script src="./js/svg-pan-zoom.js" crossorigin="anonymous"></script> 
   <script src="./js/local.js"></script>
   <script src="js/tour.js"></script>
+  <script src="js/export.js"></script>
   <script>
  
   let code = JSON.stringify($json_code);
@@ -615,7 +620,7 @@ function buildModal ()
   {
   // Based on https://bbbootstrap.com/snippets/modal-multiple-tabs-89860645
   $tabs = array(
-    "Information" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD (experimental) into graphical models and flow diagrams using the <a href="https://mermaid.ai/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tool makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents an example set or data, and the generated model demonstrates the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Copy Link</b> option. A static image version of any given model can be saved by following the <b>Download Image</b> option and using the tools provide by the <a href="https://mermaid.ink/">Mermaid Ink</a> system. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid.ai/live">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
+    "Information" => 'This is an interactive live modelling system which can automatically convert simple <b>tab</b> separated triples or JSON-LD (experimental) into graphical models and flow diagrams using the <a href="https://mermaid.ai/">Mermaid Javascript library</a>. It has been designed to be very simple to use. The tab separated triples can be typed directly into the web-page, but users can also work and prepare data in three (or four columns if applying formatting) of a online spreadsheet and then just copy the relevant columns and paste them directly into the data entry text box.<br/><br/>In general the tool makes use of a simple set of predefined formats for the flow diagrams, taken from the Mermaid library, but a <a href="?example=example_formats">series of additional predefined formats</a> have also be provided and can be defined as a fourth "triple".<br/><br/>The <a href="./">default landing page</a> presents an example set or data, and the generated model demonstrates the functionality provided. As a new user it is recommended that you try editing this data to see how the diagrams are built. Additional examples are also available via the <b>Examples</b> menu option in the upper right.<br/><br/> The system has also be defined to allow models to be shared via automatically generate, and often quite long, URLs. This can be accessed via the <b>Links</b> menu option, as the <b>Copy Link</b> option. A picture of the whole model can be saved with the <b>Download PNG</b> or <b>Download SVG</b> options. PNG pictures are sized so that the text is always clear, whatever the size of the model, and SVG files stay sharp at any size. It is also possible to further edit a model using the full options of the Mermaid library using the <a href="https://mermaid.ai/live">Mermaid Live Editor</a>, via the <b>Mermaid Editor</b> link.
     <br/><br/>
     To learn how to use the tool, open the <b>Documentation</b> menu and start with <a href="./?example=documentation">Getting started</a>. Each documentation page has a guided tour.
     <br/><br/>

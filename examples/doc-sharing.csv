@@ -10,7 +10,9 @@ Your model	can be kept as	Plain text
 
 //subgraph The Links menu
 Copy Link	copies	A web address that rebuilds the model	object|note
-Download Image	saves	A picture of the model made by Mermaid Ink|https://mermaid.ink/	object|url
+Download PNG	saves	A picture of the whole model with text 16 pixels high	object|note
+Download PNG (large text)	saves	The same picture with text 32 pixels high	object|note
+Download SVG	saves	A drawing that stays sharp at any size	object|note
 Mermaid Editor	opens the model in	The Mermaid Live Editor|https://mermaid.live/	object|url
 Mermaid Code	copies	The Mermaid code behind the diagram	object|note
 //end
@@ -50,7 +52,7 @@ Previous: Tours|?example=doc_tours	next page	This page: Sharing	url|note
 
 //tour Sharing and embedding models
 //step Your model | | A model can be shared as a link or an image or plain text. It can also be shown on its own inside other web pages.
-//step The Links menu | The Links menu | Copy Link copies a web address that rebuilds the model. Download Image saves a picture. Mermaid Editor and Mermaid Code pass the diagram on to Mermaid's own tools.
+//step The Links menu | The Links menu | Copy Link copies a web address that rebuilds the model. Download PNG and Download SVG save a picture of the whole model. PNG pictures are sized so that the text is always clear. Mermaid Editor and Mermaid Code pass the diagram on to Mermaid's own tools.
 //step Simple mode | Simple mode | Adding &simple to a model's web address shows only the model and its tour. It works with example names and file addresses but not yet with Copy Link addresses.
 //step Other web pages | Other web pages | To show a model inside another web page use an iframe whose address ends with &simple. The model keeps its tour and pan and zoom.
 //step Web address options | Web address options | The web address can open an example by name or a file from another site. It can also return just the Mermaid code.
